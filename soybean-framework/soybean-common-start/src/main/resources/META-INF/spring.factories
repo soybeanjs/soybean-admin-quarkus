@@ -1,0 +1,7 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.soybean.framework.boot.base.GlobalExceptionHandler,\
+  com.soybean.framework.boot.base.configuration.InitBaseConfiguration ,\
+  com.soybean.framework.boot.log.configuration.LogAutoConfiguration,\
+  com.soybean.framework.boot.base.configuration.DynamicDatasourceWebAutoConfigurer,\
+  com.soybean.framework.boot.undertow.UndertowPoolCustomizer,\
+  com.soybean.framework.boot.response.GlobalResponseBodyAdvice

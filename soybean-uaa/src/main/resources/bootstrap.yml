@@ -1,0 +1,35 @@
+server:
+  port: 10002
+spring:
+  profiles:
+    active: '@spring.active@'
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  application:
+    name: '@project.artifactId@'
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+      discovery:
+        metadata:
+          group: ${spring.application.name}
+          version: 1.0
+      config:
+        server-addr: localhost:8848
+        refresh-enabled: true
+        # 默认会自动加载一个 applicationName.properties
+        extension-configs:
+          - data-id: mybatis-plus-default.yaml
+    sentinel:
+      # 是否开启sentinel
+      enabled: true
+      filter:
+        enabled: true
+      # 取消Sentinel控制台懒加载
+      eager: true
+      transport:
+        #port: @sentinel.port@
+        dashboard: ${SENTINEL.URL:localhost:8858}
+        port: 8719
+        client-ip: 127.0.0.1

@@ -1,0 +1,39 @@
+server:
+  port: 10003
+spring:
+  profiles:
+    active: '@spring.active@'
+  application:
+    name: '@project.artifactId@'
+  main:
+    allow-bean-definition-overriding: true
+  boot:
+    admin:
+      context-path: /monitor
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+  security:
+    user:
+      name: "admin"
+      password: "123456"
+  thymeleaf:
+    check-template: false #关闭
+    check-template-location: false
+management:
+  #spring-boot-actuator-autoconfigure-2.6.7.jar spring-configuration-metadata.json
+  health:
+    redis:
+      enabled: false #关闭redis健康检查
+    ldap:
+      enabled: false #关闭ldap健康检查
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+    health:
+      sensitive: false #关闭过滤敏感信息
+  endpoint:
+    health:
+      show-details: ALWAYS

@@ -1,0 +1,29 @@
+# Compiled class file
+*.class
+*.iml
+*.idea
+target/
+logs/
+
+# Log file
+*.log
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.tar.gz
+*.rar
+
+*velocity.log*
+
+# Eclipse #
+.classpath
+.project
+.settings/
+
+.DS_Store
+
+rebel.xml
+/deploy/env-build/docker/dev/data/
+/deploy/env-build/docker/dev/standalone-logs/

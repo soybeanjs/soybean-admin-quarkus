@@ -1,0 +1,6 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.soybean.framework.db.configuration.encode.EncryptHikariDataSourceConfiguration,\
+  com.soybean.framework.db.configuration.dynamic.TenantDynamicDataSourceEventBusAutoConfiguration
+
+
