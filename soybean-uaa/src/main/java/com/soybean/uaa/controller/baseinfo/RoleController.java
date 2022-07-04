@@ -3,11 +3,11 @@ package com.soybean.uaa.controller.baseinfo;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.soybean.framework.commons.BeanUtilPlus;
 import com.soybean.framework.commons.annotation.log.SysLog;
 import com.soybean.framework.commons.entity.Result;
+import com.soybean.framework.commons.util.BeanUtilPlus;
 import com.soybean.framework.db.TenantEnvironment;
-import com.soybean.framework.db.mybatis.auth.DataScopeType;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScopeType;
 import com.soybean.framework.db.mybatis.conditions.Wraps;
 import com.soybean.uaa.domain.dto.RoleDTO;
 import com.soybean.uaa.domain.dto.RoleResSaveDTO;

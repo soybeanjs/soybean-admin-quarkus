@@ -2,8 +2,8 @@ package com.soybean.framework.db.configuration.encode;
 
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.crypto.SecureUtil;
-import com.soybean.framework.commons.StringUtils;
 import com.soybean.framework.commons.exception.CheckedException;
+import com.soybean.framework.commons.util.StringUtils;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 /**
- *
  * @author wenxina
  * @see org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
  */

@@ -27,3 +27,4 @@ logs/
 rebel.xml
 /deploy/env-build/docker/dev/data/
 /deploy/env-build/docker/dev/standalone-logs/
+/deploy/env-build/docker/dev/mysql/

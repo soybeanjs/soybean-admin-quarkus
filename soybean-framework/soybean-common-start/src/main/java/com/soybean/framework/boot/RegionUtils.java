@@ -30,7 +30,6 @@ public class RegionUtils {
 
     static {
         try {
-            // 因为jar无法读取文件,复制创建临时文件
             String dbPath = RegionUtils.class.getResource("/ip2region/ip2region.db").getPath();
             File file = new File(dbPath);
             if (!file.exists()) {

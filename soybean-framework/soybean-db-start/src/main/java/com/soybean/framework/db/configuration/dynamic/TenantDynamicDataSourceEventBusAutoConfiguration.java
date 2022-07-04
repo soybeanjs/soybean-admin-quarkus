@@ -5,7 +5,7 @@ import com.baomidou.dynamic.datasource.processor.DsHeaderProcessor;
 import com.baomidou.dynamic.datasource.processor.DsProcessor;
 import com.baomidou.dynamic.datasource.processor.DsSessionProcessor;
 import com.baomidou.dynamic.datasource.processor.DsSpelExpressionProcessor;
-import com.soybean.framework.commons.StringUtils;
+import com.soybean.framework.commons.util.StringUtils;
 import com.soybean.framework.db.TenantEnvironment;
 import com.soybean.framework.db.configuration.dynamic.event.DynamicDatasourceEvent;
 import com.soybean.framework.db.configuration.dynamic.event.DynamicDatasourceEventListener;
@@ -25,7 +25,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- *
  * @author wenxina
  */
 @Slf4j

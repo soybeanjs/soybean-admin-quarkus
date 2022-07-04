@@ -1,9 +1,10 @@
 package com.soybean.uaa.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.soybean.framework.db.mybatis.auth.DataScope;
-import com.soybean.framework.db.mybatis.auth.DataScopeService;
-import com.soybean.framework.db.mybatis.auth.DataScopeType;
+import com.google.common.collect.Sets;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScope;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScopeType;
+import com.soybean.framework.db.mybatis.auth.permission.service.DataScopeService;
 import com.soybean.framework.db.mybatis.conditions.Wraps;
 import com.soybean.uaa.domain.entity.baseinfo.Org;
 import com.soybean.uaa.domain.entity.baseinfo.Role;
@@ -41,24 +42,28 @@ public class DataScopeServiceImpl implements DataScopeService {
     @Override
     public DataScope getDataScopeById(Long userId) {
         DataScope scope = new DataScope();
-        List<Long> orgIds = new ArrayList<>();
+        Set<Long> orgIds = Sets.newHashSet();
         List<Role> list = roleMapper.findRoleByUserId(userId);
         if (CollectionUtils.isEmpty(list)) {
+            scope.setSelf(true);
             return scope;
         }
         // 找到 dsType 最大的角色， dsType越大，角色拥有的权限最大
         Optional<Role> max = list.stream().max(Comparator.comparingInt((item) -> item.getScopeType().getVal()));
-        if (!max.isPresent()) {
+        if (max.isEmpty()) {
+            scope.setSelf(true);
             return scope;
         }
         Role role = max.get();
         DataScopeType scopeType = role.getScopeType();
         scope.setScopeType(role.getScopeType());
-        if (DataScopeType.CUSTOMIZE.eq(scopeType)) {
+        if (DataScopeType.ALL.eq(scopeType)) {
+            scope.setAll(true);
+        } else if (DataScopeType.CUSTOMIZE.eq(scopeType)) {
             List<RoleOrg> roleOrgList = roleOrgMapper.selectList(Wraps.<RoleOrg>lbQ()
                     .select(RoleOrg::getOrgId)
                     .eq(RoleOrg::getRoleId, role.getId()));
-            orgIds = roleOrgList.stream().mapToLong(RoleOrg::getOrgId).boxed().collect(Collectors.toList());
+            orgIds.addAll(roleOrgList.stream().mapToLong(RoleOrg::getOrgId).boxed().collect(Collectors.toList()));
         } else if (DataScopeType.THIS_LEVEL.eq(scopeType)) {
             User user = userMapper.selectById(userId);
             if (user != null && user.getOrgId() != null) {
@@ -69,9 +74,11 @@ public class DataScopeServiceImpl implements DataScopeService {
             if (user != null && user.getOrgId() != null) {
                 List<Org> orgList = findChildren(Collections.singletonList(user.getOrgId()));
                 if (CollectionUtil.isNotEmpty(orgList)) {
-                    orgIds.addAll(orgList.stream().mapToLong(Org::getId).boxed().collect(Collectors.toList()));
+                    orgIds.addAll(orgList.stream().mapToLong(Org::getId).boxed().collect(Collectors.toSet()));
                 }
             }
+        } else {
+            scope.setSelf(true);
         }
         scope.setOrgIds(orgIds);
         return scope;

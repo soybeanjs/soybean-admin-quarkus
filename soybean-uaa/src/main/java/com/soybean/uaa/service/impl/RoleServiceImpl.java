@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 import com.soybean.framework.commons.exception.CheckedException;
 import com.soybean.framework.db.TenantEnvironment;
 import com.soybean.framework.db.mybatis.SuperServiceImpl;
-import com.soybean.framework.db.mybatis.auth.DataScope;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScope;
 import com.soybean.framework.db.mybatis.conditions.Wraps;
 import com.soybean.uaa.domain.dto.ResourceQueryDTO;
 import com.soybean.uaa.domain.dto.RoleDTO;

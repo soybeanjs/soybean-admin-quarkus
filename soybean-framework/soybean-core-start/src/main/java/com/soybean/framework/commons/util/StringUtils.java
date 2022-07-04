@@ -1,4 +1,4 @@
-package com.soybean.framework.commons;
+package com.soybean.framework.commons.util;
 
 import java.text.NumberFormat;
 import java.util.regex.Matcher;

@@ -3,8 +3,8 @@ package com.soybean.uaa.domain.converts;
 
 import cn.hutool.core.lang.tree.TreeNode;
 import com.google.common.collect.Maps;
-import com.soybean.framework.commons.StringUtils;
 import com.soybean.framework.commons.entity.BaseConverts;
+import com.soybean.framework.commons.util.StringUtils;
 import com.soybean.uaa.domain.vo.VueRouter;
 
 import java.util.Map;

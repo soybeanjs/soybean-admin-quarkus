@@ -92,10 +92,9 @@
             <properties>
                 <!--开发环境-->
                 <spring.active>dev</spring.active>
+                <nacos.server-addr>120.48.68.52:30870</nacos.server-addr>
+                <nacos.namespace>dev</nacos.namespace>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <id>test</id>
@@ -155,10 +154,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-site-plugin</artifactId>-->
+            <!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -181,6 +180,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-javadoc-plugin</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <show>private</show>-->
+            <!--                    <nohelp>true</nohelp>-->
+            <!--                    <charset>UTF-8</charset>-->
+            <!--                    <encoding>UTF-8</encoding>-->
+            <!--                    <docencoding>UTF-8</docencoding>-->
+            <!--                    <additionalJOption>-Xdoclint:none</additionalJOption>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
 

@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 带负载均衡的请求
@@ -58,7 +59,7 @@ public class LoadBalancedResourceServerConfigurerAdapter extends ResourceServerC
                 log.debug("[key] - [{}] - [value] - [{}]", key, value);
             }
             if (annotation != null && !annotation.web()) {
-                key.getPathPatternsCondition().getPatterns().forEach(pathPattern -> registry.antMatchers(pathPattern.getPatternString()).permitAll());
+                Objects.requireNonNull(key.getPathPatternsCondition()).getPatterns().forEach(pathPattern -> registry.antMatchers(pathPattern.getPatternString()).permitAll());
             }
         }
         List<String> ignoreUrls = securityIgnoreProperties.getResourceUrls();

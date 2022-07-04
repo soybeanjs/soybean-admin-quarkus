@@ -1,5 +1,8 @@
-package com.soybean.framework.db.mybatis.auth;
+package com.soybean.framework.db.mybatis.auth.permission.aop;
 
+import com.soybean.framework.db.mybatis.auth.permission.DataScopeEnvironment;
+import com.soybean.framework.db.mybatis.auth.permission.annotation.DataPermission;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScope;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,7 +22,7 @@ public class DataScopeAspect implements Ordered {
 
 
     @Around("@annotation(scope)")
-    public Object around(ProceedingJoinPoint point, Scope scope) throws Throwable {
+    public Object around(ProceedingJoinPoint point, DataPermission scope) throws Throwable {
         final DataScope build = DataScope.builder().scopeType(scope.scopeType()).selfScopeName(scope.selfScopeName()).build();
         DataScopeEnvironment.set(build);
         Object object = point.proceed();

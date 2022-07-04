@@ -1,4 +1,4 @@
-package com.soybean.framework.commons;
+package com.soybean.framework.commons.util;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ReflectUtil;

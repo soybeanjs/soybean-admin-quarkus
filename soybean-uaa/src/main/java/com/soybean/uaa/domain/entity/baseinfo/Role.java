@@ -4,7 +4,7 @@ package com.soybean.uaa.domain.entity.baseinfo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.soybean.framework.commons.entity.Entity;
-import com.soybean.framework.db.mybatis.auth.DataScopeType;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScopeType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

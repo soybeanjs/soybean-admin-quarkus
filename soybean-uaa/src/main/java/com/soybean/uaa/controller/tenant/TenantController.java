@@ -2,8 +2,8 @@ package com.soybean.uaa.controller.tenant;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.soybean.framework.commons.BeanUtilPlus;
 import com.soybean.framework.commons.annotation.log.SysLog;
+import com.soybean.framework.commons.util.BeanUtilPlus;
 import com.soybean.framework.db.mybatis.conditions.Wraps;
 import com.soybean.framework.security.client.annotation.IgnoreAuthorize;
 import com.soybean.uaa.domain.dto.TenantConfigDTO;

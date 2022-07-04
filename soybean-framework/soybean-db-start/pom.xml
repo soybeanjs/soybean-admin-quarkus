@@ -69,8 +69,16 @@
         </dependency>
 
         <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>transmittable-thread-local</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.soybean</groupId>
             <artifactId>soybean-core-start</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.soybean</groupId>
+            <artifactId>soybean-oauth2-start</artifactId>
         </dependency>
     </dependencies>
 

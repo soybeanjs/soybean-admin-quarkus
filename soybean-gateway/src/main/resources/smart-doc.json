@@ -1,0 +1,16 @@
+{
+  "outPath": "/doc",
+  "coverOld": true,
+  "inlineEnum": true,
+  "isStrict": false,
+  "isReplace": true,
+  "appToken": "appToken",
+  "openUrl": "http://ip:port/api",
+  "tornaDebug": false,
+  "debugEnvName": "测试环境",
+  "replace": true,
+  "debugEnvUrl": "http://ip:port/api",
+  "responseBodyAdvice": {
+    "className": "com.soybean.framework.commons.entity.Result"
+  }
+}

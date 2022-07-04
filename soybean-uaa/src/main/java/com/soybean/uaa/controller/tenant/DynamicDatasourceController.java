@@ -2,8 +2,8 @@ package com.soybean.uaa.controller.tenant;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.soybean.framework.commons.BeanUtilPlus;
 import com.soybean.framework.commons.entity.Result;
+import com.soybean.framework.commons.util.BeanUtilPlus;
 import com.soybean.framework.db.mybatis.conditions.Wraps;
 import com.soybean.framework.db.page.PageRequest;
 import com.soybean.uaa.domain.dto.DynamicDatasourceReq;

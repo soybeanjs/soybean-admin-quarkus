@@ -1,10 +1,8 @@
 package com.soybean.gateway;
 
-import com.soybean.framework.boot.listener.AppStartupListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.context.annotation.Bean;
 
 /**
  * 网关应用程序
@@ -20,8 +18,4 @@ public class GatewayApplication {
         SpringApplication.run(GatewayApplication.class, args);
     }
 
-    @Bean
-    public AppStartupListener appStartupListener() {
-        return new AppStartupListener();
-    }
 }

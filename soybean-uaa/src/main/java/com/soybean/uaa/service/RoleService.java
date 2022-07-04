@@ -1,7 +1,7 @@
 package com.soybean.uaa.service;
 
 import com.soybean.framework.db.mybatis.SuperService;
-import com.soybean.framework.db.mybatis.auth.DataScope;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScope;
 import com.soybean.uaa.domain.dto.RoleDTO;
 import com.soybean.uaa.domain.entity.baseinfo.Role;
 import com.soybean.uaa.domain.vo.RolePermissionResp;

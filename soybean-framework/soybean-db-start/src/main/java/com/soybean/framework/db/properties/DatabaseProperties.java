@@ -3,6 +3,7 @@ package com.soybean.framework.db.properties;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
@@ -99,6 +100,10 @@ public class DatabaseProperties {
          * 租户数据源切换拦截器（不建议使用）
          */
         private boolean dsInterceptor;
+
+        public boolean isSuperTenant(String tenantCode) {
+            return StringUtils.isNotBlank(tenantCode) && StringUtils.equals(tenantCode, superTenantCode);
+        }
     }
 
     @Data

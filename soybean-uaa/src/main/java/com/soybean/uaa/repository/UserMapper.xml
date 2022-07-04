@@ -9,7 +9,7 @@
         <result column="last_modified_by" jdbcType="BIGINT" property="lastModifiedBy"/>
         <result column="last_modified_time" jdbcType="TIMESTAMP" property="lastModifiedTime"/>
         <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
-        <result column="org_id" jdbcType="BIGINT" property="org"/>
+        <result column="org_id" jdbcType="BIGINT" property="orgId"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
         <result column="avatar" jdbcType="VARCHAR" property="avatar"/>

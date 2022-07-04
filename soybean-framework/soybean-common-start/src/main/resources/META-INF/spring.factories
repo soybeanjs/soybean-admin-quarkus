@@ -4,4 +4,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.soybean.framework.boot.log.configuration.LogAutoConfiguration,\
   com.soybean.framework.boot.base.configuration.DynamicDatasourceWebAutoConfigurer,\
   com.soybean.framework.boot.undertow.UndertowPoolCustomizer,\
-  com.soybean.framework.boot.response.GlobalResponseBodyAdvice
+  com.soybean.framework.boot.response.GlobalResponseBodyAdvice,\
+  com.soybean.framework.boot.db.TenantEnvironmentConfiguration,\
+  com.soybean.framework.boot.db.BaseMybatisConfiguration

@@ -1,6 +1,6 @@
 package com.soybean.framework.commons.validation.name;
 
-import com.soybean.framework.commons.StringUtils;
+import com.soybean.framework.commons.util.StringUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

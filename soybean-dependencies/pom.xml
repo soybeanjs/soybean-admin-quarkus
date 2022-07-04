@@ -28,6 +28,16 @@
         <maven-javadoc-plugin.version>3.3.2</maven-javadoc-plugin.version>
         <maven-deploy-plugin.version>3.0.0-M2</maven-deploy-plugin.version>
         <maven-dockerfile-plugin.version>1.4.13</maven-dockerfile-plugin.version>
+        <docker-maven-plugin.version>1.2.2</docker-maven-plugin.version>
+        <fabric8-docker-maven-plugin.version>0.39.1</fabric8-docker-maven-plugin.version>
+        <docker.baseImage>amazoncorretto:11.0.15</docker.baseImage>
+        <docker.volumes>/tmp</docker.volumes>
+        <docker.java.security.egd>-Djava.security.egd=file:/dev/./urandom</docker.java.security.egd>
+        <docker.java.opts>-Xms256m -Xmx512m</docker.java.opts>
+        <docker.dockerHost>https://localhost:2375</docker.dockerHost>
+        <docker.pushRegistry>ip/library/library</docker.pushRegistry>
+        <docker.pullRegistry>ip/library/library</docker.pullRegistry>
+        <docker.maintainer>1571339199@qq.com</docker.maintainer>
 
         <versions-maven-plugin.version>2.10.0</versions-maven-plugin.version>
         <dependency-mediator-maven-plugin.version>1.0.2</dependency-mediator-maven-plugin.version>
@@ -47,15 +57,16 @@
         <!--    maven/project 等配置相关 end    -->
 
         <!--    spring全家桶 start    -->
-        <spring-boot.version>2.6.7</spring-boot.version>
-        <spring-cloud.version>2021.0.2</spring-cloud.version>
-        <spring-boot-admin.version>2.6.7</spring-boot-admin.version>
+        <spring-boot.version>2.7.1</spring-boot.version>
+        <spring-cloud.version>2021.0.3</spring-cloud.version>
+        <spring-boot-admin.version>2.7.1</spring-boot-admin.version>
         <!--    spring全家桶 end    -->
 
         <!--    阿里系 start    -->
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
+        <spring-cloud-starter-alicloud.version>2.2.0.RELEASE</spring-cloud-starter-alicloud.version>
         <sentinel.version>1.8.4</sentinel.version>
-        <dubbo.version>3.0.7</dubbo.version>
+        <dubbo.version>3.0.9</dubbo.version>
         <nacos-client.version>2.1.0</nacos-client.version>
         <!--    阿里系 end    -->
 
@@ -64,10 +75,10 @@
         <postgresql-connector.version>42.3.5</postgresql-connector.version>
         <clickhouse-jdbc.version>0.3.2</clickhouse-jdbc.version>
         <druid.version>1.2.9</druid.version>
-        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
+        <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.2</mybatis-plus-generator.version>
         <dynamic-datasource.version>3.5.1</dynamic-datasource.version>
-        <seata.version>1.4.2</seata.version>
+        <seata.version>1.5.1.1</seata.version>
         <sharding-jdbc.version>4.1.1</sharding-jdbc.version>
         <!--    数据源及相关类库 end    -->
 
@@ -85,15 +96,15 @@
 
         <!--    json start    -->
         <jackson.version>2.13.3</jackson.version>
-        <fastjson.version>1.2.79</fastjson.version>
+        <fastjson.version>2.0.8.graal</fastjson.version>
         <gson.version>2.9.0</gson.version>
         <!--    json end    -->
 
         <elasticsearch-rest-high-level-client.version>8.0.0-alpha2</elasticsearch-rest-high-level-client.version>
         <elastic.version>8.2.0</elastic.version>
         <opentracing-spring-cloud.version>0.5.9</opentracing-spring-cloud.version>
-        <xxl-job.version>2.3.0</xxl-job.version>
-        <prometheus.version>1.9.0</prometheus.version>
+        <xxl-job.version>2.3.1</xxl-job.version>
+        <prometheus.version>1.9.1</prometheus.version>
         <jjwt.version>0.9.1</jjwt.version>
         <easy-captcha.version>1.6.2</easy-captcha.version>
         <jakarta-validation-api.version>3.0.1</jakarta-validation-api.version>
@@ -101,7 +112,7 @@
         <velocity.version>1.7</velocity.version>
         <jasypt.version>3.0.4</jasypt.version>
 
-        <easyexcel.version>3.1.0</easyexcel.version>
+        <easyexcel.version>3.1.1</easyexcel.version>
         <poi.version>5.2.2</poi.version>
         <easypoi.version>4.4.0</easypoi.version>
 
@@ -113,11 +124,11 @@
 
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <redisson.version>3.17.1</redisson.version>
+        <redisson.version>3.17.4</redisson.version>
         <lettuce.version>6.1.8.RELEASE</lettuce.version>
-        <transmittable.version>2.13.0-Beta1</transmittable.version>
+        <transmittable.version>2.13.2</transmittable.version>
 
-        <hutool.version>5.8.0</hutool.version>
+        <hutool.version>5.8.4</hutool.version>
         <guava.version>31.1-jre</guava.version>
         <lombok.version>1.18.24</lombok.version>
 
@@ -166,6 +177,13 @@
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
                 <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alicloud</artifactId>
+                <version>${spring-cloud-starter-alicloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -738,17 +756,17 @@
                         <!--修改imageName节点的内容，改为私有仓库地址和端口，再加上镜像id和 TAG,我们要直接传到私服-->
                         <!--配置最后生成的镜像名，docker images里的，我们这边取项目名:版本-->
                         <imageName>${project.build.finalName}:${project.version}</imageName>
-                        <!--也可以通过以下方式定义image的tag信息。 
-                        <imageTags> 
+                        <!--也可以通过以下方式定义image的tag信息。
+                        <imageTags>
                             <imageTag>1.0</imageTag>
                         </imageTags> -->
                         <!--来指明Dockerfile文件的所在目录-->
                         <dockerDirectory>${project.basedir}</dockerDirectory>
-                        <!--<dockerHost>http://ip:port</dockerHost>-->
+                        <dockerHost>${docker.dockerHost}</dockerHost>
                         <!--入口点，project.build.finalName就是project标签下的build标签下 的filename标签内容，testDocker-->
                         <!--相当于启动容器后，会自动执行java-jar/testDocker.jar-->
                         <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
-                        <!--是否推送到docker私有仓库，旧版本插件要配置maven的settings文件。 小伙伴们可以自行查阅资料研究一下。 
+                        <!--是否推送到docker私有仓库，旧版本插件要配置maven的settings文件。 小伙伴们可以自行查阅资料研究一下。
                         <pushImage>true</pushImage>
                         <registryUrl>ip:port/data</registryUrl> --> <!-- 这里是复制 jar 包到 docker 容器指定目录配置 -->
                         <resources>
@@ -760,6 +778,17 @@
                             </resource>
                         </resources>
                     </configuration>
+                </plugin>
+                <!--        推荐用下面的fabric8或者spring-maven-plugin  spotify很久没更新了        -->
+                <!--                <plugin>-->
+                <!--                    <groupId>com.spotify</groupId>-->
+                <!--                    <artifactId>docker-maven-plugin</artifactId>-->
+                <!--                    <version>${docker-maven-plugin.version}</version>-->
+                <!--                </plugin>-->
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${fabric8-docker-maven-plugin.version}</version>
                 </plugin>
 
                 <plugin>

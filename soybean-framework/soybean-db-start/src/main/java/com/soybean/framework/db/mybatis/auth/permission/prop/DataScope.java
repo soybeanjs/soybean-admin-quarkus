@@ -1,4 +1,4 @@
-package com.soybean.framework.db.mybatis.auth;
+package com.soybean.framework.db.mybatis.auth.permission.prop;
 
 import com.soybean.framework.commons.entity.Entity;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author wenxina
@@ -32,7 +32,7 @@ public class DataScope {
     /**
      * 具体的数据范围
      */
-    private List<Long> orgIds;
+    private Set<Long> orgIds;
     /**
      * 限制范围的字段名称 （除个人外）
      */
@@ -44,4 +44,14 @@ public class DataScope {
     @Builder.Default
     private DataScopeType scopeType = DataScopeType.SELF;
 
+    /**
+     * 是否可查看全部数据
+     */
+    @Builder.Default
+    private Boolean all = false;
+    /**
+     * 是否可查看自己的数据
+     */
+    @Builder.Default
+    private Boolean self = false;
 }

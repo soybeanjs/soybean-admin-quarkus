@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.*;
 import com.soybean.framework.db.TenantEnvironment;
 import com.soybean.framework.db.configuration.handler.MyBatisMetaObjectHandler;
 import com.soybean.framework.db.injector.MySqlInjector;
-import com.soybean.framework.db.mybatis.auth.DataScopeAspect;
+import com.soybean.framework.db.mybatis.auth.permission.aop.DataScopeAspect;
 import com.soybean.framework.db.properties.DatabaseProperties;
 import com.soybean.framework.db.properties.MultiTenantType;
 import lombok.RequiredArgsConstructor;

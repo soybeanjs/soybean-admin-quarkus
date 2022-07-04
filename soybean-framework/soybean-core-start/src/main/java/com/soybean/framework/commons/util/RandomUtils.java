@@ -1,4 +1,4 @@
-package com.soybean.framework.commons;
+package com.soybean.framework.commons.util;
 
 import org.apache.commons.lang3.StringUtils;
 

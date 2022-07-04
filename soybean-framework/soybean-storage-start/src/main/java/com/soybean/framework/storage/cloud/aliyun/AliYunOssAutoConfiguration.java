@@ -4,6 +4,7 @@ import com.aliyun.oss.ClientConfiguration;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.auth.CredentialsProvider;
 import com.aliyun.oss.common.auth.DefaultCredentialProvider;
+import com.soybean.framework.storage.AliYunStorageOperation;
 import com.soybean.framework.storage.endpoint.OssEndpoint;
 import com.soybean.framework.storage.properties.AliYunStorageProperties;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static com.soybean.framework.storage.StorageOperation.ALI_YUN_STORAGE_OPERATION;
 import static com.soybean.framework.storage.StorageOperation.OSS_CONFIG_PREFIX_ALIYUN;
 
 /**
@@ -30,6 +32,11 @@ public class AliYunOssAutoConfiguration {
     public OSSClient ossClient(AliYunStorageProperties properties) {
         CredentialsProvider provider = new DefaultCredentialProvider(properties.getAccessKey(), properties.getSecretKey());
         return new OSSClient(properties.getEndpoint(), provider, new ClientConfiguration());
+    }
+
+    @Bean(ALI_YUN_STORAGE_OPERATION)
+    public AliYunStorageOperation aliYunStorageOperation(OSSClient ossClient, AliYunStorageProperties properties) {
+        return new AliYunStorageOperation(ossClient, properties);
     }
 
     @Bean

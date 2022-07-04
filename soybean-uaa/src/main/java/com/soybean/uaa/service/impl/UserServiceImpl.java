@@ -5,7 +5,7 @@ import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.soybean.framework.commons.exception.CheckedException;
 import com.soybean.framework.db.mybatis.SuperServiceImpl;
-import com.soybean.framework.db.mybatis.auth.DataScope;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScope;
 import com.soybean.framework.db.mybatis.conditions.Wraps;
 import com.soybean.framework.db.mybatis.conditions.query.LbqWrapper;
 import com.soybean.uaa.domain.dto.UserSaveDTO;

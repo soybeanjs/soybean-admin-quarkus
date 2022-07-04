@@ -1,0 +1,36 @@
+{
+  "outPath": "/doc",
+  "coverOld": true,
+  "inlineEnum": true,
+  "isStrict": false,
+  "isReplace": true,
+  "appToken": "appToken",
+  "openUrl": "http://ip:port/api",
+  "tornaDebug": false,
+  "debugEnvName": "测试环境",
+  "replace": true,
+  "debugEnvUrl": "http://ip:port/api",
+  "requestHeaders": [
+    {
+      "name": "Authorization",
+      "type": "string",
+      "desc": "通过oauth/token获取token信息",
+      "value": "token请求头的值",
+      "required": true,
+      "since": "1.0-SNAPSHOT",
+      "excludePathPatterns": "/oauth/token"
+    },
+    {
+      "name": "tenant_code",
+      "type": "string",
+      "desc": "租户编码",
+      "value": "0000",
+      "required": false,
+      "since": "1.0-SNAPSHOT",
+      "excludePathPatterns": "/oauth/token"
+    }
+  ],
+  "responseBodyAdvice": {
+    "className": "com.soybean.framework.commons.entity.Result"
+  }
+}

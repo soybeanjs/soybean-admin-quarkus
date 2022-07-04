@@ -3,9 +3,8 @@ package com.soybean.uaa.controller.baseinfo;
 import cn.hutool.core.collection.CollectionUtil;
 import com.google.common.collect.Lists;
 import com.soybean.framework.commons.entity.Result;
-import com.soybean.framework.db.mybatis.auth.DataScope;
-import com.soybean.framework.db.mybatis.auth.DataScopeService;
-import com.soybean.framework.security.client.annotation.IgnoreAuthorize;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScope;
+import com.soybean.framework.db.mybatis.auth.permission.service.DataScopeService;
 import com.soybean.uaa.domain.entity.baseinfo.Role;
 import com.soybean.uaa.domain.entity.baseinfo.User;
 import com.soybean.uaa.domain.vo.DictResp;
@@ -59,11 +58,9 @@ public class AuthorityController {
         return Result.success(result);
     }
 
-    @IgnoreAuthorize
-    @GetMapping("/list")
-    public Result<DataScope> list() {
-        return Result.success(dataScopeService.getDataScopeById(7L));
+    @GetMapping("/getDataScopeById")
+    public DataScope getDataScopeById(Long userId) {
+        return dataScopeService.getDataScopeById(userId);
     }
-
 
 }

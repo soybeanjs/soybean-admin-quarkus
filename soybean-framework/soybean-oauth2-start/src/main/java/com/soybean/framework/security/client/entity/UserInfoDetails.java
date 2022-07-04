@@ -1,5 +1,7 @@
 package com.soybean.framework.security.client.entity;
 
+import cn.hutool.core.map.MapUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author wenxina
@@ -40,6 +44,13 @@ public class UserInfoDetails implements UserDetails, CredentialsContainer, java.
     private Collection<String> permissions = new ArrayList<>();
     private Collection<String> roles = new ArrayList<>();
     private Collection<GrantedAuthority> authorities;
+    /**
+     * 上下文字段，不进行持久化
+     * <p>
+     * 1. 用于基于 LoginUser 维度的临时缓存
+     */
+    @JsonIgnore
+    private Map<String, Object> context;
 
 
     @Override
@@ -77,8 +88,21 @@ public class UserInfoDetails implements UserDetails, CredentialsContainer, java.
         return true;
     }
 
+    // ========== 上下文 ==========
+
     @Override
     public boolean isEnabled() {
         return this.enabled;
+    }
+
+    public void setContext(String key, Object value) {
+        if (context == null) {
+            context = new HashMap<>();
+        }
+        context.put(key, value);
+    }
+
+    public <T> T getContext(String key, Class<T> type) {
+        return MapUtil.get(context, key, type);
     }
 }

@@ -15,10 +15,8 @@
     </sql>
 
     <select id="findVisibleResource" resultType="com.soybean.uaa.domain.vo.VueRouter">
-        SELECT
-        t1.*
-        FROM
-        sys_resource t1
+        SELECT t1.*
+        FROM sys_resource t1
         WHERE
         1 = 1
         <if test="resource.type != null">
@@ -27,50 +25,39 @@
         <if test="resource.parentId != null">
             and t1.parent_id = #{resource.parentId}
         </if>
-        and t1.id IN (
-        SELECT
-        res_id
-        FROM
-        sys_role_res
-        WHERE
-        role_id IN ( SELECT role_id FROM sys_user_role WHERE `user_id` = #{resource.userId} ))
+        and t1.id IN (SELECT res_id
+        FROM sys_role_res
+        WHERE role_id IN (SELECT role_id FROM sys_user_role WHERE `user_id` = #{resource.userId}))
         OR t1.`global`
-        ORDER BY
-        t1.`sequence`
+        ORDER BY t1.`sequence`
     </select>
 
 
     <select id="queryPermissionByUserId" resultType="java.lang.String">
-        SELECT DISTINCT
-        DISTINCT ( t2.`permission` )
-        FROM
-        sys_role_res t1
+        select distinct(perm)
+        from (SELECT (t2.`permission`) as perm
+        FROM sys_role_res t1
         JOIN sys_resource t2 ON t1.res_id = t2.id
         JOIN sys_user_role t3 ON t3.role_id = t1.role_id
         JOIN sys_role t4 ON t3.role_id = t4.id
         WHERE t2.permission is not null
-        AND t3.user_id = #{userId}
+        AND t3.user_id = #{userId}) t
     </select>
 
     <select id="findChildrenById" resultType="com.soybean.uaa.domain.entity.baseinfo.Resource">
-        SELECT * FROM sys_resource WHERE FIND_IN_SET(#{id},tree_path)
+        SELECT *
+        FROM sys_resource
+        WHERE FIND_IN_SET(#{id}, tree_path)
     </select>
 
     <select id="getTreePathByParentId" resultType="java.lang.String">
-        SELECT
-        CONCAT(',',GROUP_CONCAT(T2.id)) tree_path
-        FROM
-        (
-        SELECT
-        @r AS r_id,
-        ( SELECT @r := parent_id FROM sys_resource WHERE id = r_id ) AS parent_id,
+        SELECT CONCAT(',', GROUP_CONCAT(T2.id)) tree_path
+        FROM (SELECT @r AS r_id,
+        (SELECT @r := parent_id FROM sys_resource WHERE id = r_id) AS parent_id,
         @l := @l + 1 AS lvl
-        FROM
-        ( SELECT @r := #{parentId}, @l := 0 ) vars,
+        FROM (SELECT @r := #{parentId}, @l := 0) vars,
         sys_resource h
-        WHERE
-        @r != 0
-        ) T1
+        WHERE @r != 0) T1
         JOIN sys_resource T2 ON T1.r_id = T2.id
     </select>
 </mapper>

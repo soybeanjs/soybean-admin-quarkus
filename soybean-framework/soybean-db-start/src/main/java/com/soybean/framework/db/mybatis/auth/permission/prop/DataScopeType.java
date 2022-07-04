@@ -1,4 +1,4 @@
-package com.soybean.framework.db.mybatis.auth;
+package com.soybean.framework.db.mybatis.auth.permission.prop;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonCreator;

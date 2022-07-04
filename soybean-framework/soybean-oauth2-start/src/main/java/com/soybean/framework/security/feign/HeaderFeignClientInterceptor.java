@@ -1,6 +1,6 @@
 package com.soybean.framework.security.feign;
 
-import com.soybean.framework.commons.StringUtils;
+import com.soybean.framework.commons.util.StringUtils;
 import com.soybean.framework.security.feign.properties.InnerServiceProperties;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;

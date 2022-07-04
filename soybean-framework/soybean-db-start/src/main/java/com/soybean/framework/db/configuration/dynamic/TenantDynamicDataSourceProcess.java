@@ -1,19 +1,25 @@
 package com.soybean.framework.db.configuration.dynamic;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.creator.HikariDataSourceCreator;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
 import com.baomidou.dynamic.datasource.support.ScriptRunner;
-import com.soybean.framework.commons.StringUtils;
+import com.google.common.collect.Lists;
+import com.soybean.framework.commons.exception.CheckedException;
+import com.soybean.framework.commons.util.StringUtils;
 import com.soybean.framework.db.configuration.dynamic.event.body.EventAction;
 import com.soybean.framework.db.configuration.dynamic.event.body.TenantDynamicDatasource;
 import com.soybean.framework.db.properties.DatabaseProperties;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.List;
@@ -104,11 +110,16 @@ public class TenantDynamicDataSourceProcess {
         return buildDb(request.getHeader(properties.getMultiTenant().getTenantCodeColumn()));
     }
 
-    public void initSqlScript(String tenantCode) {
-        runScript(buildDb(tenantCode));
+    public void initSqlScript(Long tenantId, String tenantCode) {
+        runScript(tenantId, tenantCode);
     }
 
-    private void runScript(String dsKey) {
+    @SneakyThrows
+    private void runScript(Long tenantId, String tenantCode) {
+        if (tenantId == null) {
+            throw CheckedException.badRequest("租户ID不能为空");
+        }
+        String dsKey = buildDb(tenantCode);
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
         // 从ThreadLocal中获取当前数据源
         final DataSource dataSource = ds.getDataSource(dsKey);
@@ -119,7 +130,18 @@ public class TenantDynamicDataSourceProcess {
         if (CollectionUtil.isEmpty(tenantSqlScripts)) {
             return;
         }
-        tenantSqlScripts.forEach(script -> scriptRunner.runScript(dataSource, script));
+        for (String scriptPath : tenantSqlScripts) {
+            final List<String> scriptContent = FileUtil.readUtf8Lines(scriptPath);
+            final File tmpFile = FileUtil.createTempFile(new File(Objects.requireNonNull(this.getClass().getResource("/")).getPath()));
+            List<String> newSqlScript = Lists.newArrayList();
+            for (String text : scriptContent) {
+                final String context = StrUtil.replace(text, "${tenant_id}", String.valueOf(tenantId));
+                newSqlScript.add(context);
+            }
+            FileUtil.writeLines(newSqlScript, tmpFile, "UTF-8");
+            scriptRunner.runScript(dataSource, tmpFile.getName());
+            FileUtil.del(tmpFile);
+        }
     }
 
 }

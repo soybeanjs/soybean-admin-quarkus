@@ -1,6 +1,6 @@
 package com.soybean.uaa.domain.dto;
 
-import com.soybean.framework.db.mybatis.auth.DataScopeType;
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScopeType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;

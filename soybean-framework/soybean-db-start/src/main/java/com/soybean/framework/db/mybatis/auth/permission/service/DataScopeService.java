@@ -1,4 +1,6 @@
-package com.soybean.framework.db.mybatis.auth;
+package com.soybean.framework.db.mybatis.auth.permission.service;
+
+import com.soybean.framework.db.mybatis.auth.permission.prop.DataScope;
 
 /**
  * @author wenxina
