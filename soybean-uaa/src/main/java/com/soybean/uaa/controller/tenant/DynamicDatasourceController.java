@@ -9,8 +9,6 @@ import com.soybean.framework.db.page.PageRequest;
 import com.soybean.uaa.domain.dto.DynamicDatasourceReq;
 import com.soybean.uaa.domain.entity.tenant.DynamicDatasource;
 import com.soybean.uaa.service.DynamicDatasourceService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -19,19 +17,27 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
+ * 动态数据源
+ *
  * @author wenxina
+ * @date 2022/07/12
  */
 @Slf4j
 @RestController
 @RequestMapping("/databases")
 @RequiredArgsConstructor
-@Tag(name = "数据源管理", description = "数据源管理")
 @Validated
 public class DynamicDatasourceController {
 
     private final DynamicDatasourceService dynamicDatasourceService;
 
-    @Operation(summary = "分页查询", description = "分页查询")
+    /**
+     * 动态数据源List
+     *
+     * @param pageRequest 页面请求
+     * @param database    数据库
+     * @return {@link Result}<{@link Page}<{@link DynamicDatasource}>>
+     */
     @GetMapping
     public Result<Page<DynamicDatasource>> page(PageRequest pageRequest, String database) {
         final Page<DynamicDatasource> page = dynamicDatasourceService.page(pageRequest.buildPage(),
@@ -39,37 +45,54 @@ public class DynamicDatasourceController {
         return Result.success(page);
     }
 
-    @Operation(summary = "查询可用", description = "查询可用数据源")
+    /**
+     * 查询当前激活数据源
+     *
+     * @return {@link Result}<{@link List}<{@link DynamicDatasource}>>
+     */
     @GetMapping("/active")
     public Result<List<DynamicDatasource>> queryActive() {
         return Result.success(this.dynamicDatasourceService.list(Wraps.<DynamicDatasource>lbQ().eq(DynamicDatasource::getLocked, false)));
     }
 
-    @Operation(summary = "Ping数据库")
+    /**
+     * ping数据源
+     *
+     * @param id id
+     */
     @GetMapping("/{id}/ping")
     public void ping(@PathVariable Long id) {
         this.dynamicDatasourceService.ping(id);
-
     }
 
-    @Operation(summary = "添加数据源")
+    /**
+     * 添加数据源
+     *
+     * @param req req
+     */
     @PostMapping
     public void add(@Validated @RequestBody DynamicDatasourceReq req) {
         dynamicDatasourceService.saveOrUpdateDatabase(BeanUtil.toBean(req, DynamicDatasource.class));
-
     }
 
-    @Operation(summary = "编辑数据源")
+    /**
+     * 编辑数据源
+     *
+     * @param id  id
+     * @param req req
+     */
     @PutMapping("/{id}")
     public void edit(@PathVariable Long id, @Validated @RequestBody DynamicDatasourceReq req) {
         dynamicDatasourceService.saveOrUpdateDatabase(BeanUtilPlus.toBean(id, req, DynamicDatasource.class));
-
     }
 
-    @Operation(summary = "删除数据源")
+    /**
+     * 删除数据源
+     *
+     * @param id id
+     */
     @DeleteMapping("/{id}")
     public void remove(@PathVariable Long id) {
         dynamicDatasourceService.removeDatabaseById(id);
-
     }
 }

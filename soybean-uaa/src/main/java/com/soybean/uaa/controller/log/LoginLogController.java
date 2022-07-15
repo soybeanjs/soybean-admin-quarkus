@@ -6,11 +6,6 @@ import com.soybean.framework.db.mybatis.conditions.Wraps;
 import com.soybean.framework.db.page.PageRequest;
 import com.soybean.uaa.domain.entity.log.LoginLog;
 import com.soybean.uaa.service.LoginLogService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -27,18 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @RequestMapping("/login_logs")
-@Tag(name = "登录日志", description = "登录日志")
 @RequiredArgsConstructor
 public class LoginLogController {
 
     private final LoginLogService loginLogService;
 
+    /**
+     * 查询登录日志
+     *
+     * @param request   请求
+     * @param name      名字
+     * @param principal 主要
+     * @return {@link Result}<{@link Page}<{@link LoginLog}>>
+     */
     @GetMapping
-    @Parameters({
-            @Parameter(name = "name", description = "名称", in = ParameterIn.QUERY),
-            @Parameter(name = "principal", description = "账号", in = ParameterIn.QUERY)
-    })
-    @Operation(description = "查询日志 - [DONE] - [wenxina]")
     public Result<Page<LoginLog>> query(PageRequest request, String name, String principal) {
         final Page<LoginLog> page = this.loginLogService.page(request.buildPage(), Wraps.<LoginLog>lbQ()
                 .like(LoginLog::getName, name)

@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * 日志工具类
  *
  * @author wenxina
- * @since 2019-04-28 11:30
+ * @date 2022/07/12
  */
 @Slf4j
 public class LogUtil {

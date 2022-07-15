@@ -18,6 +18,21 @@ public class DictionaryConverts {
     public static final DictionaryItemDto2ItemPoConverts DICTIONARY_ITEM_DTO_2_ITEM_PO_CONVERTS = new DictionaryItemDto2ItemPoConverts();
 
     public static class DictionaryDto2PoConverts implements BasePageConverts<DictionaryDTO, Dictionary> {
+        /**
+         * 类型转换
+         *
+         * @param source 原对象
+         * @return 目标对象
+         */
+        @Override
+        public Dictionary convert(DictionaryDTO source) {
+            if (source == null) {
+                return null;
+            }
+            Dictionary target = new Dictionary();
+            BeanUtils.copyProperties(source, target);
+            return target;
+        }
 
         @Override
         public Dictionary convert(DictionaryDTO source, Long id) {

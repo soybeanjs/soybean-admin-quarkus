@@ -27,6 +27,38 @@ public class MenuConverts {
             node.setParentId(route.getParentId());
             node.setName(route.getName());
             Map<String, Object> extra = Maps.newHashMap();
+
+//            final String name = route.getPath().substring(1).replaceAll(StrUtil.SLASH, StrUtil.UNDERLINE);
+//            extra.put("name",name);
+//
+//            String component = route.getComponent();
+//            if (StrUtil.isBlank(component)) {
+//                if (StrUtil.isNotBlank(route.getPath())) {
+//                    component = "multi";
+//                }
+//            } else if (StrUtil.equals("LAYOUT", component)) {
+//                component = "basic";
+//            } else {
+//                component = "self";
+//            }
+//            extra.put("path",route.getPath());
+//            extra.put("component",component);
+//            Map<String, Object> meta = Maps.newHashMap();
+//            meta.put("title", route.getLabel());
+//            meta.put("requiresAuth", true);
+//            meta.put("icon", route.getIcon());
+//            meta.put("hide", !route.getDisplay());
+//            meta.put("order", route.getSequence());
+//            boolean isUrl = StringUtils.containsAny(route.getComponent(), "http://", "https://");
+//            if (isUrl) {
+//                meta.put("href", route.getComponent());
+//                extra.remove("component");
+//            }
+//            extra.put("meta", meta);
+//            node.setExtra(extra);
+//            node.setWeight(route.getSequence());
+
+            extra.put("key", route.getId());
             extra.put("title", route.getLabel());
             extra.put("label", route.getLabel());
             extra.put("path", route.getPath());

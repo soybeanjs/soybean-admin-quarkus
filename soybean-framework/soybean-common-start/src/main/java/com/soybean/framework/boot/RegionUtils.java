@@ -3,7 +3,6 @@ package com.soybean.framework.boot;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.lionsoul.ip2region.DataBlock;
@@ -25,7 +24,6 @@ import java.lang.reflect.Method;
 public class RegionUtils {
 
     private static final String JAVA_TEMP_DIR = "java.io.tmpdir";
-
     private static DbSearcher searcher = null;
 
     static {
@@ -51,13 +49,16 @@ public class RegionUtils {
         }
     }
 
+    public static void main(String[] args) {
+        RegionUtils.getRegion("127.0.0.1");
+    }
+
     /**
      * 解析IP
      *
      * @param ip ip
      * @return 查询结果
      */
-    @SneakyThrows
     public static String getRegion(String ip) {
         try {
             //db
@@ -88,6 +89,5 @@ public class RegionUtils {
         }
         return StrUtil.EMPTY;
     }
-
 
 }

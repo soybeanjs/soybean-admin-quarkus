@@ -1,6 +1,5 @@
 package com.soybean.uaa.domain.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -26,7 +25,6 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = false)
 @Builder
-@Schema(name = "UserRoleSaveDTO", description = "角色分配 账号角色绑定")
 public class UserRoleSaveDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,14 +33,12 @@ public class UserRoleSaveDTO implements Serializable {
      * 角色ID
      * #c_auth_role
      */
-    @Schema(description = "角色ID")
     @NotNull(message = "角色ID不能为空")
     private Long roleId;
     /**
      * 用户ID
      * #c_core_accou
      */
-    @Schema(description = "用户ID")
     @Size(min = 1, message = "用户不能为空")
     private List<Long> userIdList;
 

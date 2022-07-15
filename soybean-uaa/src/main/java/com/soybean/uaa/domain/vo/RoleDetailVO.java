@@ -1,6 +1,5 @@
 package com.soybean.uaa.domain.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -25,28 +24,23 @@ import java.io.Serializable;
 public class RoleDetailVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Schema(description = "ID")
     private Long id;
 
     /**
      * 角色名称
      */
-    @Schema(description = "角色名称")
     private String name;
     /**
      * 角色编码
      */
-    @Schema(description = "角色编码")
     private String code;
 
     /**
      * 是否内置角色
      */
-    @Schema(description = "是否内置角色")
     private Boolean readonly;
     /**
      * 关联的组织id
      */
-    @Schema(description = "权限")
     private RoleResVO authority;
 }

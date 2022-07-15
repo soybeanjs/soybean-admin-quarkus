@@ -2,7 +2,6 @@ package com.soybean.uaa.domain.entity.baseinfo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,7 +32,6 @@ public class RoleRes {
      * #c_auth_resource
      * #c_auth_menu
      */
-    @Schema(description = "资源id")
     @NotNull(message = "资源id不能为空")
     @TableField("res_id")
     private Long resId;
@@ -43,7 +41,6 @@ public class RoleRes {
      * 角色id
      * #t_sys_role
      */
-    @Schema(description = "角色id")
     @NotNull(message = "角色id不能为空")
     @TableField("role_id")
     private Long roleId;

@@ -11,8 +11,6 @@ import com.soybean.framework.db.TenantEnvironment;
 import com.soybean.framework.security.client.utils.SecurityUtils;
 import com.soybean.uaa.domain.dto.ChangePasswordDTO;
 import com.soybean.uaa.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,13 +34,14 @@ import java.security.Principal;
 import java.util.Map;
 
 /**
+ * oauth认证授权
  * 重写响应端点。主要是为了封装响应结果
  *
  * @author wenxina
+ * @date 2022/07/12
  */
 @Slf4j
 @Controller
-@Tag(name = "认证管理", description = "认证管理")
 @RequestMapping("/oauth")
 @RequiredArgsConstructor
 public class RewriteTokenEndpoint {
@@ -52,6 +51,15 @@ public class RewriteTokenEndpoint {
     private final UserService userService;
     private final TokenStore tokenStore;
 
+    /**
+     * 获取访问令牌
+     *
+     * @param principal  主要
+     * @param parameters 参数
+     * @param request    请求
+     * @return {@link SwaggerEnhancer}<{@link OAuth2AccessToken}>
+     * @throws HttpRequestMethodNotSupportedException http请求方法不支持异常
+     */
     @ResponseBody
     @RequestMapping(value = "/token", method = {RequestMethod.GET, RequestMethod.POST})
     public SwaggerEnhancer<OAuth2AccessToken> postAccessToken(Principal principal, @RequestParam Map<String, String> parameters, HttpServletRequest request) throws HttpRequestMethodNotSupportedException {
@@ -63,6 +71,9 @@ public class RewriteTokenEndpoint {
         return r;
     }
 
+    /**
+     * 退出登录
+     */
     @DeleteMapping("/logout")
     @ResponseBody
     public void removeToken() {
@@ -81,10 +92,12 @@ public class RewriteTokenEndpoint {
     }
 
     /**
+     * 登录
      * 支持 POST 流传输方式
      *
      * @param request request
      * @return 重定向到 OAUTH 端点
+     * @throws IOException ioexception
      */
     @PostMapping("/access_token")
     public RedirectView login(HttpServletRequest request) throws IOException {
@@ -101,24 +114,38 @@ public class RewriteTokenEndpoint {
         return view;
     }
 
+    /**
+     * 用户信息
+     *
+     * @param principal 主要
+     * @return {@link Result}<{@link Object}>
+     */
     @ResponseBody
     @GetMapping("/info")
-    @Operation(summary = "获取当前用户信息")
     public Result<Object> userInfo(Principal principal) {
         OAuth2Authentication oAuth2Authentication = (OAuth2Authentication) principal;
         return Result.success(oAuth2Authentication.getPrincipal());
     }
 
+    /**
+     * 用户
+     *
+     * @param principal 主要
+     * @return {@link Principal}
+     */
     @ResponseBody
     @GetMapping("/users")
-    @Operation(summary = "获取当前用户信息")
     public Principal users(Principal principal) {
         return principal;
     }
 
+    /**
+     * 更改密码
+     *
+     * @param dto dto
+     */
     @ResponseBody
     @PutMapping("/change_password")
-    @Operation(summary = "修改密码")
     public void changePassword(@Validated @RequestBody ChangePasswordDTO dto) {
         if (!StringUtils.equals(dto.getPassword(), dto.getConfirmPassword())) {
             throw CheckedException.badRequest("新密码与确认密码不一致");

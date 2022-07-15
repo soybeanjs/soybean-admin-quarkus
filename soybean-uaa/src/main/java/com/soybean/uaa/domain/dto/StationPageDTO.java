@@ -1,21 +1,20 @@
 package com.soybean.uaa.domain.dto;
 
-import com.soybean.framework.commons.entity.SuperEntity;
+import com.soybean.framework.db.page.PageRequest;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
  * <p>
  * 实体类
- * 用户
+ * 岗位
  * </p>
  *
  * @author wenxina
- * @since 2019-11-04
+ * @since 2022-07-01
  */
 @Data
 @NoArgsConstructor
@@ -24,17 +23,21 @@ import java.io.Serializable;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = false)
 @Builder
-public class UserUpdateImageDTO implements Serializable {
+public class StationPageDTO extends PageRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "id不能为空", groups = SuperEntity.Update.class)
-    private Long id;
-
     /**
-     * 头像
+     * 名称
      */
-    @Length(max = 255, message = "头像长度不能超过255")
-    private String image;
+    @Length(max = 255, message = "名称长度不能超过255")
+    private String name;
+    /**
+     * 组织ID
+     * #c_core_org
+     */
+    private Long orgId;
+    private Integer type;
+    private Boolean status;
 
 }

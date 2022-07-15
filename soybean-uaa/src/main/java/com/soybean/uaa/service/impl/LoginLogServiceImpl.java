@@ -5,6 +5,7 @@ import cn.hutool.http.useragent.Browser;
 import cn.hutool.http.useragent.OS;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
+import com.soybean.framework.boot.RegionUtils;
 import com.soybean.framework.db.mybatis.SuperServiceImpl;
 import com.soybean.uaa.domain.entity.log.LoginLog;
 import com.soybean.uaa.repository.LoginLogMapper;
@@ -36,13 +37,14 @@ public class LoginLogServiceImpl extends SuperServiceImpl<LoginLogMapper, LoginL
     public LoginLog saveLoginLog(Long userId, String principal, String realName) {
         String ip = ServletUtil.getClientIP(request);
         final String clientId = request.getParameter("client_id");
+        String region = RegionUtils.getRegion(ip);
         String ua = request.getHeader(USER_AGENT);
         final UserAgent userAgent = UserAgentUtil.parse(ua);
         final Browser browser = userAgent.getBrowser();
         final OS os = userAgent.getOs();
         LoginLog loginLog = LoginLog.builder()
                 .userId(userId)
-                .principal(principal).ip(ip)
+                .principal(principal).ip(ip).location(region).ip(ip)
                 .platform(userAgent.getPlatform().getName())
                 .engine(userAgent.getEngine().getName())
                 .engineVersion(userAgent.getEngineVersion())

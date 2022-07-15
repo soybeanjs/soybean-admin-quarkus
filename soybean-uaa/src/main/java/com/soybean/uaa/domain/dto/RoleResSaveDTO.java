@@ -1,6 +1,5 @@
 package com.soybean.uaa.domain.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -24,11 +23,9 @@ import java.util.Set;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = false)
 @Builder
-@Schema(name = "RoleResSaveDTO", description = "角色的资源")
 public class RoleResSaveDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
 
     /**
      * 资源ID
@@ -39,7 +36,6 @@ public class RoleResSaveDTO implements Serializable {
      * 角色id
      * #c_auth_role
      */
-    @Schema(description = "角色id")
     @NotNull(message = "角色id不能为空")
     private Long roleId;
 

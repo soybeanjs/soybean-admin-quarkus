@@ -7,11 +7,6 @@ import com.soybean.framework.db.mybatis.conditions.Wraps;
 import com.soybean.framework.db.page.PageRequest;
 import com.soybean.uaa.domain.entity.log.OptLog;
 import com.soybean.uaa.service.OptLogService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -28,7 +23,6 @@ import java.time.LocalDateTime;
 @Validated
 @RestController
 @RequestMapping("/opt_logs")
-@Tag(name = "操作日志", description = "操作日志")
 @TenantDS
 @RequiredArgsConstructor
 public class OptLogController {
@@ -36,12 +30,15 @@ public class OptLogController {
 
     private final OptLogService optLogService;
 
+    /**
+     * 查询操作日志
+     *
+     * @param request     请求
+     * @param location    位置
+     * @param description 描述
+     * @return {@link Result}<{@link Page}<{@link OptLog}>>
+     */
     @GetMapping
-    @Parameters({
-            @Parameter(name = "location", description = "地区", in = ParameterIn.QUERY),
-            @Parameter(name = "description", description = "描述信息", in = ParameterIn.QUERY)
-    })
-    @Operation(description = "查询日志 - [DONE] - [wenxina]")
     public Result<Page<OptLog>> query(PageRequest request, String location, String description) {
         final Page<OptLog> page = this.optLogService.page(request.buildPage(), Wraps.<OptLog>lbQ()
                 .like(OptLog::getLocation, location)
@@ -49,11 +46,12 @@ public class OptLogController {
         return Result.success(page);
     }
 
+    /**
+     * 批量删除操作日志
+     *
+     * @param day 一天
+     */
     @DeleteMapping("/{day}")
-    @Parameters({
-            @Parameter(name = "day", description = "天数", in = ParameterIn.PATH),
-    })
-    @Operation(description = "查询日志 - [DONE] - [wenxina]")
     public void batchDelete(@PathVariable Integer day) {
         this.optLogService.remove(Wraps.<OptLog>lbQ().le(OptLog::getStartTime, LocalDateTime.now().plusDays(-day)));
     }

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.soybean.framework.commons.entity.SuperEntity;
 import com.soybean.uaa.domain.enums.Sex;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,7 +30,6 @@ import static com.baomidou.mybatisplus.annotation.SqlCondition.LIKE;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("t_user")
-@Schema(name = "User", description = "用户")
 public class User extends SuperEntity<Long> {
 
     private static final long serialVersionUID = 1L;

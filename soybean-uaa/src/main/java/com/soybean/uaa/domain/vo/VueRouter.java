@@ -1,6 +1,5 @@
 package com.soybean.uaa.domain.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -16,19 +15,12 @@ public class VueRouter {
 
     private Long id;
     private Long parentId;
-    @Schema(description = "路径")
     private String path;
-    @Schema(description = "按钮名称")
     private String name;
-    @Schema(description = "菜单名称")
     private String label;
-    @Schema(description = "图标")
     private String icon;
-    @Schema(description = "组件")
     private String component;
-    @Schema(description = "重定向")
     private String redirect;
-    @Schema(description = "元数据")
     private RouterMeta meta;
 
     private String model;
@@ -37,13 +29,10 @@ public class VueRouter {
     /**
      * 排序
      */
-    @Schema(description = "排序")
     private Integer sequence;
-    @Schema(description = "类型（1=菜单;2=按钮;3=路由;5=一键发布模板）")
     private Integer type;
 
     private Boolean global;
     private Boolean status;
-    @Schema(description = "显示/隐藏")
     private Boolean display;
 }

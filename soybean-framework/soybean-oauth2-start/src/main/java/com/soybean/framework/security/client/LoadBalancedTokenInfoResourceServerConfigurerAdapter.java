@@ -1,6 +1,5 @@
 package com.soybean.framework.security.client;
 
-import com.soybean.framework.security.client.annotation.IgnoreAuthorize;
 import com.soybean.framework.security.client.properties.SecurityIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 带负载均衡的请求
@@ -62,13 +60,7 @@ public class LoadBalancedTokenInfoResourceServerConfigurerAdapter extends Resour
         for (Map.Entry<RequestMappingInfo, HandlerMethod> handlerMethodEntry : handlerMethods.entrySet()) {
             HandlerMethod value = handlerMethodEntry.getValue();
             RequestMappingInfo key = handlerMethodEntry.getKey();
-            IgnoreAuthorize annotation = value.getMethodAnnotation(IgnoreAuthorize.class);
-            if (log.isDebugEnabled()) {
-                log.debug("[key] - [{}] - [value] - [{}]", key, value);
-            }
-            if (annotation != null && !annotation.web()) {
-                Objects.requireNonNull(key.getPathPatternsCondition()).getPatterns().forEach(pathPattern -> registry.antMatchers(pathPattern.getPatternString()).permitAll());
-            }
+            IgnoreAuthorizeUtil.resolveIgnoreAuthorize(registry, value, key, log);
         }
         List<String> ignoreUrls = securityIgnoreProperties.getResourceUrls();
         if (!CollectionUtils.isEmpty(ignoreUrls)) {

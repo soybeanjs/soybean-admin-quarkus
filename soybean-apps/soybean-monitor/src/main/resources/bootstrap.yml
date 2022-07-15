@@ -13,7 +13,11 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
+        server-addr: '@nacos.server-addr@'
+        namespace: ${spring.profiles.active}
+        metadata:
+          group: ${spring.application.name}
+          version: '@project.version@'
   security:
     user:
       name: "admin"

@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.soybean.framework.commons.entity.SuperEntity;
 import com.soybean.uaa.domain.enums.ResourceType;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -26,7 +25,6 @@ import static com.baomidou.mybatisplus.annotation.SqlCondition.LIKE;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("sys_resource")
-@Schema(name = "Resource", description = "资源")
 public class Resource extends SuperEntity<Long> {
 
     private static final long serialVersionUID = 1L;
@@ -38,14 +36,12 @@ public class Resource extends SuperEntity<Long> {
      * 数据列：
      * 按钮：
      */
-    @Schema(description = "权限编码")
     @TableField(value = "permission", condition = LIKE)
     private String permission;
 
     /**
      * 名称
      */
-    @Schema(description = "名称")
     @TableField(value = "`label`", condition = LIKE)
     private String label;
 
@@ -55,7 +51,6 @@ public class Resource extends SuperEntity<Long> {
      * 菜单ID
      * #c_auth_menu
      */
-    @Schema(description = "菜单ID")
     private Long parentId;
 
     /**
