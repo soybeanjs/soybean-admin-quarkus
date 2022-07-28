@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -104,13 +105,13 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <configuration>
                     <!--认证配置,用于私有registry认证-->
-<!--                    <authConfig>-->
-<!--                        <username></username>-->
-<!--                        <password></password>-->
-<!--                    </authConfig>-->
+                    <!--                    <authConfig>-->
+                    <!--                        <username></username>-->
+                    <!--                        <password></password>-->
+                    <!--                    </authConfig>-->
                     <!--                    Docker 远程管理地址-->
                     <dockerHost>${docker.dockerHost}</dockerHost>
-<!--                    <certPath>/docker-ca</certPath>-->
+                    <!--                    <certPath>/docker-ca</certPath>-->
                     <!--                    Docker 推送镜像仓库地址-->
                     <!--                    <pullRegistry>${docker.pullRegistry}</pullRegistry>-->
                     <!--                    <pushRegistry>${docker.pushRegistry}</pushRegistry>-->
