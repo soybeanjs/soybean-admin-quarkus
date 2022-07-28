@@ -1,0 +1,31 @@
+server:
+  port: 10004
+spring:
+  profiles:
+    active: '@spring.active@'
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+  application:
+    name: '@project.artifactId@'
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.properties
+  cloud:
+    nacos:
+      discovery:
+        server-addr: '@nacos.server-addr@'
+        namespace: ${spring.profiles.active}
+        metadata:
+          group: ${spring.application.name}
+          version: '@project.version@'
+      config:
+        server-addr: '@nacos.server-addr@'
+        file-extension: properties
+        namespace: '@nacos.namespace@'
+        enabled: true
+        shared-configs:
+          - data-id: soybean-datasource.properties
+            refresh: true
+          - data-id: soybean-redis.properties
+            refresh: true

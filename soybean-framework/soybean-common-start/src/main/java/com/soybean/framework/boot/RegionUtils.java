@@ -1,18 +1,15 @@
 package com.soybean.framework.boot;
 
-
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.lionsoul.ip2region.DataBlock;
-import org.lionsoul.ip2region.DbConfig;
-import org.lionsoul.ip2region.DbSearcher;
-import org.lionsoul.ip2region.Util;
+import org.lionsoul.ip2region.xdb.Searcher;
 
 import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.Method;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 根据ip查询地址
@@ -24,33 +21,38 @@ import java.lang.reflect.Method;
 public class RegionUtils {
 
     private static final String JAVA_TEMP_DIR = "java.io.tmpdir";
-    private static DbSearcher searcher = null;
+
+    /**
+     * 搜索
+     */
+    private static Searcher searcher = null;
 
     static {
         try {
-            String dbPath = RegionUtils.class.getResource("/ip2region/ip2region.db").getPath();
+            String dbPath = Objects.requireNonNull(RegionUtils.class.getResource("/ip2region/ip2region.xdb")).getPath();
             File file = new File(dbPath);
             if (!file.exists()) {
                 String tmpDir = System.getProperties().getProperty(JAVA_TEMP_DIR);
-                dbPath = tmpDir + "ip2region/ip2region.db";
+                dbPath = tmpDir + "ip2region/ip2region.xdb";
                 file = new File(dbPath);
-                String classPath = "classpath:ip2region/ip2region.db";
+                String classPath = "classpath:ip2region/ip2region.xdb";
                 InputStream resourceAsStream = ResourceUtil.getStreamSafe(classPath);
                 if (resourceAsStream != null) {
                     FileUtils.copyInputStreamToFile(resourceAsStream, file);
                 }
             }
-            DbConfig config = new DbConfig();
-            searcher = new DbSearcher(config, dbPath);
-            log.info("bean [{}]", config);
-            log.info("bean [{}]", searcher);
+            // 从 dbPath 加载整个 xdb 到内存。
+            byte[] cBuff = Searcher.loadContentFromFile(dbPath);
+
+            // 使用上述的 cBuff 创建一个完全基于内存的查询对象。
+            searcher = Searcher.newWithBuffer(cBuff);
         } catch (Exception e) {
             log.error("init ip region error", e);
         }
     }
 
     public static void main(String[] args) {
-        RegionUtils.getRegion("127.0.0.1");
+        RegionUtils.getRegion("1.2.3.4");
     }
 
     /**
@@ -61,29 +63,15 @@ public class RegionUtils {
      */
     public static String getRegion(String ip) {
         try {
-            //db
-            if (searcher == null || StrUtil.isEmpty(ip)) {
-                log.error("DbSearcher is null");
+            if (searcher != null && StrUtil.isEmpty(ip)) {
+                log.error("Searcher is null");
                 return StrUtil.EMPTY;
             }
-            long startTime = System.currentTimeMillis();
-            //查询算法 DbSearcher.BTREE_ALGORITHM: BINARY_ALGORITHM MEMORY_ALGORITYM
-            int algorithm = DbSearcher.MEMORY_ALGORITYM;
-            // 采用内存加载算法，提高检索效率
-            Method method = searcher.getClass().getMethod("memorySearch", String.class);
-            DataBlock dataBlock;
-            if (!Util.isIpAddress(ip)) {
-                log.warn("warning: Invalid ip address");
-            }
-            dataBlock = (DataBlock) method.invoke(searcher, ip);
-            if (dataBlock == null) {
-                return "未知";
-            }
-            String result = dataBlock.getRegion();
-            long endTime = System.currentTimeMillis();
-            log.debug("region use time[{}] result[{}]", endTime - startTime, result);
+            long startTime = System.nanoTime();
+            String result = searcher.search(ip);
+            long cost = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - startTime);
+            log.debug("region use time[{}] result[{}]", cost, result);
             return result;
-
         } catch (Exception e) {
             log.error("error:", e);
         }

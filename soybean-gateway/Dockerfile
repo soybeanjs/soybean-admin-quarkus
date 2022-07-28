@@ -1,12 +1,10 @@
-FROM amazoncorretto:11.0.15
+FROM eclipse-temurin:11.0.15_10-jre-alpine
 
 MAINTAINER 1571339199@qq.com
 
 RUN mkdir -p /soybean/gateway
 
 WORKDIR /soybean/gateway
-
-EXPOSE 10001
 
 ADD ./soybean-gateway.jar ./gateway.jar
 

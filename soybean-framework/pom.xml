@@ -165,6 +165,7 @@
                     <encoding>UTF-8</encoding>
                     <nonFilteredFileExtensions>
                         <nonFilteredFileExtension>db</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>xdb</nonFilteredFileExtension>
                     </nonFilteredFileExtensions>
                 </configuration>
             </plugin>

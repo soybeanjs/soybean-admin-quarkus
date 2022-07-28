@@ -30,7 +30,7 @@
         <maven-dockerfile-plugin.version>1.4.13</maven-dockerfile-plugin.version>
         <docker-maven-plugin.version>1.2.2</docker-maven-plugin.version>
         <fabric8-docker-maven-plugin.version>0.39.1</fabric8-docker-maven-plugin.version>
-        <docker.baseImage>amazoncorretto:11.0.15</docker.baseImage>
+        <docker.baseImage>eclipse-temurin:11.0.15_10-jre-alpine</docker.baseImage>
         <docker.volumes>/tmp</docker.volumes>
         <docker.java.security.egd>-Djava.security.egd=file:/dev/./urandom</docker.java.security.egd>
         <docker.java.opts>-Xms256m -Xmx512m</docker.java.opts>
@@ -57,9 +57,9 @@
         <!--    maven/project 等配置相关 end    -->
 
         <!--    spring全家桶 start    -->
-        <spring-boot.version>2.7.1</spring-boot.version>
+        <spring-boot.version>2.7.2</spring-boot.version>
         <spring-cloud.version>2021.0.3</spring-cloud.version>
-        <spring-boot-admin.version>2.7.1</spring-boot-admin.version>
+        <spring-boot-admin.version>2.7.2</spring-boot-admin.version>
         <!--    spring全家桶 end    -->
 
         <!--    阿里系 start    -->
@@ -116,7 +116,7 @@
         <poi.version>5.2.2</poi.version>
         <easypoi.version>4.4.0</easypoi.version>
 
-        <ip2region.version>1.7.2</ip2region.version>
+        <ip2region.version>2.6.5</ip2region.version>
         <justauth.version>1.16.5</justauth.version>
         <justauth-springboot.version>1.4.0</justauth-springboot.version>
         <okhttp.version>5.0.0-alpha.5</okhttp.version>
@@ -1013,6 +1013,11 @@
                 <checksumPolicy>fail</checksumPolicy>
             </snapshots>
         </repository>
+        <repository>
+            <id>spring-release</id>
+            <name>Spring release</name>
+            <url>https://repo.spring.io/release</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -1026,6 +1031,11 @@
                 <updatePolicy>always</updatePolicy>
                 <checksumPolicy>fail</checksumPolicy>
             </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-release</id>
+            <name>Spring release</name>
+            <url>https://repo.spring.io/release</url>
         </pluginRepository>
     </pluginRepositories>
 
