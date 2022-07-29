@@ -35,6 +35,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -48,6 +49,97 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <!--认证配置,用于私有registry认证-->
+                    <!--                    <authConfig>-->
+                    <!--                        <username></username>-->
+                    <!--                        <password></password>-->
+                    <!--                    </authConfig>-->
+                    <!--                    Docker 远程管理地址-->
+                    <dockerHost>${docker.dockerHost}</dockerHost>
+                    <!--                    <certPath>/docker-ca</certPath>-->
+                    <!--                    Docker 推送镜像仓库地址-->
+                    <!--                    <pullRegistry>${docker.pullRegistry}</pullRegistry>-->
+                    <!--                    <pushRegistry>${docker.pushRegistry}</pushRegistry>-->
+                    <images>
+                        <image>
+                            <!-- 指定image的名字（包含registry地址）-->
+                            <name>${project.name}:2022-07-28-001</name>
+                            <!--定义基础镜像-->
+                            <build>
+                                <!-- 指定dockerfile文件的位置-->
+                                <dockerFile>${basedir}/Dockerfile</dockerFile>
+                                <buildOptions>
+                                    <!-- 网络的配置，与宿主主机共端口号-->
+                                    <network>host</network>
+                                </buildOptions>
+                            </build>
+                        </image>
+                        <!--                        <image>-->
+                        <!--                            &lt;!&ndash;由于推送到私有镜像仓库，镜像名需要添加仓库地址&ndash;&gt;-->
+                        <!--                            <name>${project.name}:2022-07-28-001</name>-->
+                        <!--                            &lt;!&ndash;定义镜像构建行为&ndash;&gt;-->
+                        <!--                            <build>-->
+                        <!--                                &lt;!&ndash;定义基础镜像&ndash;&gt;-->
+                        <!--                                <from>${docker.baseImage}</from>-->
+                        <!--                                <args>-->
+                        <!--                                    <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>-->
+                        <!--                                </args>-->
+                        <!--                                &lt;!&ndash;定义哪些文件拷贝到容器中&ndash;&gt;-->
+                        <!--                                <assembly>-->
+                        <!--                                    &lt;!&ndash;定义拷贝到容器的目录&ndash;&gt;-->
+                        <!--                                    <targetDir>/</targetDir>-->
+                        <!--                                    &lt;!&ndash;只拷贝生成的jar包&ndash;&gt;-->
+                        <!--                                    <descriptorRef>artifact</descriptorRef>-->
+                        <!--                                </assembly>-->
+                        <!--                                <env>-->
+                        <!--                                    <TZ>Asia/Shanghai</TZ>-->
+                        <!--                                    <JAVA_OPTS>${docker.java.opts}</JAVA_OPTS>-->
+                        <!--                                </env>-->
+                        <!--                                <runCmds>-->
+                        <!--                                    <run>ln -snf /usr/share/zoneinfo/$TZ /etc/localtime</run>-->
+                        <!--                                    <run>echo $TZ > /etc/timezone</run>-->
+                        <!--                                </runCmds>-->
+                        <!--                                &lt;!&ndash;定义容器启动命令&ndash;&gt;-->
+                        <!--                                <entryPoint>-->
+                        <!--                                    ["sh","-c","java $JAVA_OPTS ${docker.java.security.egd} -jar /${project.build.finalName}.jar"]-->
+                        <!--                                </entryPoint>-->
+                        <!--                                &lt;!&ndash;定义维护者&ndash;&gt;-->
+                        <!--                                <maintainer>${docker.maintainer}</maintainer>-->
+                        <!--                            </build>-->
+                        <!--                        </image>-->
+                    </images>
+                </configuration>
+            </plugin>
+
+            <!--            <plugin>-->
+            <!--                <groupId>com.spotify</groupId>-->
+            <!--                <artifactId>docker-maven-plugin</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <imageName>${project.artifactId}</imageName>-->
+            <!--                    <imageTags>-->
+            <!--                        <imageTag>latest</imageTag>-->
+            <!--                    </imageTags>-->
+            <!--                    <forceTags>true</forceTags>-->
+            <!--                    <baseImage>${docker.baseImage}</baseImage>-->
+            <!--                    <volumes>${docker.volumes}</volumes>-->
+            <!--                    <dockerHost>${docker.dockerHost}</dockerHost>-->
+            <!--                    <env>-->
+            <!--                        <JAVA_OPTS>${docker.java.opts}</JAVA_OPTS>-->
+            <!--                    </env>-->
+            <!--                    <entryPoint>["sh","-c","java $JAVA_OPTS ${docker.java.security.egd} -jar /${project.build.finalName}.jar"]</entryPoint>-->
+            <!--                    <resources>-->
+            <!--                        <resource>-->
+            <!--                            <targetPath>/</targetPath>-->
+            <!--                            <directory>${project.build.directory}</directory>-->
+            <!--                            <include>${project.build.finalName}.jar</include>-->
+            <!--                        </resource>-->
+            <!--                    </resources>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
 

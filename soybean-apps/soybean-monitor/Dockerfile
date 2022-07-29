@@ -2,12 +2,20 @@ FROM eclipse-temurin:11.0.15_10-jre-alpine
 
 MAINTAINER 1571339199@qq.com
 
-RUN mkdir -p /soybean/monitor
+#VOLUME /tmp
+#
+#COPY target/lib/ ./lib/
 
-WORKDIR /soybean/monitor
+RUN mkdir -p /app
 
-ADD ./soybean-monitor.jar ./monitor.jar
+WORKDIR /app
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "monitor.jar"]
+COPY ./target/soybean-monitor.jar app.jar
 
-CMD ["--spring.profiles.active=docker"]
+ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms256m -Xmx512m"
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar app.jar"]
+
+CMD ["--spring.profiles.active=dev"]
