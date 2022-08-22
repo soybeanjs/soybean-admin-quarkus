@@ -3,10 +3,12 @@
 	<h1>Soybean Admin Java</h1>
 </div>
 
-[![Spring Boot](https://img.shields.io/maven-central/v/org.springframework.boot/spring-boot-dependencies.svg?label=Spring%20Boot&logo=Spring)](https://search.maven.org/artifact/org.springframework.boot/spring-boot-dependencies)  [![Spring Cloud](https://img.shields.io/maven-central/v/org.springframework.cloud/spring-cloud-dependencies.svg?label=Spring%20Cloud&logo=Spring)](https://search.maven.org/artifact/org.springframework.cloud/spring-cloud-dependencies)  [![Spring Cloud Alibaba](https://img.shields.io/maven-central/v/com.alibaba.cloud/spring-cloud-alibaba-dependencies.svg?label=Spring%20Cloud%20Alibaba&logo=Spring)](https://search.maven.org/artifact/com.alibaba.cloud/spring-cloud-alibaba-dependencies)  [![Docker](https://img.shields.io/badge/Docker-success)]()  [![docker--compose](https://img.shields.io/badge/docker--compose-success)]()  [![Portainer](https://img.shields.io/badge/Portainer-success)]()  [![skywalking](https://img.shields.io/badge/skywalking-inactive)]()  [![elasticsearch](https://img.shields.io/badge/elasticsearch-important)]()  [![fluentd](https://img.shields.io/badge/fluentd-important)]()  [![kibana](https://img.shields.io/badge/kibana-important)]()  [![grafana](https://img.shields.io/badge/grafana-ff69b4)]()  [![prometheus](https://img.shields.io/badge/prometheus-ff69b4)]()  [![loki](https://img.shields.io/badge/loki-ff69b4)]()  
+[![Spring Boot](https://img.shields.io/maven-central/v/org.springframework.boot/spring-boot-dependencies.svg?label=Spring%20Boot&logo=Spring)](https://search.maven.org/artifact/org.springframework.boot/spring-boot-dependencies)  [![Spring Cloud](https://img.shields.io/maven-central/v/org.springframework.cloud/spring-cloud-dependencies.svg?label=Spring%20Cloud&logo=Spring)](https://search.maven.org/artifact/org.springframework.cloud/spring-cloud-dependencies)  [![Spring Cloud Alibaba](https://img.shields.io/maven-central/v/com.alibaba.cloud/spring-cloud-alibaba-dependencies.svg?label=Spring%20Cloud%20Alibaba&logo=Spring)](https://search.maven.org/artifact/com.alibaba.cloud/spring-cloud-alibaba-dependencies)  [![Docker](https://img.shields.io/badge/Docker-success)]()  [![docker--compose](https://img.shields.io/badge/docker--compose-success)]()  [![Portainer](https://img.shields.io/badge/Portainer-success)]()  [![skywalking](https://img.shields.io/badge/skywalking-inactive)]()  [![elasticsearch](https://img.shields.io/badge/elasticsearch-important)]()  [![fluentd](https://img.shields.io/badge/fluentd-important)]()  [![kibana](https://img.shields.io/badge/kibana-important)]()  [![grafana](https://img.shields.io/badge/grafana-ff69b4)]()  [![prometheus](https://img.shields.io/badge/prometheus-ff69b4)]()  [![loki](https://img.shields.io/badge/loki-ff69b4)]()
+
 ## 简介
 
-Soybean Admin Java 是一个基于 Spring-Boot、Spring-Cloud、Spring-Cloud-Alibaba、Nacos、Mybatis-Plus、Oauth2.0、Redis、RabbitMq、Mysql等基本组件开发的开箱即用Sass微服务架构平台
+Soybean Admin Java 是一个基于
+Spring-Boot、Spring-Cloud、Spring-Cloud-Alibaba、Nacos、Mybatis-Plus、Oauth2.0、Redis、RabbitMq、Mysql等基本组件开发的开箱即用Sass微服务架构平台
 
 ## 说明
 
@@ -28,6 +30,7 @@ Soybean Admin Java 是一个基于 Spring-Boot、Spring-Cloud、Spring-Cloud-Ali
 ![](http://120.48.68.52:30385/default/img/iShot_2022-08-22_22.55.37.png)
 
 ## 开发环境部署
+
 - 先决条件
   [![Docker](https://img.shields.io/badge/Docker-success)]()  [![docker--compose](https://img.shields.io/badge/docker--compose-success)]()
   ```

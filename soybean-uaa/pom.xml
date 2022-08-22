@@ -139,39 +139,39 @@
                                 </buildOptions>
                             </build>
                         </image>
-<!--                        <image>-->
-<!--                            &lt;!&ndash;由于推送到私有镜像仓库，镜像名需要添加仓库地址&ndash;&gt;-->
-<!--                            <name>${project.name}:2022-07-01-001</name>-->
-<!--                            &lt;!&ndash;定义镜像构建行为&ndash;&gt;-->
-<!--                            <build>-->
-<!--                                &lt;!&ndash;定义基础镜像&ndash;&gt;-->
-<!--                                <from>${docker.baseImage}</from>-->
-<!--                                <args>-->
-<!--                                    <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>-->
-<!--                                </args>-->
-<!--                                &lt;!&ndash;定义哪些文件拷贝到容器中&ndash;&gt;-->
-<!--                                <assembly>-->
-<!--                                    &lt;!&ndash;定义拷贝到容器的目录&ndash;&gt;-->
-<!--                                    <targetDir>/</targetDir>-->
-<!--                                    &lt;!&ndash;只拷贝生成的jar包&ndash;&gt;-->
-<!--                                    <descriptorRef>artifact</descriptorRef>-->
-<!--                                </assembly>-->
-<!--                                <env>-->
-<!--                                    <TZ>Asia/Shanghai</TZ>-->
-<!--                                    <JAVA_OPTS>${docker.java.opts}</JAVA_OPTS>-->
-<!--                                </env>-->
-<!--                                <runCmds>-->
-<!--                                    <run>ln -snf /usr/share/zoneinfo/$TZ /etc/localtime</run>-->
-<!--                                    <run>echo $TZ > /etc/timezone</run>-->
-<!--                                </runCmds>-->
-<!--                                &lt;!&ndash;定义容器启动命令&ndash;&gt;-->
-<!--                                <entryPoint>-->
-<!--                                    ["sh","-c","java $JAVA_OPTS ${docker.java.security.egd} -jar /${project.build.finalName}.jar"]-->
-<!--                                </entryPoint>-->
-<!--                                &lt;!&ndash;定义维护者&ndash;&gt;-->
-<!--                                <maintainer>${docker.maintainer}</maintainer>-->
-<!--                            </build>-->
-<!--                        </image>-->
+                        <!--                        <image>-->
+                        <!--                            &lt;!&ndash;由于推送到私有镜像仓库，镜像名需要添加仓库地址&ndash;&gt;-->
+                        <!--                            <name>${project.name}:2022-07-01-001</name>-->
+                        <!--                            &lt;!&ndash;定义镜像构建行为&ndash;&gt;-->
+                        <!--                            <build>-->
+                        <!--                                &lt;!&ndash;定义基础镜像&ndash;&gt;-->
+                        <!--                                <from>${docker.baseImage}</from>-->
+                        <!--                                <args>-->
+                        <!--                                    <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>-->
+                        <!--                                </args>-->
+                        <!--                                &lt;!&ndash;定义哪些文件拷贝到容器中&ndash;&gt;-->
+                        <!--                                <assembly>-->
+                        <!--                                    &lt;!&ndash;定义拷贝到容器的目录&ndash;&gt;-->
+                        <!--                                    <targetDir>/</targetDir>-->
+                        <!--                                    &lt;!&ndash;只拷贝生成的jar包&ndash;&gt;-->
+                        <!--                                    <descriptorRef>artifact</descriptorRef>-->
+                        <!--                                </assembly>-->
+                        <!--                                <env>-->
+                        <!--                                    <TZ>Asia/Shanghai</TZ>-->
+                        <!--                                    <JAVA_OPTS>${docker.java.opts}</JAVA_OPTS>-->
+                        <!--                                </env>-->
+                        <!--                                <runCmds>-->
+                        <!--                                    <run>ln -snf /usr/share/zoneinfo/$TZ /etc/localtime</run>-->
+                        <!--                                    <run>echo $TZ > /etc/timezone</run>-->
+                        <!--                                </runCmds>-->
+                        <!--                                &lt;!&ndash;定义容器启动命令&ndash;&gt;-->
+                        <!--                                <entryPoint>-->
+                        <!--                                    ["sh","-c","java $JAVA_OPTS ${docker.java.security.egd} -jar /${project.build.finalName}.jar"]-->
+                        <!--                                </entryPoint>-->
+                        <!--                                &lt;!&ndash;定义维护者&ndash;&gt;-->
+                        <!--                                <maintainer>${docker.maintainer}</maintainer>-->
+                        <!--                            </build>-->
+                        <!--                        </image>-->
                     </images>
                 </configuration>
             </plugin>
