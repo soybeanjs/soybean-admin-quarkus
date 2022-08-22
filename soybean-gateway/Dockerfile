@@ -1,4 +1,4 @@
-FROM eclipse-temurin:11.0.15_10-jre-alpine
+FROM apache/skywalking-java-agent:8.11.0-java11
 
 MAINTAINER 1571339199@qq.com
 
@@ -12,7 +12,9 @@ WORKDIR /app
 
 COPY ./target/soybean-gateway.jar app.jar
 
-ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms256m -Xmx512m"
+ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms256m -Xmx512m" \
+    SW_AGENT_COLLECTOR_BACKEND_SERVICES="127.0.0.1:11800" \
+    SW_AGENT_NAME="soundforce-gateway"
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 

@@ -3,6 +3,12 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.3</version>
+        <relativePath/>
+    </parent>
     <packaging>pom</packaging>
     <groupId>com.soybean</groupId>
     <artifactId>soybean-dependencies</artifactId>
@@ -57,9 +63,9 @@
         <!--    maven/project 等配置相关 end    -->
 
         <!--    spring全家桶 start    -->
-        <spring-boot.version>2.7.2</spring-boot.version>
+        <spring-boot.version>2.7.3</spring-boot.version>
         <spring-cloud.version>2021.0.3</spring-cloud.version>
-        <spring-boot-admin.version>2.7.2</spring-boot-admin.version>
+        <spring-boot-admin.version>2.7.3</spring-boot-admin.version>
         <!--    spring全家桶 end    -->
 
         <!--    阿里系 start    -->

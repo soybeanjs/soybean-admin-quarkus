@@ -92,7 +92,7 @@
             <properties>
                 <!--开发环境-->
                 <spring.active>dev</spring.active>
-                <nacos.server-addr>120.48.68.52:30870</nacos.server-addr>
+                <nacos.server-addr>localhost:8848</nacos.server-addr>
                 <nacos.namespace>dev</nacos.namespace>
             </properties>
         </profile>

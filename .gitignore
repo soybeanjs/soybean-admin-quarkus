@@ -25,6 +25,6 @@ logs/
 .DS_Store
 
 rebel.xml
-/deploy/env-build/docker/dev/data/
-/deploy/env-build/docker/dev/standalone-logs/
 /deploy/env-build/docker/dev/mysql/
+/deploy/env-build/docker/dev/rabbitmq/
+/deploy/env-build/docker/dev/standalone-logs/

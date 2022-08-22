@@ -9,7 +9,7 @@
 # 另外最后一句某些网上流传的精简打包本质是把jar文件和程序运行时文件分离开来然后吹嘘镜像从几百兆缩减到了几兆
 # 只能说不要为了瘦身而瘦身 这种方式了解其本质即可 但项目错综复杂 纵观其他kafka nacos开源组件如果都这样做 那java程序在云原生环境下可太牛了
 # 如果非要追求java方式的镜像精简 推荐vertx或者quarkus或者等spring native成熟 否则推荐其他语言
-FROM eclipse-temurin:11.0.15_10-jre
+FROM apache/skywalking-java-agent:8.11.0-java11
 
 MAINTAINER 1571339199@qq.com
 
@@ -23,7 +23,9 @@ WORKDIR /app
 
 COPY ./target/soybean-uaa.jar app.jar
 
-ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms256m -Xmx512m"
+ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms256m -Xmx512m" \
+    SW_AGENT_COLLECTOR_BACKEND_SERVICES="127.0.0.1:11800" \
+    SW_AGENT_NAME="soundforce-uaa"
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
