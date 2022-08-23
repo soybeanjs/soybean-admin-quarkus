@@ -12,7 +12,7 @@ services:
       - $PWD/env/nacos-standlone-mysql.env
     volumes:
       - $PWD/standalone-logs/:/home/nacos/logs
-      - $PWD/init.d/custom.properties:/home/nacos/init.d/custom.properties
+      - $PWD/init.d/application.properties:/home/nacos/conf/application.properties
     ports:
       - "8848:8848"
       - "9848:9848"
@@ -150,7 +150,7 @@ services:
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: 172.18.0.12:24224
+        fluentd-address: 172.18.0.15:24224
         tag: httpd.access
 
   fluentd:
