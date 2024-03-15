@@ -1,6 +1,7 @@
-package cn.soybean.system.entity
+package cn.soybean.system.domain.entity
 
 import cn.soybean.framework.common.base.BaseEntity
+import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -13,7 +14,7 @@ class SystemMenuEntity(
     /**
      * 菜单名称
      */
-    @Column(name = "menu_name", nullable = false)
+    @Column(name = "menu_name", nullable = false, length = DbConstants.LENGTH_20)
     var menuName: String? = null,
 
     /**
@@ -25,7 +26,7 @@ class SystemMenuEntity(
     /**
      * 排序
      */
-    @Column(name = "order", nullable = false)
+    @Column(name = "sequence", nullable = false)
     var order: Int? = null,
 
     /**
@@ -37,40 +38,40 @@ class SystemMenuEntity(
     /**
      * 菜单图标
      */
-    @Column(name = "icon")
+    @Column(name = "icon", length = DbConstants.LENGTH_20)
     var icon: String? = null,
 
     /**
      * 菜单图标类型
      */
-    @Column(name = "icon_type")
+    @Column(name = "icon_type", length = DbConstants.LENGTH_20)
     var iconType: String? = null,
 
     /**
      * 路由名称
      */
-    @Column(name = "route_name")
+    @Column(name = "route_name", length = DbConstants.LENGTH_20)
     var routeName: String? = null,
 
     /**
      * 路由地址
      */
-    @Column(name = "route_path")
+    @Column(name = "route_path", length = DbConstants.LENGTH_20)
     var routePath: String? = null,
 
     /**
      * 组件
      */
-    @Column(name = "component")
+    @Column(name = "component", length = DbConstants.LENGTH_20)
     var component: String? = null,
 
-    @Column(name = "i18n_key")
+    @Column(name = "i18n_key", length = DbConstants.LENGTH_20)
     var i18nKey: String? = null,
 
     @Column(name = "multi_tab")
     var multiTab: Boolean? = null,
 
-    @Column(name = "active_menu")
+    @Column(name = "active_menu", length = DbConstants.LENGTH_20)
     var activeMenu: String? = null,
 
     @Column(name = "hide_in_menu")

@@ -1,12 +1,20 @@
-package cn.soybean.system.entity
+package cn.soybean.system.domain.entity
 
 import cn.soybean.framework.common.base.BaseTenantEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "sys_user_role")
+@Table(
+    name = "sys_user_role", indexes = [
+        Index(columnList = "tenant_id"),
+        Index(columnList = "user_id, role_id"),
+        Index(columnList = "user_id"),
+        Index(columnList = "role_id")
+    ]
+)
 class SystemUserRoleEntity(
 
     /**

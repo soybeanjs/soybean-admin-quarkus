@@ -1,6 +1,7 @@
-package cn.soybean.system.entity
+package cn.soybean.system.domain.entity
 
 import cn.soybean.framework.common.base.BaseEntity
+import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
 import cn.soybean.framework.common.converters.JsonLongSetTypeHandler
 import jakarta.persistence.Column
@@ -15,7 +16,7 @@ class SystemTenantPackageEntity(
     /**
      * 租户套餐名称
      */
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = DbConstants.LENGTH_20)
     var name: String? = null,
 
     /**

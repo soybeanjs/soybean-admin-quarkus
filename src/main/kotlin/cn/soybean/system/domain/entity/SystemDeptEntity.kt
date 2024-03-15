@@ -1,18 +1,24 @@
-package cn.soybean.system.entity
+package cn.soybean.system.domain.entity
 
 import cn.soybean.framework.common.base.BaseTenantEntity
+import cn.soybean.framework.common.consts.DbConstants
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "sys_dept")
+@Table(
+    name = "sys_dept", indexes = [
+        Index(columnList = "tenant_id")
+    ]
+)
 class SystemDeptEntity(
 
     /**
      * 部门名称
      */
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = DbConstants.LENGTH_20)
     var name: String? = null,
 
     /**
@@ -24,7 +30,7 @@ class SystemDeptEntity(
     /**
      * 排序
      */
-    @Column(name = "order")
+    @Column(name = "sequence")
     var order: Int? = null,
 
     /**
@@ -36,7 +42,7 @@ class SystemDeptEntity(
     /**
      * 部门领导账号名称
      */
-    @Column(name = "leader_account_name")
+    @Column(name = "leader_account_name", length = DbConstants.LENGTH_20)
     var leaderAccountName: String? = null,
 
     @Column(name = "remark")

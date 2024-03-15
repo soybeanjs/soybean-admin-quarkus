@@ -10,6 +10,10 @@ object DbEnums {
         CUSTOM // 用户自定义数据权限，可能针对特定的业务需求定义更细粒度的权限
     }
 
+    enum class LoginType {
+        PC
+    }
+
     enum class MenuItemType {
         MENU, // 表示一个具体的菜单项
         DIRECTORY // 表示一个包含子菜单项的目录

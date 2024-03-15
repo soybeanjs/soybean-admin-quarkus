@@ -18,9 +18,10 @@ class BaseEntityListener {
     fun setCreatedInfo(obj: Any) {
         when (obj) {
             is BaseEntity -> {
-                obj.createBy = loginHelper.getUserId()
-                obj.createAccountName = loginHelper.getAccountName()
-                obj.createTime = LocalDateTime.now()
+                if (obj.createBy == null) loginHelper.getUserId().also { obj.createBy = it }
+                if (obj.createAccountName.isNullOrBlank()) loginHelper.getAccountName()
+                    .also { obj.createAccountName = it }
+                LocalDateTime.now().also { obj.createTime = it }
             }
         }
     }
@@ -29,9 +30,10 @@ class BaseEntityListener {
     fun setUpdatedInfo(obj: Any) {
         when (obj) {
             is BaseEntity -> {
-                obj.updateBy = loginHelper.getUserId()
-                obj.updateAccountName = loginHelper.getAccountName()
-                obj.updateTime = LocalDateTime.now()
+                if (obj.updateBy == null) loginHelper.getUserId().also { obj.updateBy = it }
+                if (obj.updateAccountName.isNullOrBlank()) loginHelper.getAccountName()
+                    .also { obj.updateAccountName = it }
+                LocalDateTime.now().also { obj.updateTime = it }
             }
         }
     }
