@@ -1,3 +1,3 @@
 package cn.soybean.system.domain.vo
 
-data class LoginRespVO(val accessToken: String, val refreshToken: String)
+data class LoginRespVO(val token: String, val refreshToken: String)

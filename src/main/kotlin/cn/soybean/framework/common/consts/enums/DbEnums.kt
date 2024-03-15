@@ -15,6 +15,7 @@ object DbEnums {
     }
 
     enum class MenuItemType {
+        _UNUSED,
         MENU, // 表示一个具体的菜单项
         DIRECTORY // 表示一个包含子菜单项的目录
     }

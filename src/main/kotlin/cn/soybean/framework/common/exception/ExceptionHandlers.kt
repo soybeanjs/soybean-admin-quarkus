@@ -14,19 +14,14 @@ class ExceptionHandlers {
     @ServerExceptionMapper
     fun handleNoResultException(e: NoResultException): Uni<Response> = uni {
         Response.ok()
-            .entity(
-                ResponseEntity.fail<Any>(
-                    Response.Status.NO_CONTENT.statusCode.toString(),
-                    Response.Status.NO_CONTENT.reasonPhrase
-                )
-            )
+            .entity(ResponseEntity.fail<Any>(Response.Status.NO_CONTENT.reasonPhrase))
             .build()
     }
 
     @ServerExceptionMapper
     fun handleServiceException(e: ServiceException): Uni<Response> = uni {
         Response.ok()
-            .entity(ResponseEntity.fail<Any>(e.message))
+            .entity(ResponseEntity.fail<Any>(e.message ?: "Unknown"))
             .build()
     }
 }

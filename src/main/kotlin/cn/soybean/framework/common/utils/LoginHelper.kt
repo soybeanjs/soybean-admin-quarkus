@@ -20,11 +20,17 @@ class LoginHelper {
     @Claim("tenantId")
     private lateinit var tenant: String
 
+    @Inject
+    @Claim(standard = Claims.groups)
+    private lateinit var groups: Set<Any>
+
     fun getUserId(): Long? = subject.toLongOrNull()
 
     fun getAccountName(): String = upn
 
     fun getTenantId(): Long? = tenant.toLongOrNull()
+
+    fun getRoles(): Set<Any> = groups
 
     companion object {
         const val TENANT_KEY: String = "tenantId"
