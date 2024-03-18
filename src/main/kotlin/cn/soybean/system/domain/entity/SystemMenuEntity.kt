@@ -4,8 +4,6 @@ import cn.soybean.framework.common.base.BaseEntity
 import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
 import cn.soybean.framework.infrastructure.converters.JsonToListConverter
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
-import io.smallrye.mutiny.Uni
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -95,19 +93,4 @@ class SystemMenuEntity(
 
     @Column(name = "href", length = DbConstants.LENGTH_64)
     var href: String? = null,
-) : BaseEntity() {
-    companion object : PanacheCompanion<SystemMenuEntity> {
-        fun listAllByUserId(userId: Long): Uni<List<SystemMenuEntity>> {
-            return list(
-                """
-                        select m from SystemMenuEntity m
-                        left join SystemRoleMenuEntity rm on m.id = rm.menuId
-                        left join SystemUserRoleEntity ur on rm.roleId = ur.roleId
-                        where ur.userId = ?1 and m.status = ?2
-                """,
-                userId,
-                DbEnums.Status.ENABLED
-            )
-        }
-    }
-}
+) : BaseEntity()

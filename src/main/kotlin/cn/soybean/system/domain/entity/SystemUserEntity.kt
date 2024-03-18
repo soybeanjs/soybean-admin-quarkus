@@ -3,11 +3,6 @@ package cn.soybean.system.domain.entity
 import cn.soybean.framework.common.base.BaseTenantEntity
 import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
-import cn.soybean.framework.interfaces.exception.ErrorCode
-import cn.soybean.framework.interfaces.exception.ServiceException
-import io.quarkus.elytron.security.common.BcryptUtil
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
-import io.smallrye.mutiny.Uni
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Index
@@ -101,28 +96,4 @@ class SystemUserEntity(
      */
     @Column(name = "status", nullable = false)
     var status: DbEnums.Status = DbEnums.Status.ENABLED
-) : BaseTenantEntity() {
-    companion object : PanacheCompanion<SystemUserEntity> {
-        private fun findByAccountNameOrEmailOrPhoneNumber(username: String, tenantId: Long): Uni<SystemUserEntity> =
-            find(
-                "tenantId = ?1 and (accountName = ?2 or email = ?2 or phoneNumber = ?2)",
-                tenantId,
-                username
-            ).singleResult()
-
-        fun pwdAuthenticate(userName: String, password: String, tenantId: Long): Uni<SystemUserEntity> =
-            findByAccountNameOrEmailOrPhoneNumber(userName, tenantId)
-                .onItem().ifNull().failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
-                .flatMap { verifyUserCredentials(it, password) }
-
-        private fun verifyUserCredentials(user: SystemUserEntity, password: String): Uni<SystemUserEntity> = when {
-            !BcryptUtil.matches(password, user.accountPassword) -> Uni.createFrom()
-                .failure(ServiceException(ErrorCode.ACCOUNT_CREDENTIALS_INVALID))
-
-            user.status == DbEnums.Status.DISABLED -> Uni.createFrom()
-                .failure(ServiceException(ErrorCode.ACCOUNT_DISABLED))
-
-            else -> Uni.createFrom().item(user)
-        }
-    }
-}
+) : BaseTenantEntity()

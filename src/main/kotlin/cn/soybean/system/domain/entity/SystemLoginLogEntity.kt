@@ -3,7 +3,6 @@ package cn.soybean.system.domain.entity
 import cn.soybean.framework.common.base.BaseTenantEntity
 import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -42,6 +41,4 @@ class SystemLoginLogEntity(
     // UA
     @Column(name = "user_agent")
     val userAgent: String? = null
-) : BaseTenantEntity() {
-    companion object : PanacheCompanion<SystemLoginLogEntity>
-}
+) : BaseTenantEntity()

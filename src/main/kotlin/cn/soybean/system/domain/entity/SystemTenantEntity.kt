@@ -3,10 +3,6 @@ package cn.soybean.system.domain.entity
 import cn.soybean.framework.common.base.BaseEntity
 import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
-import cn.soybean.framework.interfaces.exception.ErrorCode
-import cn.soybean.framework.interfaces.exception.ServiceException
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
-import io.smallrye.mutiny.Uni
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Index
@@ -71,18 +67,4 @@ class SystemTenantEntity(
      */
     @Column(name = "expire_time", nullable = false)
     var expireTime: LocalDateTime? = null
-) : BaseEntity() {
-    companion object : PanacheCompanion<SystemTenantEntity> {
-        fun findByName(name: String): Uni<SystemTenantEntity> = find("name", name).singleResult()
-
-        fun verifyTenantStatus(tenant: SystemTenantEntity): Uni<SystemTenantEntity> = when {
-            tenant.status == DbEnums.Status.DISABLED -> Uni.createFrom()
-                .failure(ServiceException(ErrorCode.TENANT_DISABLED))
-
-            LocalDateTime.now().isAfter(tenant.expireTime) ->
-                Uni.createFrom().failure(ServiceException(ErrorCode.TENANT_EXPIRED))
-
-            else -> Uni.createFrom().item(tenant)
-        }
-    }
-}
+) : BaseEntity()

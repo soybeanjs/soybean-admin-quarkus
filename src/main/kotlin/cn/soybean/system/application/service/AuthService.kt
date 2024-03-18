@@ -5,12 +5,12 @@ import cn.soybean.framework.common.util.LoginHelper.Companion.DEPT_KEY
 import cn.soybean.framework.common.util.LoginHelper.Companion.TENANT_KEY
 import cn.soybean.framework.common.util.LoginHelper.Companion.USER_KEY
 import cn.soybean.framework.common.util.getClientIPAndPort
-import cn.soybean.framework.interfaces.exception.ErrorCode
-import cn.soybean.framework.interfaces.exception.ServiceException
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
-import cn.soybean.system.domain.entity.SystemRoleEntity
 import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.entity.SystemUserEntity
+import cn.soybean.system.domain.service.RoleService
+import cn.soybean.system.domain.service.TenantService
+import cn.soybean.system.domain.service.UserService
 import cn.soybean.system.interfaces.dto.PwdLoginDTO
 import cn.soybean.system.interfaces.vo.LoginRespVO
 import io.smallrye.jwt.build.Jwt
@@ -22,25 +22,25 @@ import org.eclipse.microprofile.jwt.Claims
 
 @ApplicationScoped
 class AuthService(
+    private val tenantService: TenantService,
+    private val userService: UserService,
+    private val roleService: RoleService,
     private val routingContext: RoutingContext,
     private val eventBus: Event<SystemLoginLogEntity>
 ) {
 
-    fun pwdLogin(req: PwdLoginDTO): Uni<LoginRespVO> = SystemTenantEntity.findByName(req.tenantName)
-        .onItem().ifNull().failWith(ServiceException(ErrorCode.TENANT_NOT_FOUND))
+    fun pwdLogin(req: PwdLoginDTO): Uni<LoginRespVO> = tenantService.findAndVerifyTenant(req.tenantName)
         .flatMap { tenant ->
-            SystemTenantEntity.verifyTenantStatus(tenant)
-                .flatMap {
-                    SystemUserEntity.pwdAuthenticate(req.userName, req.password, tenant.id!!)
-                        .map { user -> Pair(tenant, user) }
+            userService.findAndVerifyUserCredentials(req.userName, req.password, tenant.id!!)
+                .flatMap { user ->
+                    roleService.getRoleCodesByUserId(user.id!!)
+                        .map { roles -> Triple(tenant, user, roles) }
                 }
         }
-        .flatMap { pair ->
-            SystemRoleEntity.getRoleCodeByUserId(pair.second.id!!)
-                .map { roles -> Triple(pair.first, pair.second, roles) }
-        }
-        .map { triple ->
-            createLoginRespVO(triple.first, triple.second, triple.third)
+        .map { (tenant, user, roles) ->
+            createLoginRespVO(tenant, user, roles).also {
+                saveLoginLog(user, tenant.id)
+            }
         }
 
     private fun createLoginRespVO(

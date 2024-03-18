@@ -1,3 +1,7 @@
 package cn.soybean.system.domain.repository
 
-interface SystemRoleRepository 
+import io.smallrye.mutiny.Uni
+
+interface SystemRoleRepository {
+    fun getRoleCodesByUserId(userId: Long): Uni<Set<String>>
+}

@@ -4,8 +4,6 @@ import cn.soybean.framework.common.base.BaseTenantEntity
 import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
 import cn.soybean.framework.infrastructure.converters.JsonLongSetTypeHandler
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
-import io.smallrye.mutiny.Uni
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -66,11 +64,4 @@ class SystemRoleEntity(
 
     @Column(name = "remark")
     var remark: String? = null,
-) : BaseTenantEntity() {
-    companion object : PanacheCompanion<SystemRoleEntity> {
-        fun getRoleCodeByUserId(userId: Long): Uni<Set<String>> = list(
-            "select r from SystemRoleEntity r, SystemUserRoleEntity ur where r.id = ur.roleId and ur.userId = ?1",
-            userId
-        ).map { roles -> roles.mapNotNull { it.code }.toSet() }
-    }
-}
+) : BaseTenantEntity()

@@ -3,20 +3,21 @@ package cn.soybean.system.application.service
 import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.util.isSuperUser
 import cn.soybean.system.domain.entity.SystemMenuEntity
+import cn.soybean.system.domain.service.MenuService
 import cn.soybean.system.interfaces.convert.convertToMenuRespVO
 import cn.soybean.system.interfaces.vo.MenuRespVO
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class SystemManageService {
+class SystemManageService(private val menuService: MenuService) {
 
     fun getUserRoutes(userId: Long?): Uni<Map<String, Any>> = userId?.let { nonNullUserId ->
         when {
-            isSuperUser(nonNullUserId) -> SystemMenuEntity.listAll()
+            isSuperUser(nonNullUserId) -> menuService.all()
                 .map { mapOf("routes" to buildMenuTree(it), "home" to "home") }
 
-            else -> SystemMenuEntity.listAllByUserId(userId)
+            else -> menuService.allByUserId(userId)
                 .map { mapOf("routes" to buildMenuTree(it), "home" to "home") }
         }
     } ?: Uni.createFrom().item(mapOf("routes" to Unit, "home" to "home"))
