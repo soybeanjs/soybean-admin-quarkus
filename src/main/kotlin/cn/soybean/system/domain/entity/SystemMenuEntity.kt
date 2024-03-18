@@ -3,7 +3,7 @@ package cn.soybean.system.domain.entity
 import cn.soybean.framework.common.base.BaseEntity
 import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
-import cn.soybean.framework.common.converters.JsonToListConverter
+import cn.soybean.framework.infrastructure.converters.JsonToListConverter
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
 import io.smallrye.mutiny.Uni
 import jakarta.persistence.Column

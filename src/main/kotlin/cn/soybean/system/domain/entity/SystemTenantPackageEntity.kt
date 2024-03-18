@@ -3,7 +3,7 @@ package cn.soybean.system.domain.entity
 import cn.soybean.framework.common.base.BaseEntity
 import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
-import cn.soybean.framework.common.converters.JsonLongSetTypeHandler
+import cn.soybean.framework.infrastructure.converters.JsonLongSetTypeHandler
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity

@@ -1,6 +1,6 @@
 package cn.soybean.framework.common.base
 
-import cn.soybean.framework.common.utils.LoginHelper
+import cn.soybean.framework.common.util.LoginHelper
 import io.quarkus.arc.Arc
 import io.quarkus.runtime.annotations.RegisterForReflection
 import jakarta.persistence.PrePersist
