@@ -28,6 +28,11 @@ object DbEnums {
         ENABLED, DISABLED
     }
 
+    enum class ApiKeyType {
+        SIMPLE, // API key验证
+        SIGNED // API key验证 或者 需要API key和API Secret共同参与的加签验签 互斥的话自己修改filter业务逻辑
+    }
+
     enum class CountryInfo(
         val englishName: String,
         val chineseName: String,
