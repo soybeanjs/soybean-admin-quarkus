@@ -30,7 +30,7 @@ class SystemBootStrapRecorder(
             Panache.withSession {
                 SystemApiKeyEntity.listAll().map { apiKey ->
                     apiKey.forEach {
-                        apiKeyCache.set(it.apiKey!!, it)
+                        apiKeyCache.set(it.apiKey, it)
                     }
                 }
             }

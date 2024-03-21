@@ -49,5 +49,5 @@ class SystemApisEntity(
     @Column(name = "create_time", updatable = false)
     var createTime: LocalDateTime? = null
 ) : PanacheEntityBase {
-    companion object : PanacheCompanion<SystemApisEntity>;
+    companion object : PanacheCompanion<SystemApisEntity>
 }
