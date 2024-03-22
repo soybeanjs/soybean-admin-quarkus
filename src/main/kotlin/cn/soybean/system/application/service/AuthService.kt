@@ -57,7 +57,6 @@ class AuthService(
             .claim(Claims.nickname.name, systemUserEntity.nickName)
             .claim(Claims.gender.name, systemUserEntity.gender ?: "")
             .sign()
-        saveLoginLog(systemUserEntity, tenantEntity.id)
         return LoginRespVO(tokenValue, "")
     }
 
