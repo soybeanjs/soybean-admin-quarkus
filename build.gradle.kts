@@ -23,11 +23,11 @@ val projectVersion: String by project
 
 val javaVersion = JavaVersion.VERSION_21
 
-val jacksonModuleKotlinVersion = "2.16.1"
-val redissonQuarkus30Version = "3.26.1"
-val konvertVersion = "3.0.0"
-val mutinyReactorVersion = "2.5.6"
-val jakartaPersistenceVersion = "3.2.0-M1"
+val jacksonModuleKotlinVersion = "2.17.0"
+val redissonQuarkus30Version = "3.27.2"
+val konvertVersion = "3.0.1"
+val mutinyReactorVersion = "2.6.0"
+val jakartaPersistenceVersion = "3.2.0-M2"
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
