@@ -1,28 +1,24 @@
 package cn.soybean.system.interfaces.vo
 
-import com.fasterxml.jackson.annotation.JsonInclude
+import cn.soybean.framework.common.consts.enums.DbEnums
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class MenuRespVO(
-    val parentId: Long? = null,
-    val name: String? = null,
-    val path: String? = null,
-    val component: String? = null,
-    val meta: RouteMeta? = null,
-    var children: List<MenuRespVO>? = null
-)
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class RouteMeta(
-    val title: String? = null,
-    val i18nKey: String? = null,
-    val roles: List<String>? = null,
-    val keepAlive: Boolean? = null,
-    val constant: Boolean? = null,
-    val icon: String? = null,
-    val order: Int? = null,
-    val href: String? = null,
-    val hideInMenu: Boolean? = null,
-    val activeMenu: String? = null,
-    val multiTab: Boolean? = null,
+data class MenuRespVO(
+    var menuName: String? = null,
+    var menuType: DbEnums.MenuItemType? = null,
+    var order: Int? = null,
+    var parentId: Long? = null,
+    var icon: String? = null,
+    var iconType: String? = null,
+    var routeName: String? = null,
+    var routePath: String? = null,
+    var component: String? = null,
+    var i18nKey: String? = null,
+    var multiTab: Boolean? = null,
+    var activeMenu: String? = null,
+    var hideInMenu: Boolean? = null,
+    var status: DbEnums.Status? = null,
+    var roles: List<String>? = null,
+    var keepAlive: Boolean? = null,
+    var constant: Boolean? = null,
+    var href: String? = null,
 )

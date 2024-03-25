@@ -4,6 +4,8 @@ import cn.soybean.framework.common.base.BaseEntity
 import cn.soybean.framework.common.consts.DbConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
 import cn.soybean.framework.infrastructure.converters.JsonToListConverter
+import cn.soybean.system.interfaces.vo.MenuRespVO
+import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -11,6 +13,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "sys_menu")
+@KonvertTo(MenuRespVO::class)
 class SystemMenuEntity(
 
     /**

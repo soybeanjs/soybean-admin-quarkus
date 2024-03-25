@@ -6,6 +6,9 @@ import cn.soybean.framework.interfaces.exception.ServiceException
 import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.domain.repository.SystemUserRepository
 import io.quarkus.elytron.security.common.BcryptUtil
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheQuery
+import io.quarkus.panache.common.Parameters
+import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
@@ -26,4 +29,7 @@ class UserService(private val systemUserRepository: SystemUserRepository) {
 
         else -> Uni.createFrom().item(user)
     }
+
+    fun getUserList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemUserEntity> =
+        systemUserRepository.getUserList(query, sort, params)
 }
