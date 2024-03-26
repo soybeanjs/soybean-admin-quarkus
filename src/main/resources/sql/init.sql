@@ -3,56 +3,56 @@ INSERT INTO public.sys_menu (id, create_account_name, create_by, create_time, up
                              update_time, active_menu, component, hide_in_menu, i18n_key, icon, menu_name, menu_type,
                              multi_tab, sequence, parent_id, route_name, route_path, status, constant, href, keep_alive,
                              roles, icon_type)
-VALUES (1, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'layout.base$view.home', null,
-        'route.home', 'mdi:monitor-dashboard', '首页', 2, null, 10, 0, 'home', '/home', 1, null, null, null, null, null)
+VALUES (1, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'layout.base$view.home', false,
+        'route.home', 'mdi:monitor-dashboard', '首页', 1, null, 10, 0, 'home', '/home', 0, null, null, null, null, '1')
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.sys_menu (id, create_account_name, create_by, create_time, update_account_name, update_by,
                              update_time, active_menu, component, hide_in_menu, i18n_key, icon, menu_name, menu_type,
                              multi_tab, sequence, parent_id, route_name, route_path, status, constant, href, keep_alive,
                              roles, icon_type)
-VALUES (2, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'layout.base', null, 'route.manage',
-        'carbon:cloud-service-management', '系统管理', 1, null, 20, 0, 'manage', '/manage', 1, null, null, null, null,
-        null)
+VALUES (2, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'layout.base', false, 'route.manage',
+        'carbon:cloud-service-management', '系统管理', 0, null, 20, 0, 'manage', '/manage', 0, null, null, null, null,
+        '1')
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.sys_menu (id, create_account_name, create_by, create_time, update_account_name, update_by,
                              update_time, active_menu, component, hide_in_menu, i18n_key, icon, menu_name, menu_type,
                              multi_tab, sequence, parent_id, route_name, route_path, status, constant, href, keep_alive,
                              roles, icon_type)
-VALUES (3, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'view.manage_user', null,
-        'route.manage_user', 'ic:round-manage-accounts', '用户管理', 2, null, 1, 2, 'manage_user', '/manage/user', 1,
-        null, null, null, null, null)
+VALUES (3, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'view.manage_user', false,
+        'route.manage_user', 'ic:round-manage-accounts', '用户管理', 1, null, 1, 2, 'manage_user', '/manage/user', 0,
+        null, null, null, null, '1')
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.sys_menu (id, create_account_name, create_by, create_time, update_account_name, update_by,
                              update_time, active_menu, component, hide_in_menu, i18n_key, icon, menu_name, menu_type,
                              multi_tab, sequence, parent_id, route_name, route_path, status, constant, href, keep_alive,
                              roles, icon_type)
-VALUES (4, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'view.manage_role', null,
-        'route.manage_role', 'carbon:user-role', '角色管理', 2, null, 2, 2, 'manage_role', '/manage/role', 1, null,
-        null, null, null, null)
+VALUES (4, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'view.manage_role', false,
+        'route.manage_role', 'carbon:user-role', '角色管理', 1, null, 2, 2, 'manage_role', '/manage/role', 0, null,
+        null, null, null, '1')
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.sys_menu (id, create_account_name, create_by, create_time, update_account_name, update_by,
                              update_time, active_menu, component, hide_in_menu, i18n_key, icon, menu_name, menu_type,
                              multi_tab, sequence, parent_id, route_name, route_path, status, constant, href, keep_alive,
                              roles, icon_type)
-VALUES (5, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'view.manage_menu', null,
-        'route.manage_menu', 'material-symbols:route', '菜单管理', 2, null, 3, 2, 'manage_menu', '/manage/menu', 1,
-        null, null, null, null, null)
+VALUES (5, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'view.manage_menu', false,
+        'route.manage_menu', 'material-symbols:route', '菜单管理', 1, null, 3, 2, 'manage_menu', '/manage/menu', 0,
+        null, null, null, null, '1')
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.sys_menu (id, create_account_name, create_by, create_time, update_account_name, update_by,
                              update_time, active_menu, component, hide_in_menu, i18n_key, icon, menu_name, menu_type,
                              multi_tab, sequence, parent_id, route_name, route_path, status, constant, href, keep_alive,
                              roles, icon_type)
 VALUES (6, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'view.manage_user-detail',
-        true, 'route.manage_user-detail', null, '用户详情', 2, null, 4, 2, 'manage_user-detail',
-        '/manage/user-detail/:id', 1, null, null, null, null, null)
+        true, 'route.manage_user-detail', null, '用户详情', 1, null, 4, 2, 'manage_user-detail',
+        '/manage/user-detail/:id', 0, null, null, null, null, '1')
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.sys_menu (id, create_account_name, create_by, create_time, update_account_name, update_by,
                              update_time, active_menu, component, hide_in_menu, i18n_key, icon, menu_name, menu_type,
                              multi_tab, sequence, parent_id, route_name, route_path, status, constant, href, keep_alive,
                              roles, icon_type)
-VALUES (7, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'layout.base$view.about', null,
-        'route.about', 'fluent:book-information-24-regular', '关于', 2, null, 30, 0, 'about', '/about', 1, null, null,
-        null, null, null)
+VALUES (7, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, null, 'layout.base$view.about', false,
+        'route.about', 'fluent:book-information-24-regular', '关于', 1, null, 30, 0, 'about', '/about', 0, null, null,
+        null, null, '1')
 ON CONFLICT (id) DO NOTHING;
 
 -- sys_role
@@ -83,7 +83,7 @@ INSERT INTO public.sys_user (id, create_account_name, create_by, create_time, up
                              dept_id, email, gender, nick_name, personal_profile, phone_code, phone_number, status)
 VALUES (1, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, 1, 'Soybean',
         '$2a$10$BrNwelZswsGy9FGCTARd5efBtM0Ra4Xz8e8DoT86EOju9Ii0jpBg6', null, true, 'CN', null, null, 0, 'Soybean',
-        null, '86', null, 0)
+        'Built-in super administrator user', '86', null, 0)
 ON CONFLICT (id) DO NOTHING;
 
 -- sys_api_key

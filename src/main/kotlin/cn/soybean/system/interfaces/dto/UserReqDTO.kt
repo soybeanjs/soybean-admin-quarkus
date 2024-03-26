@@ -5,19 +5,19 @@ import cn.soybean.framework.interfaces.dto.BasePageParam
 import jakarta.ws.rs.QueryParam
 
 class UserReqDTO(
-    @field:QueryParam("userName")
+    @field:QueryParam("accountName")
     var accountName: String? = null,
 
-    @field:QueryParam("userGender")
+    @field:QueryParam("gender")
     var gender: DbEnums.Gender? = null,
 
     @field:QueryParam("nickName")
     var nickName: String? = null,
 
-    @field:QueryParam("userPhone")
+    @field:QueryParam("phoneNumber")
     var phoneNumber: String? = null,
 
-    @field:QueryParam("userEmail")
+    @field:QueryParam("email")
     var email: String? = null,
 
     @field:QueryParam("status")

@@ -5,10 +5,10 @@ import cn.soybean.framework.interfaces.dto.BasePageParam
 import jakarta.ws.rs.QueryParam
 
 class RoleReqDTO(
-    @field:QueryParam("roleName")
+    @field:QueryParam("name")
     var name: String? = null,
 
-    @field:QueryParam("roleCode")
+    @field:QueryParam("code")
     var code: String? = null,
 
     @field:QueryParam("status")

@@ -7,7 +7,6 @@ import cn.soybean.system.domain.entity.toMenuRespVO
 import cn.soybean.system.domain.service.MenuService
 import cn.soybean.system.interfaces.convert.convertToMenuRespVO
 import cn.soybean.system.interfaces.vo.MenuRespVO
-import cn.soybean.system.interfaces.vo.MenuRoute
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
@@ -15,38 +14,67 @@ import jakarta.enterprise.context.ApplicationScoped
 class RouteAppService(private val menuService: MenuService) {
 
     fun getUserRoutes(userId: Long?): Uni<Map<String, Any>> = userId?.let { nonNullUserId ->
-        when {
+        val menusUni: Uni<List<SystemMenuEntity>> = when {
             isSuperUser(nonNullUserId) -> menuService.all()
-                .map { mapOf("routes" to buildMenuTree(it), "home" to "home") }
+            else -> menuService.allByUserId(nonNullUserId)
+        }
 
-            else -> menuService.allByUserId(userId)
-                .map { mapOf("routes" to buildMenuTree(it), "home" to "home") }
+        menusUni.map { menuItems ->
+            val menuRoutes = buildTree(
+                items = menuItems,
+                idSelector = { it.id ?: 0L },
+                parentIdSelector = { it.parentId ?: DbConstants.PARENT_ID_ROOT },
+                rootId = DbConstants.PARENT_ID_ROOT,
+                orderSelector = { it.order ?: 0 },
+                transform = { item, children ->
+                    item.convertToMenuRespVO().apply { this.children = children }
+                }
+            )
+            mapOf("routes" to menuRoutes, "home" to "home")
         }
     } ?: Uni.createFrom().item(mapOf("routes" to Unit, "home" to "home"))
 
-    private fun buildMenuTree(menuList: List<SystemMenuEntity>): List<MenuRoute> {
-        if (menuList.isEmpty()) return emptyList()
-
-        val treeNodeMap = menuList.associate {
-            it.id to it.convertToMenuRespVO()
-        }.toMutableMap()
-
-        treeNodeMap.values.forEach { childNode ->
-            if (childNode.parentId != DbConstants.PARENT_ID_ROOT) {
-                treeNodeMap[childNode.parentId]?.children =
-                    treeNodeMap[childNode.parentId]?.children.orEmpty() + childNode
-            }
+    fun getMenuList(userId: Long?): Uni<List<MenuRespVO>> = userId?.let { nonNullUserId ->
+        val menusUni: Uni<List<SystemMenuEntity>> = when {
+            isSuperUser(nonNullUserId) -> menuService.all()
+            else -> menuService.allByUserId(nonNullUserId)
         }
 
-        // 返回根节点列表
-        return treeNodeMap.values.filter { it.parentId == DbConstants.PARENT_ID_ROOT }
-    }
-
-    fun getMenuList(userId: Long?): Uni<List<MenuRespVO>> = userId?.let { nonNullUserId ->
-        when {
-            isSuperUser(nonNullUserId) -> menuService.all().map { menus -> menus.map { it.toMenuRespVO() } }
-
-            else -> menuService.allByUserId(userId).map { menus -> menus.map { it.toMenuRespVO() } }
+        menusUni.map { menuItems ->
+            buildTree(
+                items = menuItems,
+                idSelector = { it.id ?: 0L },
+                parentIdSelector = { it.parentId ?: DbConstants.PARENT_ID_ROOT },
+                rootId = DbConstants.PARENT_ID_ROOT,
+                orderSelector = { it.order ?: 0 },
+                transform = { item, children ->
+                    item.toMenuRespVO().apply { this.children = children }
+                }
+            )
         }
     } ?: Uni.createFrom().item(emptyList())
+
+    private fun <T, R> buildTree(
+        items: List<T>,
+        idSelector: (T) -> Long,
+        parentIdSelector: (T) -> Long,
+        rootId: Long,
+        orderSelector: (T) -> Int,
+        transform: (T, children: List<R>) -> R
+    ): List<R> {
+        val childrenByParentId = items.groupBy(parentIdSelector)
+
+        fun buildNode(item: T): R {
+            val children = childrenByParentId[idSelector(item)]
+                ?.sortedBy(orderSelector)
+                ?.map(::buildNode)
+                .orEmpty()
+            return transform(item, children)
+        }
+
+        return childrenByParentId[rootId]
+            ?.sortedBy(orderSelector)
+            ?.map(::buildNode)
+            .orEmpty()
+    }
 }

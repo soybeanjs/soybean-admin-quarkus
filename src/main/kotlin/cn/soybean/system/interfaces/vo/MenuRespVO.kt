@@ -3,6 +3,7 @@ package cn.soybean.system.interfaces.vo
 import cn.soybean.framework.common.consts.enums.DbEnums
 
 data class MenuRespVO(
+    var id: Long? = null,
     var menuName: String? = null,
     var menuType: DbEnums.MenuItemType? = null,
     var order: Int? = null,
@@ -21,4 +22,5 @@ data class MenuRespVO(
     var keepAlive: Boolean? = null,
     var constant: Boolean? = null,
     var href: String? = null,
+    var children: List<MenuRespVO>? = null
 )

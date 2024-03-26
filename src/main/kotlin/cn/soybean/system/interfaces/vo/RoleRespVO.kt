@@ -3,6 +3,7 @@ package cn.soybean.system.interfaces.vo
 import cn.soybean.framework.common.consts.enums.DbEnums
 
 data class RoleRespVO(
+    var id: Long? = null,
     var name: String? = null,
     var code: String? = null,
     var order: Int? = null,
