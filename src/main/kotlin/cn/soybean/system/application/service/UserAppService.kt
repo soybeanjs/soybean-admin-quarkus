@@ -4,7 +4,7 @@ import cn.soybean.framework.interfaces.dto.PageResult
 import cn.soybean.framework.interfaces.dto.QueryBuilder
 import cn.soybean.system.domain.entity.toUserRespVO
 import cn.soybean.system.domain.service.UserService
-import cn.soybean.system.interfaces.dto.UserReqDTO
+import cn.soybean.system.interfaces.dto.query.UserReqQuery
 import cn.soybean.system.interfaces.vo.UserRespVO
 import io.quarkus.panache.common.Page
 import io.quarkus.panache.common.Sort
@@ -14,7 +14,7 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class UserAppService(private val userService: UserService) {
 
-    fun getUserList(queryParam: UserReqDTO, tenantId: Long?): Uni<PageResult<UserRespVO>> =
+    fun getUserList(queryParam: UserReqQuery, tenantId: Long?): Uni<PageResult<UserRespVO>> =
         tenantId?.let { nonNullTenantId ->
             val queryBuilder = QueryBuilder(nonNullTenantId)
             queryParam.accountName?.let { queryBuilder.addLikeCondition("accountName", it) }

@@ -4,7 +4,7 @@ import cn.soybean.framework.common.consts.AppConstants
 import cn.soybean.framework.common.util.isSuperUser
 import cn.soybean.system.domain.entity.SystemApisEntity
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
-import cn.soybean.system.infrastructure.dto.UserPermActionDTO
+import cn.soybean.system.infrastructure.dto.UserPermAction
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.logging.Log
 import io.quarkus.vertx.VertxContextSupport
@@ -57,7 +57,7 @@ class SystemEventHandler(
         )
     }
 
-    fun handleUserPermActionEvent(@ObservesAsync userPermAction: UserPermActionDTO) {
+    fun handleUserPermActionEvent(@ObservesAsync userPermAction: UserPermAction) {
         sessionFactory.withStatelessSession { statelessSession ->
             when {
                 isSuperUser(userPermAction.userId) -> getApiPermAction(statelessSession).map { apis ->
@@ -73,7 +73,7 @@ class SystemEventHandler(
             )
     }
 
-    private fun storeUserPermAction(apis: List<SystemApisEntity>, userPermAction: UserPermActionDTO) {
+    private fun storeUserPermAction(apis: List<SystemApisEntity>, userPermAction: UserPermAction) {
         val permAction = apis.asSequence()
             .mapNotNull { it.permissions }
             .flatMap { it.split(",").asSequence().map(String::trim) }

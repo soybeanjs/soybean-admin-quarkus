@@ -4,7 +4,7 @@ import cn.soybean.framework.interfaces.dto.PageResult
 import cn.soybean.framework.interfaces.dto.QueryBuilder
 import cn.soybean.system.domain.entity.toRoleRespVO
 import cn.soybean.system.domain.service.RoleService
-import cn.soybean.system.interfaces.dto.RoleReqDTO
+import cn.soybean.system.interfaces.dto.query.RoleReqQuery
 import cn.soybean.system.interfaces.vo.RoleRespVO
 import io.quarkus.panache.common.Page
 import io.quarkus.panache.common.Sort
@@ -14,7 +14,7 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class RoleAppService(private val roleService: RoleService) {
 
-    fun getRoleList(queryParam: RoleReqDTO, tenantId: Long?): Uni<PageResult<RoleRespVO>> =
+    fun getRoleList(queryParam: RoleReqQuery, tenantId: Long?): Uni<PageResult<RoleRespVO>> =
         tenantId?.let { nonNullTenantId ->
             val queryBuilder = QueryBuilder(nonNullTenantId)
             queryParam.name?.let { queryBuilder.addLikeCondition("name", it) }

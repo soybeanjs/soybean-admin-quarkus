@@ -43,7 +43,7 @@ class SystemApisEntity(
     /**
      * description
      */
-    @Column(name = "description", length = DbConstants.LENGTH_64)
+    @Column(name = "description")
     var description: String? = null,
 
     @Column(name = "create_time", updatable = false)

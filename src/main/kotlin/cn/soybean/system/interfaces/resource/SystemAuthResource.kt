@@ -3,7 +3,7 @@ package cn.soybean.system.interfaces.resource
 import cn.soybean.framework.common.util.LoginHelper
 import cn.soybean.framework.interfaces.response.ResponseEntity
 import cn.soybean.system.application.service.AuthService
-import cn.soybean.system.interfaces.dto.PwdLoginDTO
+import cn.soybean.system.interfaces.dto.request.PwdLoginRequest
 import cn.soybean.system.interfaces.vo.LoginRespVO
 import cn.soybean.system.interfaces.vo.UserInfoVO
 import io.quarkus.hibernate.reactive.panache.common.WithSession
@@ -17,6 +17,7 @@ import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
+import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 
@@ -29,13 +30,15 @@ class SystemAuthResource(private val authService: AuthService, private val login
     @Path("/login")
     @POST
     @WithSession
-    fun login(@RequestBody(description = "PC端后台管理系统登录请求体") @Valid req: PwdLoginDTO): Uni<ResponseEntity<LoginRespVO>> =
+    @Operation(summary = "账号密码登录", description = "PC端后台管理系统账号密码登录")
+    fun login(@RequestBody(description = "PC端后台管理系统登录请求体") @Valid req: PwdLoginRequest): Uni<ResponseEntity<LoginRespVO>> =
         authService.pwdLogin(req).map { ResponseEntity.ok(it) }
 
     @Authenticated
     @Path("/getUserInfo")
     @GET
     @WithSession
+    @Operation(summary = "用户信息", description = "获取用户信息")
     fun getUserInfo(): Uni<ResponseEntity<UserInfoVO>> = uni {
         ResponseEntity.ok(
             UserInfoVO(

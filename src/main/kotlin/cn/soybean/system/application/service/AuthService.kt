@@ -13,8 +13,8 @@ import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.domain.service.RoleService
 import cn.soybean.system.domain.service.TenantService
 import cn.soybean.system.domain.service.UserService
-import cn.soybean.system.infrastructure.dto.UserPermActionDTO
-import cn.soybean.system.interfaces.dto.PwdLoginDTO
+import cn.soybean.system.infrastructure.dto.UserPermAction
+import cn.soybean.system.interfaces.dto.request.PwdLoginRequest
 import cn.soybean.system.interfaces.vo.LoginRespVO
 import io.smallrye.jwt.build.Jwt
 import io.smallrye.mutiny.Uni
@@ -30,10 +30,10 @@ class AuthService(
     private val roleService: RoleService,
     private val routingContext: RoutingContext,
     private val eventBus: Event<SystemLoginLogEntity>,
-    private val userPermActionEventBus: Event<UserPermActionDTO>
+    private val userPermActionEventBus: Event<UserPermAction>
 ) {
 
-    fun pwdLogin(req: PwdLoginDTO): Uni<LoginRespVO> = tenantService.findAndVerifyTenant(req.tenantName)
+    fun pwdLogin(req: PwdLoginRequest): Uni<LoginRespVO> = tenantService.findAndVerifyTenant(req.tenantName)
         .flatMap { tenant ->
             userService.findAndVerifyUserCredentials(req.userName, req.password, tenant.id!!)
                 .flatMap { user ->
@@ -62,7 +62,7 @@ class AuthService(
             .claim(Claims.nickname.name, systemUserEntity.nickName)
             .claim(Claims.gender.name, systemUserEntity.gender ?: "")
             .sign()
-        userPermActionEventBus.fireAsync(systemUserEntity.id?.let { UserPermActionDTO(it) })
+        userPermActionEventBus.fireAsync(systemUserEntity.id?.let { UserPermAction(it) })
         return LoginRespVO(tokenValue, "")
     }
 

@@ -1,11 +1,11 @@
-package cn.soybean.system.interfaces.dto
+package cn.soybean.system.interfaces.dto.query
 
 import cn.soybean.framework.common.consts.enums.DbEnums
 import cn.soybean.framework.interfaces.dto.BasePageParam
 import jakarta.ws.rs.QueryParam
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 
-class RoleReqDTO(
+class RoleReqQuery(
     @field:Parameter(description = "角色名称")
     @field:QueryParam("name")
     var name: String? = null,
