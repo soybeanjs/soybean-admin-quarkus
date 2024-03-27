@@ -7,6 +7,7 @@ object AppConstants {
     const val API_SIGNATURE = "X-Api-Signature"
     const val API_TIMESTAMP = "X-Api-Timestamp"
     const val API_NONCE = "X-Api-Nonce"
+    const val API_TENANT_ID = "X-Tenant-Id"
     const val API_TIMESTAMP_DISPARITY: Long = 10 * 60 * 1000
     const val API_TIMESTAMP_EXTRA_TIME_MARGIN: Long = 2 * 60 * 1000
     const val API_NONCE_CACHE_PREFIX = "CACHE::API_NONCE"

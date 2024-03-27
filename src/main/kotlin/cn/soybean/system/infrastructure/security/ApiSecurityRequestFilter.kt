@@ -77,7 +77,7 @@ class ApiSecurityRequestFilter(
     private fun validateHeaderAndParams(context: ContainerRequestContext, keyName: String): Uni<Response> {
         val keyValue = context.getHeaderString(keyName) ?: context.uriInfo.queryParameters.getFirst(keyName)
         return keyValue?.let {
-            val (isValid, errorMessage) = validateApiKeyValue(it)
+            val (isValid, errorMessage) = validateApiKeyValue(it, context)
             when {
                 isValid -> Uni.createFrom().nullItem()
                 else -> Uni.createFrom().item(badRequestResponse(errorMessage))
@@ -86,7 +86,10 @@ class ApiSecurityRequestFilter(
             .item(badRequestResponse("Oops! Looks like we're missing the '$keyName' API key needed to access this feature. Could you double-check and include it either in your request headers or as a query parameter? Thanks!"))
     }
 
-    private fun validateApiKeyValue(keyValue: String): Triple<Boolean, String, String> {
+    private fun validateApiKeyValue(
+        keyValue: String,
+        context: ContainerRequestContext
+    ): Triple<Boolean, String, String> {
         val apikeyEntity = apiKeyCache.get(keyValue)
         return when {
             apikeyEntity == null -> Triple(
@@ -101,7 +104,13 @@ class ApiSecurityRequestFilter(
                 ""
             )
 
-            else -> Triple(true, "", apikeyEntity.apiSecret)
+            else -> {
+                context.headers.putSingle(
+                    AppConstants.API_TENANT_ID,
+                    apikeyEntity.tenantId?.toString() ?: "defaultTenantId"
+                )
+                Triple(true, "", apikeyEntity.apiSecret)
+            }
         }
     }
 
@@ -187,7 +196,7 @@ class ApiSecurityRequestFilter(
         allQueryParams[AppConstants.API_KEY] = apiKey
         allQueryParams[AppConstants.API_TIMESTAMP] = context.getHeaderString(AppConstants.API_TIMESTAMP)
         allQueryParams[AppConstants.API_NONCE] = apiNonce
-        val (isValid, errorMessage, apiSecret) = validateApiKeyValue(apiKey)
+        val (isValid, errorMessage, apiSecret) = validateApiKeyValue(apiKey, context)
         return when {
             isValid -> {
                 val calculatedSign = SignUtil.createSign(allQueryParams, algorithm, apiSecret)
