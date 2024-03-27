@@ -13,8 +13,8 @@ open class BasePageParam(
      */
     @field:Parameter(name = "current", description = "页码,默认1", example = "1", required = false)
     @field:QueryParam("current")
-    @field:NotNull(message = "页码不能为空")
-    @field:Min(value = 1, message = "页码最小值为 1")
+    @field:NotNull(message = "{validation.page.index.NotNull}")
+    @field:Min(value = 1, message = "{validation.page.index.Min}")
     var index: Int = PAGE_NO,
 
     /**
@@ -22,9 +22,9 @@ open class BasePageParam(
      */
     @field:Parameter(name = "size", description = "每页数据,默认10", example = "10", required = false)
     @field:QueryParam("size")
-    @field:NotNull(message = "每页条数不能为空")
-    @field:Min(value = 1, message = "每页条数最小值为 1")
-    @field:Max(value = 100, message = "每页条数最大值为 100")
+    @field:NotNull(message = "{validation.page.size.NotNull}")
+    @field:Min(value = 1, message = "{validation.page.size.Min}")
+    @field:Max(value = 100, message = "{validation.page.size.Max}")
     var size: Int = PAGE_SIZE
 ) : Serializable {
     // 用于获取调整后的页码（适用于 Panache）

@@ -11,6 +11,8 @@ import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotEmpty
 import jakarta.ws.rs.BeanParam
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
@@ -54,5 +56,6 @@ class RoleResource(private val roleAppService: RoleAppService, private val login
     @DELETE
     @WithTransaction
     @Operation(summary = "删除角色", description = "删除角色信息")
-    fun deleteRole(): Uni<ResponseEntity<Boolean>> = TODO()
+    fun deleteRole(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") id: List<Long>): Uni<ResponseEntity<Boolean>> =
+        roleAppService.deleteRole(id).map { ResponseEntity.ok(it) }
 }

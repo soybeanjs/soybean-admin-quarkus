@@ -13,6 +13,8 @@ import io.quarkus.security.Authenticated
 import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.uni
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotEmpty
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
@@ -62,7 +64,8 @@ class RouteResource(private val routeAppService: RouteAppService, private val lo
     @DELETE
     @WithTransaction
     @Operation(summary = "删除路由", description = "删除路由信息")
-    fun deleteRoute(): Uni<ResponseEntity<Boolean>> = TODO()
+    fun deleteRoute(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") id: List<Long>): Uni<ResponseEntity<Boolean>> =
+        routeAppService.deleteRoute(id).map { ResponseEntity.ok(it) }
 
     @Path("/getConstantRoutes")
     @GET

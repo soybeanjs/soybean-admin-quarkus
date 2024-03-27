@@ -30,4 +30,6 @@ class RoleAppService(private val roleService: RoleService) {
                 }
             }
         } ?: Uni.createFrom().item(PageResult.empty())
+
+    fun deleteRole(id: List<Long>): Uni<Boolean> = TODO()
 }

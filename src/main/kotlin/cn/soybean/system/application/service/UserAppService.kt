@@ -33,4 +33,6 @@ class UserAppService(private val userService: UserService) {
                 }
             }
         } ?: Uni.createFrom().item(PageResult.empty())
+
+    fun deleteUser(id: List<Long>): Uni<Boolean> = TODO()
 }

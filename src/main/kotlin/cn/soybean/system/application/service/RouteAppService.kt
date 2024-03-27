@@ -77,4 +77,6 @@ class RouteAppService(private val menuService: MenuService) {
             ?.map(::buildNode)
             .orEmpty()
     }
+
+    fun deleteRoute(id: List<Long>): Uni<Boolean> = TODO()
 }

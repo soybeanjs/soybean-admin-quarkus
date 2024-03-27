@@ -11,6 +11,8 @@ import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotEmpty
 import jakarta.ws.rs.BeanParam
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
@@ -54,5 +56,6 @@ class UserResource(private val userAppService: UserAppService, private val login
     @DELETE
     @WithTransaction
     @Operation(summary = "删除用户", description = "删除用户信息")
-    fun deleteUser(): Uni<ResponseEntity<Boolean>> = TODO()
+    fun deleteUser(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") id: List<Long>): Uni<ResponseEntity<Boolean>> =
+        userAppService.deleteUser(id).map { ResponseEntity.ok(it) }
 }
