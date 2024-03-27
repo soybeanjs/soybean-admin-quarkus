@@ -1,10 +1,12 @@
 package cn.soybean.system.interfaces.resource
 
+import cn.soybean.framework.common.consts.AppConstants
 import cn.soybean.framework.common.util.LoginHelper
 import cn.soybean.framework.interfaces.response.ResponseEntity
 import cn.soybean.system.application.service.RoleAppService
 import cn.soybean.system.interfaces.dto.RoleReqDTO
 import io.quarkus.hibernate.reactive.panache.common.WithSession
+import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
@@ -18,7 +20,7 @@ import jakarta.ws.rs.core.Response
 @Consumes(MediaType.APPLICATION_JSON)
 class RoleResource(private val roleAppService: RoleAppService, private val loginHelper: LoginHelper) {
 
-    //    @PermissionsAllowed("action:role@getRoleList")
+    @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}role.list")
     @Path("/getRoleList")
     @GET
     @WithSession

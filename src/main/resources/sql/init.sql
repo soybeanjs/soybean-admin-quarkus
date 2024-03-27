@@ -82,7 +82,8 @@ INSERT INTO public.sys_user (id, create_account_name, create_by, create_time, up
                              update_time, tenant_id, account_name, account_password, avatar, builtin, country_code,
                              dept_id, email, gender, nick_name, personal_profile, phone_code, phone_number, status)
 VALUES (1, 'builtin', -1, '2024-01-01 00:00:00.000000', null, null, null, 1, 'Soybean',
-        '$2a$10$BrNwelZswsGy9FGCTARd5efBtM0Ra4Xz8e8DoT86EOju9Ii0jpBg6', null, true, 'CN', null, null, 0, 'Soybean',
+        '$2a$10$BrNwelZswsGy9FGCTARd5efBtM0Ra4Xz8e8DoT86EOju9Ii0jpBg6',
+        'https://minio.bytebytebrew.com/default/Ugly%20Avatar%20Face.png', true, 'CN', null, null, 0, 'Soybean',
         'Built-in super administrator user', '86', null, 0)
 ON CONFLICT (id) DO NOTHING;
 

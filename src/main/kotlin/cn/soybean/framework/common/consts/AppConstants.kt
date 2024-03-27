@@ -10,4 +10,9 @@ object AppConstants {
     const val API_TIMESTAMP_DISPARITY: Long = 10 * 60 * 1000
     const val API_TIMESTAMP_EXTRA_TIME_MARGIN: Long = 2 * 60 * 1000
     const val API_NONCE_CACHE_PREFIX = "CACHE::API_NONCE"
+    const val APP_COMMON_ROLE = "SYSTEM_BACKEND_USER"
+    private const val APP_PERM_PREFIX = "permissions"
+    const val APP_PERM_NAME_PREFIX = "${APP_PERM_PREFIX}-"
+    const val APP_PERM_ACTION_PREFIX = "${APP_PERM_PREFIX}:"
+    const val APP_PERM_ACTION_CACHE_PREFIX = "CACHE::APP_PERM_ACTION"
 }

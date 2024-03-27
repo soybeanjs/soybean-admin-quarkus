@@ -1,8 +1,10 @@
 package cn.soybean.system.application.service
 
+import cn.soybean.framework.common.consts.AppConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
 import cn.soybean.framework.common.util.LoginHelper.Companion.DEPT_KEY
 import cn.soybean.framework.common.util.LoginHelper.Companion.TENANT_KEY
+import cn.soybean.framework.common.util.LoginHelper.Companion.USER_AVATAR
 import cn.soybean.framework.common.util.LoginHelper.Companion.USER_KEY
 import cn.soybean.framework.common.util.getClientIPAndPort
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
@@ -11,6 +13,7 @@ import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.domain.service.RoleService
 import cn.soybean.system.domain.service.TenantService
 import cn.soybean.system.domain.service.UserService
+import cn.soybean.system.infrastructure.dto.UserPermActionDTO
 import cn.soybean.system.interfaces.dto.PwdLoginDTO
 import cn.soybean.system.interfaces.vo.LoginRespVO
 import io.smallrye.jwt.build.Jwt
@@ -26,7 +29,8 @@ class AuthService(
     private val userService: UserService,
     private val roleService: RoleService,
     private val routingContext: RoutingContext,
-    private val eventBus: Event<SystemLoginLogEntity>
+    private val eventBus: Event<SystemLoginLogEntity>,
+    private val userPermActionEventBus: Event<UserPermActionDTO>
 ) {
 
     fun pwdLogin(req: PwdLoginDTO): Uni<LoginRespVO> = tenantService.findAndVerifyTenant(req.tenantName)
@@ -50,13 +54,15 @@ class AuthService(
     ): LoginRespVO {
         val tokenValue = Jwt.upn(systemUserEntity.accountName)
             .subject(systemUserEntity.id.toString())
-            .groups(roleCodes)
+            .groups(roleCodes + AppConstants.APP_COMMON_ROLE)
             .claim(TENANT_KEY, tenantEntity.id)
             .claim(USER_KEY, systemUserEntity.id)
             .claim(DEPT_KEY, systemUserEntity.deptId ?: "")
+            .claim(USER_AVATAR, systemUserEntity.avatar ?: "")
             .claim(Claims.nickname.name, systemUserEntity.nickName)
             .claim(Claims.gender.name, systemUserEntity.gender ?: "")
             .sign()
+        userPermActionEventBus.fireAsync(systemUserEntity.id?.let { UserPermActionDTO(it) })
         return LoginRespVO(tokenValue, "")
     }
 

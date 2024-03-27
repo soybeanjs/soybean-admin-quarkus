@@ -36,5 +36,6 @@ class LoginHelper {
         const val TENANT_KEY: String = "tenantId"
         const val USER_KEY: String = "userId"
         const val DEPT_KEY: String = "deptId"
+        const val USER_AVATAR: String = "avatar"
     }
 }

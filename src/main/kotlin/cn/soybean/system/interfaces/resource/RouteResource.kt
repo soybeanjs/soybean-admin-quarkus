@@ -1,5 +1,6 @@
 package cn.soybean.system.interfaces.resource
 
+import cn.soybean.framework.common.consts.AppConstants
 import cn.soybean.framework.common.util.LoginHelper
 import cn.soybean.framework.interfaces.response.ResponseEntity
 import cn.soybean.system.application.service.RouteAppService
@@ -7,6 +8,7 @@ import cn.soybean.system.interfaces.vo.MenuRoute
 import cn.soybean.system.interfaces.vo.RouteMeta
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.security.Authenticated
+import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.uni
 import jakarta.ws.rs.Consumes
@@ -30,7 +32,7 @@ class RouteResource(private val routeAppService: RouteAppService, private val lo
             Response.ok(ResponseEntity.ok(it)).build()
         }
 
-    //    @PermissionsAllowed("action:route@getMenuList")
+    @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.list")
     @Path("/getMenuList")
     @GET
     @WithSession
