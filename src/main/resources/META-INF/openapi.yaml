@@ -1,0 +1,6 @@
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: X-api-key
+      in: header

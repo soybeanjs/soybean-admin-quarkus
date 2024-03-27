@@ -4,12 +4,14 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.QueryParam
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 import java.io.Serializable
 
 open class BasePageParam(
     /**
      * See [io.quarkus.panache.common.Page.index]
      */
+    @field:Parameter(name = "current", description = "页码,默认1", example = "1", required = false)
     @field:QueryParam("current")
     @field:NotNull(message = "页码不能为空")
     @field:Min(value = 1, message = "页码最小值为 1")
@@ -18,6 +20,7 @@ open class BasePageParam(
     /**
      * See [io.quarkus.panache.common.Page.size]
      */
+    @field:Parameter(name = "size", description = "每页数据,默认10", example = "10", required = false)
     @field:QueryParam("size")
     @field:NotNull(message = "每页条数不能为空")
     @field:Min(value = 1, message = "每页条数最小值为 1")

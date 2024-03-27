@@ -4,6 +4,8 @@ import cn.soybean.framework.common.util.LoginHelper
 import cn.soybean.framework.interfaces.response.ResponseEntity
 import cn.soybean.system.application.service.AuthService
 import cn.soybean.system.interfaces.dto.PwdLoginDTO
+import cn.soybean.system.interfaces.vo.LoginRespVO
+import cn.soybean.system.interfaces.vo.UserInfoVO
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.security.Authenticated
 import io.smallrye.mutiny.Uni
@@ -15,35 +17,32 @@ import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
-import jakarta.ws.rs.core.Response
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
+import org.eclipse.microprofile.openapi.annotations.tags.Tag
 
 @Path("/auth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Tag(name = "Auth", description = "Operations related to auths")
 class SystemAuthResource(private val authService: AuthService, private val loginHelper: LoginHelper) {
 
     @Path("/login")
     @POST
     @WithSession
-    fun login(@Valid req: PwdLoginDTO): Uni<Response> = authService.pwdLogin(req)
-        .map {
-            Response.ok(ResponseEntity.ok(it)).build()
-        }
+    fun login(@RequestBody(description = "PC端后台管理系统登录请求体") @Valid req: PwdLoginDTO): Uni<ResponseEntity<LoginRespVO>> =
+        authService.pwdLogin(req).map { ResponseEntity.ok(it) }
 
     @Authenticated
     @Path("/getUserInfo")
     @GET
     @WithSession
-    fun getUserInfo(): Uni<Response> =
-        uni {
-            Response.ok(
-                ResponseEntity.ok(
-                    mapOf(
-                        "userId" to loginHelper.getUserId(),
-                        "userName" to loginHelper.getAccountName(),
-                        "roles" to loginHelper.getRoles()
-                    )
-                )
-            ).build()
-        }
+    fun getUserInfo(): Uni<ResponseEntity<UserInfoVO>> = uni {
+        ResponseEntity.ok(
+            UserInfoVO(
+                userId = loginHelper.getUserId(),
+                userName = loginHelper.getAccountName(),
+                roles = loginHelper.getRoles()
+            )
+        )
+    }
 }

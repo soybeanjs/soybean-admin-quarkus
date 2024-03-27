@@ -5,6 +5,8 @@ import cn.soybean.system.interfaces.annotations.ApiKeyRequest
 import cn.soybean.system.interfaces.annotations.ApiSignRequest
 import io.quarkus.logging.Log
 import io.quarkus.security.PermissionsAllowed
+import io.smallrye.mutiny.Uni
+import io.smallrye.mutiny.uni
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
@@ -12,14 +14,16 @@ import jakarta.ws.rs.container.ContainerRequestContext
 import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.openapi.annotations.Operation
+import org.eclipse.microprofile.openapi.annotations.tags.Tag
 
 @Path("/hello")
+@Tag(name = "Demo", description = "Operations related to demos")
 class ExampleResource {
 
     @PermissionsAllowed("${AppConstants.APP_PERM_NAME_PREFIX}hello")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    fun hello(): String = "Hello from RESTEasy Reactive"
+    fun hello(): Uni<String> = uni { "Hello from RESTEasy Reactive" }
 
     @ApiSignRequest
     @Path("/sign")
