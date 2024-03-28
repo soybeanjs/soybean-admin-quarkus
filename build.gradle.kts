@@ -41,6 +41,10 @@ dependencies {
     implementation("io.quarkus:quarkus-cache")
     implementation("io.quarkus:quarkus-redis-client")
 
+    implementation("io.quarkus:quarkus-kubernetes")
+    implementation("io.quarkus:quarkus-container-image-jib")
+    implementation("io.quarkus:quarkus-smallrye-health")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonModuleKotlinVersion}")
 
     implementation("io.quarkus:quarkus-smallrye-jwt")
