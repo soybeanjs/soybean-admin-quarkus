@@ -3,6 +3,7 @@ package cn.soybean.system.infrastructure.security
 import cn.soybean.framework.common.consts.AppConstants
 import cn.soybean.framework.common.consts.enums.DbEnums
 import cn.soybean.framework.interfaces.response.ResponseEntity
+import cn.soybean.system.infrastructure.localization.LocalizationService
 import cn.soybean.system.infrastructure.util.SignUtil
 import cn.soybean.system.interfaces.annotations.ApiKeyRequest
 import cn.soybean.system.interfaces.annotations.ApiSignRequest
@@ -45,7 +46,8 @@ enum class ApiRequestType {
 class ApiSecurityRequestFilter(
     private val resourceInfo: ResourceInfo,
     private val apiKeyCache: ApiKeyCache,
-    @RedisClientName("sign-redis") private val reactiveRedisDataSource: ReactiveRedisDataSource
+    @RedisClientName("sign-redis") private val reactiveRedisDataSource: ReactiveRedisDataSource,
+    private val i18n: LocalizationService
 ) {
 
     @ServerRequestFilter
@@ -82,8 +84,7 @@ class ApiSecurityRequestFilter(
                 isValid -> Uni.createFrom().nullItem()
                 else -> Uni.createFrom().item(badRequestResponse(errorMessage))
             }
-        } ?: Uni.createFrom()
-            .item(badRequestResponse("Oops! Looks like we're missing the '$keyName' API key needed to access this feature. Could you double-check and include it either in your request headers or as a query parameter? Thanks!"))
+        } ?: Uni.createFrom().item(badRequestResponse(i18n.getMessage("http.security.apiKeyMissing", keyName)))
     }
 
     private fun validateApiKeyValue(
@@ -92,15 +93,11 @@ class ApiSecurityRequestFilter(
     ): Triple<Boolean, String, String> {
         val apikeyEntity = apiKeyCache.get(keyValue)
         return when {
-            apikeyEntity == null -> Triple(
-                false,
-                "Whoops! It seems the API key you entered doesn't match our records. Could you take another look and try once more? Appreciate it!",
-                ""
-            )
+            apikeyEntity == null -> Triple(false, i18n.getMessage("http.security.apiKeyNotExists"), "")
 
             apikeyEntity.status != DbEnums.Status.ENABLED -> Triple(
                 false,
-                "Uh-oh! Your API key seems to be disabled. If you think there's been a mix-up, please don't hesitate to get in touch with our support team.",
+                i18n.getMessage("http.security.apiKeyDisabled"),
                 ""
             )
 
@@ -137,17 +134,14 @@ class ApiSecurityRequestFilter(
 
     private fun validateHeaderAndParams(context: ContainerRequestContext): Pair<Boolean, String> {
         val headerChecks = listOf(
-            AppConstants.API_KEY to "Hey there! We noticed you forgot to include your API key in the request headers. Mind adding it? Thanks a bunch!",
-            AppConstants.API_SIGNATURE to "Just a heads-up! We couldn't find the API signature in your request headers. Could you please include it? Cheers!",
-            AppConstants.API_TIMESTAMP to "Looks like the timestamp is missing from your request headers. Adding it will help us process your request smoothly. Thanks!",
-            AppConstants.API_NONCE to "Oops! We're missing the nonce in your request headers. Adding it ensures your request's uniqueness. Much obliged!"
+            AppConstants.API_KEY to i18n.getMessage("http.security.apiKeyNotIncluded"),
+            AppConstants.API_SIGNATURE to i18n.getMessage("http.security.signatureMissing"),
+            AppConstants.API_TIMESTAMP to i18n.getMessage("http.security.timestampMissing"),
+            AppConstants.API_NONCE to i18n.getMessage("http.security.nonceMissing")
         )
 
         headerChecks.forEach { (headerName, errorMessage) ->
-            context.getHeaderString(headerName) ?: return Pair(
-                false,
-                errorMessage
-            )
+            context.getHeaderString(headerName) ?: return Pair(false, errorMessage)
         }
 
         return Pair(true, "")
@@ -157,12 +151,7 @@ class ApiSecurityRequestFilter(
         abs(
             Instant.now().toEpochMilli() - timestamp.toLong()
         ) > AppConstants.API_TIMESTAMP_DISPARITY -> Uni.createFrom()
-            .item(
-                Pair(
-                    false,
-                    "Hold up! The timestamp you provided is a bit off the mark. Adjusting it to fit the allowed range would be awesome. Thanks!"
-                )
-            )
+            .item(Pair(false, i18n.getMessage("http.security.timestampOff")))
 
         else -> Uni.createFrom().item(Pair(true, ""))
     }
@@ -170,13 +159,7 @@ class ApiSecurityRequestFilter(
     private fun validateNonce(nonce: String): Uni<Pair<Boolean, String>> =
         reactiveRedisDataSource.key().exists("${AppConstants.API_NONCE_CACHE_PREFIX}::$nonce").flatMap { exists ->
             when {
-                exists -> Uni.createFrom()
-                    .item(
-                        Pair(
-                            false,
-                            "Oh no! It looks like this nonce has already had its moment. Ensuring your request is unique by using a new nonce would be great."
-                        )
-                    )
+                exists -> Uni.createFrom().item(Pair(false, i18n.getMessage("http.security.nonceUsed")))
 
                 else -> Uni.createFrom().item(Pair(true, ""))
             }
@@ -211,7 +194,7 @@ class ApiSecurityRequestFilter(
                         .flatMap { Uni.createFrom().nullItem() }
 
                     else -> Uni.createFrom()
-                        .item(badRequestResponse("Yikes! Something seems off with the signature you provided. Would you mind double-checking and giving it another go? We appreciate it!"))
+                        .item(badRequestResponse(i18n.getMessage("http.security.signatureOff")))
                 }
             }
 
