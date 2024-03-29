@@ -1,7 +1,7 @@
 package cn.soybean.system.interfaces.resource
 
-import cn.soybean.framework.common.util.LoginHelper
-import cn.soybean.framework.interfaces.response.ResponseEntity
+import cn.soybean.infrastructure.security.LoginHelper
+import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.service.AuthService
 import cn.soybean.system.interfaces.dto.request.PwdLoginRequest
 import cn.soybean.system.interfaces.vo.LoginRespVO

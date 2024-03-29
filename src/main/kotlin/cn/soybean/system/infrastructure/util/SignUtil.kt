@@ -1,6 +1,6 @@
 package cn.soybean.system.infrastructure.util
 
-import cn.soybean.framework.common.consts.AppConstants
+import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.system.infrastructure.util.SignUtil.createSign
 import cn.soybean.system.infrastructure.util.SignUtil.getRandomString
 import org.jetbrains.annotations.Contract

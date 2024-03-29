@@ -1,7 +1,7 @@
 package cn.soybean.system.application.eventhandler
 
-import cn.soybean.framework.common.consts.AppConstants
-import cn.soybean.framework.common.util.isSuperUser
+import cn.soybean.infrastructure.config.consts.AppConstants
+import cn.soybean.interfaces.rest.util.isSuperUser
 import cn.soybean.system.domain.entity.SystemApisEntity
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
 import cn.soybean.system.infrastructure.dto.UserPermAction

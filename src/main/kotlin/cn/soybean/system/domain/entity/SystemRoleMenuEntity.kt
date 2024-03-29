@@ -1,6 +1,6 @@
 package cn.soybean.system.domain.entity
 
-import cn.soybean.framework.common.base.BaseTenantEntity
+import cn.soybean.domain.model.BaseTenantEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Index

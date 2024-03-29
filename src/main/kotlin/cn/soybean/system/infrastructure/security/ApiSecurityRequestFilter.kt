@@ -1,8 +1,8 @@
 package cn.soybean.system.infrastructure.security
 
-import cn.soybean.framework.common.consts.AppConstants
-import cn.soybean.framework.common.consts.enums.DbEnums
-import cn.soybean.framework.interfaces.response.ResponseEntity
+import cn.soybean.domain.enums.DbEnums
+import cn.soybean.infrastructure.config.consts.AppConstants
+import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.infrastructure.localization.LocalizationService
 import cn.soybean.system.infrastructure.util.SignUtil
 import cn.soybean.system.interfaces.annotations.ApiKeyRequest

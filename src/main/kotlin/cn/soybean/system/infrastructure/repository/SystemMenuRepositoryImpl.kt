@@ -1,6 +1,6 @@
 package cn.soybean.system.infrastructure.repository
 
-import cn.soybean.framework.common.consts.enums.DbEnums
+import cn.soybean.domain.enums.DbEnums
 import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.domain.repository.SystemMenuRepository
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository

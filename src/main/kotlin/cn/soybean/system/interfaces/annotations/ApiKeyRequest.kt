@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.annotations
 
-import cn.soybean.framework.common.consts.AppConstants
+import cn.soybean.infrastructure.config.consts.AppConstants
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)

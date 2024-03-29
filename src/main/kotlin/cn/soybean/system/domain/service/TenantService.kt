@@ -1,8 +1,8 @@
 package cn.soybean.system.domain.service
 
-import cn.soybean.framework.common.consts.enums.DbEnums
-import cn.soybean.framework.interfaces.exception.ErrorCode
-import cn.soybean.framework.interfaces.exception.ServiceException
+import cn.soybean.application.exceptions.ErrorCode
+import cn.soybean.application.exceptions.ServiceException
+import cn.soybean.domain.enums.DbEnums
 import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.repository.SystemTenantRepository
 import io.smallrye.mutiny.Uni

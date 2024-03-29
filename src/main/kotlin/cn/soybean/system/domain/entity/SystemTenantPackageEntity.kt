@@ -1,9 +1,9 @@
 package cn.soybean.system.domain.entity
 
-import cn.soybean.framework.common.base.BaseEntity
-import cn.soybean.framework.common.consts.DbConstants
-import cn.soybean.framework.common.consts.enums.DbEnums
-import cn.soybean.framework.infrastructure.converters.JsonLongSetTypeHandler
+import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.model.BaseEntity
+import cn.soybean.infrastructure.config.consts.DbConstants
+import cn.soybean.infrastructure.persistence.converters.JsonLongSetTypeHandler
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity

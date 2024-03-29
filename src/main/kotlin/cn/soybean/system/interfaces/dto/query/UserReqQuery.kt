@@ -1,7 +1,7 @@
 package cn.soybean.system.interfaces.dto.query
 
-import cn.soybean.framework.common.consts.enums.DbEnums
-import cn.soybean.framework.interfaces.dto.BasePageParam
+import cn.soybean.domain.enums.DbEnums
+import cn.soybean.interfaces.rest.dto.request.BasePageParam
 import jakarta.ws.rs.QueryParam
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 

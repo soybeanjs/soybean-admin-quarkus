@@ -1,9 +1,9 @@
 package cn.soybean.system.interfaces.resource
 
-import cn.soybean.framework.common.consts.AppConstants
-import cn.soybean.framework.common.util.LoginHelper
-import cn.soybean.framework.interfaces.dto.PageResult
-import cn.soybean.framework.interfaces.response.ResponseEntity
+import cn.soybean.infrastructure.config.consts.AppConstants
+import cn.soybean.infrastructure.security.LoginHelper
+import cn.soybean.interfaces.rest.dto.response.PageResult
+import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.service.RoleAppService
 import cn.soybean.system.interfaces.dto.query.RoleReqQuery
 import cn.soybean.system.interfaces.vo.RoleRespVO

@@ -1,8 +1,8 @@
 package cn.soybean.system.domain.entity
 
-import cn.soybean.framework.common.base.BaseTenantEntity
-import cn.soybean.framework.common.consts.DbConstants
-import cn.soybean.framework.common.consts.enums.DbEnums
+import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.model.BaseTenantEntity
+import cn.soybean.infrastructure.config.consts.DbConstants
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import jakarta.persistence.Column

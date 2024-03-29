@@ -1,6 +1,6 @@
 package cn.soybean
 
-import cn.soybean.framework.common.consts.AppConstants
+import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.system.infrastructure.util.SignUtil.createSign
 import cn.soybean.system.infrastructure.util.SignUtil.getRandomString
 import io.quarkus.test.junit.QuarkusTest

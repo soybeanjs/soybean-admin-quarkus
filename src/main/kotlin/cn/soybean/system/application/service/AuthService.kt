@@ -1,12 +1,12 @@
 package cn.soybean.system.application.service
 
-import cn.soybean.framework.common.consts.AppConstants
-import cn.soybean.framework.common.consts.enums.DbEnums
-import cn.soybean.framework.common.util.LoginHelper.Companion.DEPT_KEY
-import cn.soybean.framework.common.util.LoginHelper.Companion.TENANT_KEY
-import cn.soybean.framework.common.util.LoginHelper.Companion.USER_AVATAR
-import cn.soybean.framework.common.util.LoginHelper.Companion.USER_KEY
-import cn.soybean.framework.common.util.getClientIPAndPort
+import cn.soybean.domain.enums.DbEnums
+import cn.soybean.infrastructure.config.consts.AppConstants
+import cn.soybean.infrastructure.security.LoginHelper.Companion.DEPT_KEY
+import cn.soybean.infrastructure.security.LoginHelper.Companion.TENANT_KEY
+import cn.soybean.infrastructure.security.LoginHelper.Companion.USER_AVATAR
+import cn.soybean.infrastructure.security.LoginHelper.Companion.USER_KEY
+import cn.soybean.interfaces.rest.util.getClientIPAndPort
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
 import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.entity.SystemUserEntity

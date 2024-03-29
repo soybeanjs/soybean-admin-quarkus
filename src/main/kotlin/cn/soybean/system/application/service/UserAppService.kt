@@ -1,7 +1,7 @@
 package cn.soybean.system.application.service
 
-import cn.soybean.framework.interfaces.dto.PageResult
-import cn.soybean.framework.interfaces.dto.QueryBuilder
+import cn.soybean.infrastructure.persistence.QueryBuilder
+import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.domain.entity.toUserRespVO
 import cn.soybean.system.domain.service.UserService
 import cn.soybean.system.interfaces.dto.query.UserReqQuery

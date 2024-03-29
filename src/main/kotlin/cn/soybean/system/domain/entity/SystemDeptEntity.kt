@@ -1,7 +1,7 @@
 package cn.soybean.system.domain.entity
 
-import cn.soybean.framework.common.base.BaseTenantEntity
-import cn.soybean.framework.common.consts.DbConstants
+import cn.soybean.domain.model.BaseTenantEntity
+import cn.soybean.infrastructure.config.consts.DbConstants
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Index

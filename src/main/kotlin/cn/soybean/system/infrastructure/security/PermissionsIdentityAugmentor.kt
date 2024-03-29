@@ -1,6 +1,6 @@
 package cn.soybean.system.infrastructure.security
 
-import cn.soybean.framework.common.consts.AppConstants
+import cn.soybean.infrastructure.config.consts.AppConstants
 import io.quarkus.security.identity.AuthenticationRequestContext
 import io.quarkus.security.identity.SecurityIdentity
 import io.quarkus.security.identity.SecurityIdentityAugmentor

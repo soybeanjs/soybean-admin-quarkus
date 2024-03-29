@@ -1,7 +1,7 @@
 package cn.soybean.system.application.service
 
-import cn.soybean.framework.common.consts.DbConstants
-import cn.soybean.framework.common.util.isSuperUser
+import cn.soybean.infrastructure.config.consts.DbConstants
+import cn.soybean.interfaces.rest.util.isSuperUser
 import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.domain.entity.toMenuRespVO
 import cn.soybean.system.domain.service.MenuService

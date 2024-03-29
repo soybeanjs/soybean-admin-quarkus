@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.vo
 
-import cn.soybean.framework.common.consts.enums.DbEnums
+import cn.soybean.domain.enums.DbEnums
 
 data class MenuRespVO(
     var id: Long? = null,
