@@ -2,9 +2,9 @@ package cn.soybean.system.application.eventhandler
 
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.interfaces.rest.util.isSuperUser
+import cn.soybean.system.application.event.UserPermAction
 import cn.soybean.system.domain.entity.SystemApisEntity
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
-import cn.soybean.system.infrastructure.dto.UserPermAction
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.logging.Log
 import io.quarkus.vertx.VertxContextSupport

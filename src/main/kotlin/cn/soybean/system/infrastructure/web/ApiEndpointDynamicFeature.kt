@@ -1,7 +1,6 @@
 package cn.soybean.system.infrastructure.web
 
-import cn.soybean.system.infrastructure.common.generateOperationId
-import cn.soybean.system.infrastructure.dto.ApiEndpoint
+import cn.soybean.system.infrastructure.web.helper.generateOperationId
 import io.quarkus.security.PermissionsAllowed
 import jakarta.ws.rs.HttpMethod
 import jakarta.ws.rs.Path

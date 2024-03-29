@@ -1,8 +1,8 @@
 package cn.soybean
 
 import cn.soybean.infrastructure.config.consts.AppConstants
-import cn.soybean.system.interfaces.annotations.ApiKeyRequest
-import cn.soybean.system.interfaces.annotations.ApiSignRequest
+import cn.soybean.system.infrastructure.annotations.ApiKeyRequest
+import cn.soybean.system.infrastructure.annotations.ApiSignRequest
 import io.quarkus.logging.Log
 import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni

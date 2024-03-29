@@ -24,11 +24,13 @@ class LoginHelper {
     @Claim(standard = Claims.groups)
     private lateinit var groups: Set<Any>
 
-    fun getUserId(): Long? = subject.toLongOrNull()
+    fun getUserId(): Long =
+        subject.toLongOrNull() ?: throw IllegalArgumentException("Subject cannot be converted to Long")
 
     fun getAccountName(): String = upn
 
-    fun getTenantId(): Long? = tenant.toLongOrNull()
+    fun getTenantId(): Long =
+        tenant.toLongOrNull() ?: throw IllegalArgumentException("Tenant ID is not a valid Long value")
 
     fun getRoles(): Set<Any> = groups
 

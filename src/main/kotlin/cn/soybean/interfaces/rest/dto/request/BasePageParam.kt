@@ -1,5 +1,6 @@
 package cn.soybean.interfaces.rest.dto.request
 
+import io.quarkus.panache.common.Page
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
@@ -28,7 +29,9 @@ open class BasePageParam(
     var size: Int = PAGE_SIZE
 ) : Serializable {
     // 用于获取调整后的页码（适用于 Panache）
-    fun getAdjustedPageNo(): Int = index - 1
+    private fun getAdjustedPageNo(): Int = index - 1
+
+    fun ofPage(): Page = Page.of(getAdjustedPageNo(), size)
 
     companion object {
         const val PAGE_NO = 1

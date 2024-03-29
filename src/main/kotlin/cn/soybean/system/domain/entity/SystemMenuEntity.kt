@@ -4,7 +4,7 @@ import cn.soybean.domain.enums.DbEnums
 import cn.soybean.domain.model.BaseEntity
 import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.infrastructure.persistence.converters.JsonToListConverter
-import cn.soybean.system.interfaces.vo.MenuRespVO
+import cn.soybean.system.interfaces.rest.vo.MenuRespVO
 import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
 import jakarta.persistence.Convert

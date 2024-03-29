@@ -3,10 +3,10 @@ package cn.soybean.system.infrastructure.security
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.interfaces.rest.response.ResponseEntity
+import cn.soybean.system.infrastructure.annotations.ApiKeyRequest
+import cn.soybean.system.infrastructure.annotations.ApiSignRequest
 import cn.soybean.system.infrastructure.localization.LocalizationService
 import cn.soybean.system.infrastructure.util.SignUtil
-import cn.soybean.system.interfaces.annotations.ApiKeyRequest
-import cn.soybean.system.interfaces.annotations.ApiSignRequest
 import io.quarkus.redis.client.RedisClientName
 import io.quarkus.redis.datasource.ReactiveRedisDataSource
 import io.quarkus.redis.datasource.value.SetArgs
