@@ -2,9 +2,11 @@ package cn.soybean.system.application.eventhandler
 
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.interfaces.rest.util.isSuperUser
-import cn.soybean.system.application.event.UserPermAction
+import cn.soybean.system.application.event.ApiEndpointEvent
+import cn.soybean.system.application.event.UserPermActionEvent
 import cn.soybean.system.domain.entity.SystemApisEntity
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
+import cn.soybean.system.infrastructure.web.toSystemApisEntity
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.logging.Log
 import io.quarkus.vertx.VertxContextSupport
@@ -42,13 +44,13 @@ class SystemEventHandler(
             )
     }
 
-    fun handleSystemApisEvent(@ObservesAsync apisEntities: Set<SystemApisEntity>) {
+    fun handleSystemApisEvent(@ObservesAsync apiEndpointEvent: ApiEndpointEvent) {
         VertxContextSupport.subscribeWith(
-            { Multi.createFrom().item(apisEntities) },
+            { Multi.createFrom().item(apiEndpointEvent.data) },
             { item ->
                 Panache.withTransaction {
                     SystemApisEntity.deleteAll()
-                        .flatMap { SystemApisEntity.persist(item) }
+                        .flatMap { SystemApisEntity.persist(item.map { it.toSystemApisEntity() }.toList()) }
                 }.subscribe().with(
                     { Log.trace("ApisEntity event processed successfully") },
                     { throwable -> Log.error("Error processing ApisEntity event: ${throwable.message}") }
@@ -57,29 +59,29 @@ class SystemEventHandler(
         )
     }
 
-    fun handleUserPermActionEvent(@ObservesAsync userPermAction: UserPermAction) {
+    fun handleUserPermActionEvent(@ObservesAsync userPermActionEvent: UserPermActionEvent) {
         sessionFactory.withStatelessSession { statelessSession ->
             when {
-                isSuperUser(userPermAction.userId) -> getApiPermAction(statelessSession).map { apis ->
-                    storeUserPermAction(apis, userPermAction)
+                isSuperUser(userPermActionEvent.userId) -> getApiPermAction(statelessSession).map { apis ->
+                    storeUserPermAction(apis, userPermActionEvent.userId)
                 }
 
                 else -> TODO()
             }
         }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
             .subscribe().with(
-                { Log.trace("UserPermAction event processed successfully. userId: ${userPermAction.userId}") },
-                { throwable -> Log.error("Error processing UserPermAction event: ${throwable.message}") }
+                { Log.trace("UserPermActionEvent event processed successfully. userId: ${userPermActionEvent.userId}") },
+                { throwable -> Log.error("Error processing UserPermActionEvent event: ${throwable.message}") }
             )
     }
 
-    private fun storeUserPermAction(apis: List<SystemApisEntity>, userPermAction: UserPermAction) {
+    private fun storeUserPermAction(apis: List<SystemApisEntity>, userId: Long) {
         val permAction = apis.asSequence()
             .mapNotNull { it.permissions }
             .flatMap { it.split(",").asSequence().map(String::trim) }
             .filterNot { it.isBlank() }
             .toSet()
-        val permissionsKey = "${AppConstants.APP_PERM_ACTION_CACHE_PREFIX}:${userPermAction.userId}"
+        val permissionsKey = "${AppConstants.APP_PERM_ACTION_CACHE_PREFIX}:$userId"
         val permissions = redissonClient.getSet<String>(permissionsKey)
 
         permissions.deleteAsync()

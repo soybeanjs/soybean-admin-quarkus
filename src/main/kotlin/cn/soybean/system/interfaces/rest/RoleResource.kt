@@ -1,12 +1,12 @@
 package cn.soybean.system.interfaces.rest
 
+import cn.soybean.domain.CommandInvoker
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.infrastructure.persistence.QueryBuilder
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.command.DeleteRoleCommand
-import cn.soybean.system.application.command.service.RoleCommandService
 import cn.soybean.system.application.query.PageRoleQuery
 import cn.soybean.system.application.query.service.RoleQueryService
 import cn.soybean.system.interfaces.rest.dto.query.RoleQuery
@@ -36,7 +36,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Tag(name = "Roles", description = "Operations related to roles")
 class RoleResource(
     private val roleQueryService: RoleQueryService,
-    private val roleCommandService: RoleCommandService,
+    private val commandInvoker: CommandInvoker,
     private val loginHelper: LoginHelper
 ) {
 
@@ -72,5 +72,5 @@ class RoleResource(
     @WithTransaction
     @Operation(summary = "删除角色", description = "删除角色信息")
     fun deleteRole(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") id: Set<Long>): Uni<ResponseEntity<Boolean>> =
-        roleCommandService.handle(DeleteRoleCommand(id)).map { ResponseEntity.ok(it) }
+        commandInvoker.dispatch<DeleteRoleCommand, Boolean>(DeleteRoleCommand(id)).map { ResponseEntity.ok(it) }
 }

@@ -1,12 +1,12 @@
 package cn.soybean.system.interfaces.rest
 
+import cn.soybean.domain.CommandInvoker
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.infrastructure.persistence.QueryBuilder
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.command.DeleteUserCommand
-import cn.soybean.system.application.command.service.UserCommandService
 import cn.soybean.system.application.query.PageUserQuery
 import cn.soybean.system.application.query.service.UserQueryService
 import cn.soybean.system.interfaces.rest.dto.query.UserQuery
@@ -36,7 +36,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Tag(name = "Users", description = "Operations related to users")
 class UserResource(
     private val userQueryService: UserQueryService,
-    private val userCommandService: UserCommandService,
+    private val commandInvoker: CommandInvoker,
     private val loginHelper: LoginHelper
 ) {
 
@@ -75,5 +75,5 @@ class UserResource(
     @WithTransaction
     @Operation(summary = "删除用户", description = "删除用户信息")
     fun deleteUser(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") id: Set<Long>): Uni<ResponseEntity<Boolean>> =
-        userCommandService.handle(DeleteUserCommand(id)).map { ResponseEntity.ok(it) }
+        commandInvoker.dispatch<DeleteUserCommand, Boolean>(DeleteUserCommand(id)).map { ResponseEntity.ok(it) }
 }

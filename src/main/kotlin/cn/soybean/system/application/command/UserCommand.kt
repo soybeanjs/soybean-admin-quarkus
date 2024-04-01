@@ -1,3 +1,5 @@
 package cn.soybean.system.application.command
 
-data class DeleteUserCommand(val ids: Set<Long>)
+import cn.soybean.domain.Command
+
+data class DeleteUserCommand(val ids: Set<Long>) : Command

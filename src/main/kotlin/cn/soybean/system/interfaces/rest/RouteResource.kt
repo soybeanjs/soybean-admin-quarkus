@@ -1,10 +1,10 @@
 package cn.soybean.system.interfaces.rest
 
+import cn.soybean.domain.CommandInvoker
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.command.DeleteRouteCommand
-import cn.soybean.system.application.command.service.RouteCommandService
 import cn.soybean.system.application.query.GetRoutesByUserIdQuery
 import cn.soybean.system.application.query.ListTreeRoutesByUserIdQuery
 import cn.soybean.system.application.query.service.RouteQueryService
@@ -36,7 +36,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Tag(name = "Route", description = "Operations related to routes")
 class RouteResource(
     private val routeQueryService: RouteQueryService,
-    private val routeCommandService: RouteCommandService,
+    private val commandInvoker: CommandInvoker,
     private val loginHelper: LoginHelper
 ) {
 
@@ -73,7 +73,7 @@ class RouteResource(
     @WithTransaction
     @Operation(summary = "删除路由", description = "删除路由信息")
     fun deleteRoute(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") id: Set<Long>): Uni<ResponseEntity<Boolean>> =
-        routeCommandService.handle(DeleteRouteCommand(id)).map { ResponseEntity.ok(it) }
+        commandInvoker.dispatch<DeleteRouteCommand, Boolean>(DeleteRouteCommand(id)).map { ResponseEntity.ok(it) }
 
     @Path("/getConstantRoutes")
     @GET

@@ -1,5 +1,6 @@
 package cn.soybean.system.application.service
 
+import cn.soybean.domain.DomainEventPublisher
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.infrastructure.security.LoginHelper.Companion.DEPT_KEY
@@ -7,7 +8,7 @@ import cn.soybean.infrastructure.security.LoginHelper.Companion.TENANT_KEY
 import cn.soybean.infrastructure.security.LoginHelper.Companion.USER_AVATAR
 import cn.soybean.infrastructure.security.LoginHelper.Companion.USER_KEY
 import cn.soybean.interfaces.rest.util.getClientIPAndPort
-import cn.soybean.system.application.event.UserPermAction
+import cn.soybean.system.application.event.UserPermActionEvent
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
 import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.entity.SystemUserEntity
@@ -27,7 +28,7 @@ class AuthService(
     private val roleService: RoleService,
     private val routingContext: RoutingContext,
     private val eventBus: Event<SystemLoginLogEntity>,
-    private val userPermActionEventBus: Event<UserPermAction>
+    private val eventPublisher: DomainEventPublisher
 ) {
 
     fun pwdLogin(req: PwdLoginRequest): Uni<LoginRespVO> = tenantService.findAndVerifyTenant(req.tenantName)
@@ -59,7 +60,7 @@ class AuthService(
             .claim(Claims.nickname.name, systemUserEntity.nickName)
             .claim(Claims.gender.name, systemUserEntity.gender ?: "")
             .sign()
-        userPermActionEventBus.fireAsync(systemUserEntity.id?.let { UserPermAction(it) })
+        systemUserEntity.id?.let { UserPermActionEvent(it) }?.let { eventPublisher.publish(it) }
         return LoginRespVO(tokenValue, "")
     }
 

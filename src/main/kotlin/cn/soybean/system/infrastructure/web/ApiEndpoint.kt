@@ -2,6 +2,7 @@ package cn.soybean.system.infrastructure.web
 
 import cn.soybean.system.domain.entity.SystemApisEntity
 import io.mcarle.konvert.api.KonvertTo
+import java.time.LocalDateTime
 
 @KonvertTo(SystemApisEntity::class)
 data class ApiEndpoint(
@@ -11,5 +12,6 @@ data class ApiEndpoint(
     val description: String?,
     val permissions: String?,
     val inclusive: Boolean?,
-    val operationId: String
+    val operationId: String,
+    var createTime: LocalDateTime? = null
 )
