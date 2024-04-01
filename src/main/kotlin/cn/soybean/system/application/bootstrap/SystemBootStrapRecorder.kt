@@ -2,9 +2,9 @@ package cn.soybean.system.application.bootstrap
 
 import cn.soybean.system.domain.entity.SystemApiKeyEntity
 import cn.soybean.system.domain.entity.SystemApisEntity
-import cn.soybean.system.infrastructure.dto.toSystemApisEntity
 import cn.soybean.system.infrastructure.security.ApiKeyCache
 import cn.soybean.system.infrastructure.web.ApiEndpointDynamicFeature.Companion.apiEndpoints
+import cn.soybean.system.infrastructure.web.toSystemApisEntity
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.runtime.StartupEvent
 import io.quarkus.vertx.VertxContextSupport
