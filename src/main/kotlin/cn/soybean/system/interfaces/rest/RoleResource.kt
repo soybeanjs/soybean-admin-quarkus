@@ -6,10 +6,16 @@ import cn.soybean.infrastructure.persistence.QueryBuilder
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.interfaces.rest.response.ResponseEntity
+import cn.soybean.system.application.command.CreateRoleCommand
 import cn.soybean.system.application.command.DeleteRoleCommand
+import cn.soybean.system.application.command.UpdateRoleCommand
 import cn.soybean.system.application.query.PageRoleQuery
 import cn.soybean.system.application.query.service.RoleQueryService
 import cn.soybean.system.interfaces.rest.dto.query.RoleQuery
+import cn.soybean.system.interfaces.rest.dto.request.RoleRequest
+import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
+import cn.soybean.system.interfaces.rest.dto.request.toCreateRoleCommand
+import cn.soybean.system.interfaces.rest.dto.request.toUpdateRoleCommand
 import cn.soybean.system.interfaces.rest.vo.RoleRespVO
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
@@ -17,6 +23,8 @@ import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.groups.ConvertGroup
 import jakarta.ws.rs.BeanParam
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
@@ -59,13 +67,15 @@ class RoleResource(
     @POST
     @WithTransaction
     @Operation(summary = "创建角色", description = "创建角色信息")
-    fun createRole(): Uni<ResponseEntity<Boolean>> = TODO()
+    fun createRole(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RoleRequest): Uni<ResponseEntity<Boolean>> =
+        commandInvoker.dispatch<CreateRoleCommand, Boolean>(req.toCreateRoleCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}role.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新角色", description = "更新角色信息")
-    fun updateRole(): Uni<ResponseEntity<Boolean>> = TODO()
+    fun updateRole(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RoleRequest): Uni<ResponseEntity<Boolean>> =
+        commandInvoker.dispatch<UpdateRoleCommand, Boolean>(req.toUpdateRoleCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}role.delete")
     @DELETE

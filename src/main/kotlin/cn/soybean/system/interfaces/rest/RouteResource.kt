@@ -4,10 +4,16 @@ import cn.soybean.domain.CommandInvoker
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.response.ResponseEntity
+import cn.soybean.system.application.command.CreateRouteCommand
 import cn.soybean.system.application.command.DeleteRouteCommand
+import cn.soybean.system.application.command.UpdateRouteCommand
 import cn.soybean.system.application.query.GetRoutesByUserIdQuery
 import cn.soybean.system.application.query.ListTreeRoutesByUserIdQuery
 import cn.soybean.system.application.query.service.RouteQueryService
+import cn.soybean.system.interfaces.rest.dto.request.RouteRequest
+import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
+import cn.soybean.system.interfaces.rest.dto.request.toCreateRouteCommand
+import cn.soybean.system.interfaces.rest.dto.request.toUpdateRouteCommand
 import cn.soybean.system.interfaces.rest.vo.MenuRespVO
 import cn.soybean.system.interfaces.rest.vo.MenuRoute
 import cn.soybean.system.interfaces.rest.vo.RouteMeta
@@ -19,6 +25,8 @@ import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.uni
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.groups.ConvertGroup
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
@@ -60,13 +68,15 @@ class RouteResource(
     @POST
     @WithTransaction
     @Operation(summary = "创建路由", description = "创建路由信息")
-    fun createRoute(): Uni<ResponseEntity<Boolean>> = TODO()
+    fun createRoute(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RouteRequest): Uni<ResponseEntity<Boolean>> =
+        commandInvoker.dispatch<CreateRouteCommand, Boolean>(req.toCreateRouteCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新路由", description = "更新路由信息")
-    fun updateRoute(): Uni<ResponseEntity<Boolean>> = TODO()
+    fun updateRoute(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RouteRequest): Uni<ResponseEntity<Boolean>> =
+        commandInvoker.dispatch<UpdateRouteCommand, Boolean>(req.toUpdateRouteCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.delete")
     @DELETE
