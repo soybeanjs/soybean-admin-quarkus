@@ -27,7 +27,7 @@ class UpdateRouteCommandHandler : CommandHandler<UpdateRouteCommand, Boolean> {
 }
 
 @ApplicationScoped
-class RouteCommandHandler : CommandHandler<DeleteRouteCommand, Boolean> {
+class DeleteRouteCommandHandler : CommandHandler<DeleteRouteCommand, Boolean> {
     override fun handle(command: DeleteRouteCommand): Uni<Boolean> {
         TODO("Not yet implemented")
     }

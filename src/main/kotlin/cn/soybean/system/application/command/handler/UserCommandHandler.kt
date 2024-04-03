@@ -27,7 +27,7 @@ class UpdateUserCommandHandler : CommandHandler<UpdateUserCommand, Boolean> {
 }
 
 @ApplicationScoped
-class UserCommandHandler : CommandHandler<DeleteUserCommand, Boolean> {
+class DeleteUserCommandHandler : CommandHandler<DeleteUserCommand, Boolean> {
     override fun handle(command: DeleteUserCommand): Uni<Boolean> {
         TODO("Not yet implemented")
     }

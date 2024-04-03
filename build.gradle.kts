@@ -45,6 +45,11 @@ dependencies {
     implementation("io.quarkus:quarkus-container-image-jib")
     implementation("io.quarkus:quarkus-smallrye-health")
     implementation("io.quarkus:quarkus-opentelemetry")
+    implementation("io.quarkus:quarkus-smallrye-fault-tolerance")
+
+//    implementation("io.quarkus:quarkus-mongodb-client")
+    implementation("io.quarkus:quarkus-mongodb-panache-kotlin")
+    implementation("io.quarkus:quarkus-smallrye-reactive-messaging-kafka")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonModuleKotlinVersion}")
 

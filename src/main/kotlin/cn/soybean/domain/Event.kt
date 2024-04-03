@@ -14,7 +14,7 @@ interface DomainEventListener<E : DomainEvent> {
 @ApplicationScoped
 class EventInvoker(private val handlers: Instance<DomainEventListener<*>>) {
 
-    fun publish(event: DomainEvent) {
+    fun distributionProcess(event: DomainEvent) {
         handlers.forEach { handler ->
             if (handler.supports(event)) {
                 callHandlerSafely(handler, event)
