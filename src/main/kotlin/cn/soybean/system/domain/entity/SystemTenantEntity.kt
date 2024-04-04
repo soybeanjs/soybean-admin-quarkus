@@ -30,7 +30,7 @@ class SystemTenantEntity(
      * 租户联系人账号ID
      */
     @Column(name = "contact_user_id", nullable = false)
-    val contactUserId: Long? = null,
+    val contactUserId: String? = null,
 
     /**
      * 租户联系人账号名称
@@ -60,7 +60,7 @@ class SystemTenantEntity(
      * 租户套餐ID
      */
     @Column(name = "package_id", nullable = false)
-    var packageId: Long? = null,
+    var packageId: String? = null,
 
     /**
      * 租户过期时间

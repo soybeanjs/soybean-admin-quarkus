@@ -86,7 +86,7 @@ class SystemUserEntity(
      * 部门ID
      */
     @Column(name = "dept_id")
-    var deptId: Long? = null,
+    var deptId: String? = null,
 
     /**
      * 是否内置

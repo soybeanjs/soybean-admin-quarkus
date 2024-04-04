@@ -21,11 +21,11 @@ class SystemRoleMenuEntity(
      * 角色ID
      */
     @Column(name = "role_id", nullable = false)
-    val roleId: Long? = null,
+    val roleId: String? = null,
 
     /**
      * 菜单ID
      */
     @Column(name = "menu_id", nullable = false)
-    val menuId: Long? = null
+    val menuId: String? = null
 ) : BaseTenantEntity()

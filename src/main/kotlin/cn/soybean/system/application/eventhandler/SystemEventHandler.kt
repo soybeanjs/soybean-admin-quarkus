@@ -75,7 +75,7 @@ class SystemEventHandler(
             )
     }
 
-    private fun storeUserPermAction(apis: List<SystemApisEntity>, userId: Long) {
+    private fun storeUserPermAction(apis: List<SystemApisEntity>, userId: String) {
         val permAction = apis.asSequence()
             .mapNotNull { it.permissions }
             .flatMap { it.split(",").asSequence().map(String::trim) }

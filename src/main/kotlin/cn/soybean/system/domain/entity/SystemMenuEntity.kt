@@ -3,7 +3,7 @@ package cn.soybean.system.domain.entity
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.domain.model.BaseEntity
 import cn.soybean.infrastructure.config.consts.DbConstants
-import cn.soybean.infrastructure.persistence.converters.JsonToListConverter
+import cn.soybean.infrastructure.persistence.converters.JsonStringListConverter
 import cn.soybean.system.interfaces.rest.vo.MenuRespVO
 import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
@@ -38,7 +38,7 @@ class SystemMenuEntity(
      * 父菜单ID
      */
     @Column(name = "parent_id", nullable = false)
-    var parentId: Long? = null,
+    var parentId: String? = null,
 
     /**
      * 菜单图标
@@ -85,7 +85,7 @@ class SystemMenuEntity(
     @Column(name = "status", nullable = false)
     var status: DbEnums.Status = DbEnums.Status.ENABLED,
 
-    @Convert(converter = JsonToListConverter::class)
+    @Convert(converter = JsonStringListConverter::class)
     var roles: List<String>? = null,
 
     @Column(name = "keep_alive")

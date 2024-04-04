@@ -23,7 +23,7 @@ class RouteQueryHandler(private val menuService: MenuService) : RouteQueryServic
         return menusUni.map { menuItems ->
             val menuRoutes = buildTree(
                 items = menuItems,
-                idSelector = { it.id ?: 0L },
+                idSelector = { it.id },
                 parentIdSelector = { it.parentId ?: DbConstants.PARENT_ID_ROOT },
                 rootId = DbConstants.PARENT_ID_ROOT,
                 orderSelector = { it.order ?: 0 },
@@ -42,7 +42,7 @@ class RouteQueryHandler(private val menuService: MenuService) : RouteQueryServic
         return menusUni.map { menuItems ->
             buildTree(
                 items = menuItems,
-                idSelector = { it.id ?: 0L },
+                idSelector = { it.id },
                 parentIdSelector = { it.parentId ?: DbConstants.PARENT_ID_ROOT },
                 rootId = DbConstants.PARENT_ID_ROOT,
                 orderSelector = { it.order ?: 0 },
@@ -53,16 +53,16 @@ class RouteQueryHandler(private val menuService: MenuService) : RouteQueryServic
         }
     }
 
-    private fun getRoutesByUserId(userId: Long): Uni<List<SystemMenuEntity>> = when {
+    private fun getRoutesByUserId(userId: String): Uni<List<SystemMenuEntity>> = when {
         isSuperUser(userId) -> menuService.all()
         else -> menuService.allByUserId(userId)
     }
 
     private fun <T, R> buildTree(
         items: List<T>,
-        idSelector: (T) -> Long,
-        parentIdSelector: (T) -> Long,
-        rootId: Long,
+        idSelector: (T) -> String,
+        parentIdSelector: (T) -> String,
+        rootId: String,
         orderSelector: (T) -> Int,
         transform: (T, children: List<R>) -> R
     ): List<R> {

@@ -28,6 +28,7 @@ val redissonQuarkus30Version = "3.27.2"
 val konvertVersion = "3.0.1"
 val mutinyReactorVersion = "2.6.0"
 val jakartaPersistenceVersion = "3.2.0-M2"
+val idgeneratorVersion = "1.0.6"
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
@@ -48,6 +49,7 @@ dependencies {
     implementation("io.quarkus:quarkus-smallrye-fault-tolerance")
 
 //    implementation("io.quarkus:quarkus-mongodb-client")
+    implementation("com.github.yitter:yitter-idgenerator:${idgeneratorVersion}")
     implementation("io.quarkus:quarkus-mongodb-panache-kotlin")
     implementation("io.quarkus:quarkus-smallrye-reactive-messaging-kafka")
 
@@ -60,8 +62,10 @@ dependencies {
 
     implementation("io.quarkus:quarkus-reactive-pg-client")
     implementation("io.quarkus:quarkus-hibernate-reactive-panache-kotlin")
+    implementation("io.quarkus:quarkus-smallrye-graphql")
 
     implementation("io.smallrye.reactive:mutiny-reactor:${mutinyReactorVersion}")
+    implementation("io.smallrye.reactive:mutiny-kotlin:${mutinyReactorVersion}")
 
     implementation("io.mcarle:konvert-api:$konvertVersion")
     implementation("io.mcarle:konvert-cdi-annotations:$konvertVersion")

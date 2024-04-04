@@ -7,6 +7,6 @@ import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 
 interface SystemRoleRepository {
-    fun getRoleCodesByUserId(userId: Long): Uni<Set<String>>
+    fun getRoleCodesByUserId(userId: String): Uni<Set<String>>
     fun getRoleList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemRoleEntity>
 }

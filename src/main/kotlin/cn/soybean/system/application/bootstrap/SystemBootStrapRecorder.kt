@@ -5,6 +5,8 @@ import cn.soybean.system.application.event.ApiEndpointEvent
 import cn.soybean.system.domain.entity.SystemApiKeyEntity
 import cn.soybean.system.infrastructure.security.ApiKeyCache
 import cn.soybean.system.infrastructure.web.ApiEndpointDynamicFeature.Companion.apiEndpoints
+import com.github.yitter.contract.IdGeneratorOptions
+import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.runtime.StartupEvent
 import io.quarkus.vertx.VertxContextSupport
@@ -22,6 +24,13 @@ class SystemBootStrapRecorder(
         initApiEndpoints()
 
         initApiKeyCache()
+
+        initYitterIdGenerator()
+    }
+
+    private fun initYitterIdGenerator() {
+        val options = IdGeneratorOptions()
+        YitIdHelper.setIdGenerator(options)
     }
 
     private fun initApiKeyCache() {

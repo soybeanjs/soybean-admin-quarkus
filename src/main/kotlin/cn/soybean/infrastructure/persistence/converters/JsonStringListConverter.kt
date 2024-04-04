@@ -4,7 +4,7 @@ import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
 
 @Converter
-class JsonToListConverter : AttributeConverter<List<String>, String> {
+class JsonStringListConverter : AttributeConverter<List<String>, String> {
 
     override fun convertToDatabaseColumn(attribute: List<String>?): String? =
         when {

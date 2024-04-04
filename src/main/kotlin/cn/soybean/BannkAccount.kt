@@ -8,6 +8,7 @@ import cn.soybean.domain.Projection
 import cn.soybean.domain.SerializerUtils
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.yitter.idgen.YitIdHelper
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import io.quarkus.logging.Log
 import io.quarkus.mongodb.panache.common.MongoEntity
@@ -33,7 +34,6 @@ import org.eclipse.microprofile.faulttolerance.CircuitBreaker
 import org.eclipse.microprofile.faulttolerance.Retry
 import org.eclipse.microprofile.faulttolerance.Timeout
 import java.math.BigDecimal
-import java.util.*
 
 data class CreateBankAccountCommand(val email: String, val userName: String, val address: String)
 data class ChangeEmailCommand(val aggregateID: String, val newEmail: String)
@@ -51,10 +51,10 @@ interface BankAccountCommandService {
 class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAccountCommandService {
 
     override fun handle(command: CreateBankAccountCommand): Uni<String> {
-        val aggregate = BankAccountAggregate(UUID.randomUUID().toString())
+        val aggregate = BankAccountAggregate(YitIdHelper.nextId().toString())
         aggregate.createBankAccount(command.email, command.address, command.userName)
         return eventStoreDB.save(aggregate)
-            .replaceWith(aggregate.id)
+            .replaceWith(aggregate.aggregateId)
             .onItem().invoke { _ -> Log.debugf("created bank account: %s", aggregate) }
     }
 
@@ -67,7 +67,7 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
             .flatMap { aggregate -> eventStoreDB.save(aggregate) }
             .onItem().invoke { _ ->
                 Log.debugf(
-                    "changed email: %s, id: %s",
+                    "changed email: %s, aggregateId: %s",
                     command.newEmail,
                     command.aggregateID
                 )
@@ -82,7 +82,7 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
             .flatMap { aggregate -> eventStoreDB.save(aggregate) }
             .onItem().invoke { _ ->
                 Log.debugf(
-                    "changed address: %s, id: %s",
+                    "changed address: %s, aggregateId: %s",
                     command.newAddress,
                     command.aggregateID
                 )
@@ -97,7 +97,7 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
             .flatMap { aggregate -> eventStoreDB.save(aggregate) }
             .onItem().invoke { _ ->
                 Log.debugf(
-                    "deposited amount: %s, id: %s",
+                    "deposited amount: %s, aggregateId: %s",
                     command.amount,
                     command.aggregateID
                 )
@@ -143,8 +143,8 @@ data class BalanceDepositedAggregateEvent(
     }
 }
 
-class BankAccountAggregate @JsonCreator constructor(@JsonProperty("id") id: String) :
-    AggregateRoot(id, AGGREGATE_TYPE) {
+class BankAccountAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggregateId: String) :
+    AggregateRoot(aggregateId, AGGREGATE_TYPE) {
 
     private var email: String = ""
     private var userName: String = ""
@@ -205,7 +205,7 @@ class BankAccountAggregate @JsonCreator constructor(@JsonProperty("id") id: Stri
     }
 
     fun createBankAccount(email: String, address: String, userName: String) {
-        val data = BankAccountCreatedAggregateEvent(id, email, address, userName)
+        val data = BankAccountCreatedAggregateEvent(aggregateId, email, address, userName)
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(BankAccountCreatedAggregateEvent.BANK_ACCOUNT_CREATED_V1, dataBytes, null)
@@ -213,7 +213,7 @@ class BankAccountAggregate @JsonCreator constructor(@JsonProperty("id") id: Stri
     }
 
     fun changeEmail(newEmail: String) {
-        val data = EmailChangedAggregateEvent(id, newEmail)
+        val data = EmailChangedAggregateEvent(aggregateId, newEmail)
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(EmailChangedAggregateEvent.EMAIL_CHANGED_V1, dataBytes, null)
@@ -221,7 +221,7 @@ class BankAccountAggregate @JsonCreator constructor(@JsonProperty("id") id: Stri
     }
 
     fun changeAddress(newAddress: String) {
-        val data = AddressUpdatedAggregateEvent(id, newAddress)
+        val data = AddressUpdatedAggregateEvent(aggregateId, newAddress)
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(AddressUpdatedAggregateEvent.ADDRESS_UPDATED_V1, dataBytes, null)
@@ -229,7 +229,7 @@ class BankAccountAggregate @JsonCreator constructor(@JsonProperty("id") id: Stri
     }
 
     fun depositBalance(amount: BigDecimal) {
-        val data = BalanceDepositedAggregateEvent(id, amount)
+        val data = BalanceDepositedAggregateEvent(aggregateId, amount)
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(BalanceDepositedAggregateEvent.BALANCE_DEPOSITED_V1, dataBytes, null)
@@ -491,8 +491,8 @@ class BankAccountResource(private val commandService: BankAccountCommandService)
     fun createBanAccount(@Valid dto: CreateBankAccountRequestDTO): Uni<Response> {
         val command = CreateBankAccountCommand(dto.email, dto.userName, dto.address)
         Log.debugf("CreateBankAccountCommand: %s", command)
-        return commandService.handle(command).map { id ->
-            Response.status(Response.Status.CREATED).entity(id).build()
+        return commandService.handle(command).map { aggregateId ->
+            Response.status(Response.Status.CREATED).entity(aggregateId).build()
         }
     }
 

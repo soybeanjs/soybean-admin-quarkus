@@ -14,4 +14,4 @@ fun getClientIPAndPort(request: HttpServerRequest): Pair<String, Int?> = Pair(
     request.remoteAddress().port()
 )
 
-fun isSuperUser(userId: Long): Boolean = userId == DbConstants.SUPER_USER
+fun isSuperUser(userId: String): Boolean = userId == DbConstants.SUPER_USER

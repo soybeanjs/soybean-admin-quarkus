@@ -82,8 +82,8 @@ class RouteResource(
     @DELETE
     @WithTransaction
     @Operation(summary = "删除路由", description = "删除路由信息")
-    fun deleteRoute(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") id: Set<Long>): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<DeleteRouteCommand, Boolean>(DeleteRouteCommand(id)).map { ResponseEntity.ok(it) }
+    fun deleteRoute(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
+        commandInvoker.dispatch<DeleteRouteCommand, Boolean>(DeleteRouteCommand(ids)).map { ResponseEntity.ok(it) }
 
     @Path("/getConstantRoutes")
     @GET

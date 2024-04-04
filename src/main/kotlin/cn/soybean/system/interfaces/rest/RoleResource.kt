@@ -81,6 +81,6 @@ class RoleResource(
     @DELETE
     @WithTransaction
     @Operation(summary = "删除角色", description = "删除角色信息")
-    fun deleteRole(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") id: Set<Long>): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<DeleteRoleCommand, Boolean>(DeleteRoleCommand(id)).map { ResponseEntity.ok(it) }
+    fun deleteRole(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
+        commandInvoker.dispatch<DeleteRoleCommand, Boolean>(DeleteRoleCommand(ids)).map { ResponseEntity.ok(it) }
 }

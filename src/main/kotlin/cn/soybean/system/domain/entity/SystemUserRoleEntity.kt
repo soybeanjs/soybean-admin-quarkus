@@ -21,11 +21,11 @@ class SystemUserRoleEntity(
      * 用户ID
      */
     @Column(name = "user_id", nullable = false)
-    val userId: Long? = null,
+    val userId: String? = null,
 
     /**
      * 角色ID
      */
     @Column(name = "role_id", nullable = false)
-    val roleId: Long? = null
+    val roleId: String? = null
 ) : BaseTenantEntity()

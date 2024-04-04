@@ -84,6 +84,6 @@ class UserResource(
     @DELETE
     @WithTransaction
     @Operation(summary = "删除用户", description = "删除用户信息")
-    fun deleteUser(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") id: Set<Long>): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<DeleteUserCommand, Boolean>(DeleteUserCommand(id)).map { ResponseEntity.ok(it) }
+    fun deleteUser(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
+        commandInvoker.dispatch<DeleteUserCommand, Boolean>(DeleteUserCommand(ids)).map { ResponseEntity.ok(it) }
 }

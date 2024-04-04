@@ -5,5 +5,5 @@ import io.smallrye.mutiny.Uni
 
 interface SystemMenuRepository {
     fun all(): Uni<List<SystemMenuEntity>>
-    fun allByUserId(userId: Long): Uni<List<SystemMenuEntity>>
+    fun allByUserId(userId: String): Uni<List<SystemMenuEntity>>
 }

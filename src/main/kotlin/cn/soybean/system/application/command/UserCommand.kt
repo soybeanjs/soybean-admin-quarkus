@@ -14,12 +14,12 @@ data class CreateUserCommand(
     var phoneNumber: String? = null,
     var gender: DbEnums.Gender? = null,
     var avatar: String? = null,
-    var deptId: Long? = null,
+    var deptId: String? = null,
     var status: DbEnums.Status
 ) : Command
 
 data class UpdateUserCommand(
-    var id: Long,
+    var id: String,
     var accountName: String,
     var accountPassword: String,
     var nickName: String,
@@ -30,8 +30,8 @@ data class UpdateUserCommand(
     var phoneNumber: String? = null,
     var gender: DbEnums.Gender? = null,
     var avatar: String? = null,
-    var deptId: Long? = null,
+    var deptId: String? = null,
     var status: DbEnums.Status
 ) : Command
 
-data class DeleteUserCommand(val ids: Set<Long>) : Command
+data class DeleteUserCommand(val ids: Set<String>) : Command

@@ -7,6 +7,6 @@ import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 
 interface SystemUserRepository {
-    fun findByAccountNameOrEmailOrPhoneNumber(username: String, tenantId: Long): Uni<SystemUserEntity>
+    fun findByAccountNameOrEmailOrPhoneNumber(username: String, tenantId: String): Uni<SystemUserEntity>
     fun getUserList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemUserEntity>
 }

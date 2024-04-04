@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class MenuRoute(
     @JsonIgnore
-    val parentId: Long? = null,
+    val parentId: String? = null,
     val name: String? = null,
     val path: String? = null,
     val component: String? = null,

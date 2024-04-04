@@ -26,7 +26,7 @@ class SystemLoginLogEntity(
 
     // 用户编号
     @Column(name = "user_id")
-    val userId: Long? = null,
+    val userId: String? = null,
 
     @Column(name = "account_name", length = DbConstants.LENGTH_20)
     val accountName: String? = null,

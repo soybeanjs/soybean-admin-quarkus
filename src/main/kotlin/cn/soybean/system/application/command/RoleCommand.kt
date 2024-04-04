@@ -9,19 +9,19 @@ data class CreateRoleCommand(
     var order: Int,
     var status: DbEnums.Status,
     var dataScope: DbEnums.DataPermission? = null,
-    var dataScopeDeptIds: Set<Long>? = null,
+    var dataScopeDeptIds: Set<String>? = null,
     var remark: String? = null
 ) : Command
 
 data class UpdateRoleCommand(
-    var id: Long,
+    var id: String,
     var name: String,
     var code: String,
     var order: Int,
     var status: DbEnums.Status,
     var dataScope: DbEnums.DataPermission? = null,
-    var dataScopeDeptIds: Set<Long>? = null,
+    var dataScopeDeptIds: Set<String>? = null,
     var remark: String? = null
 ) : Command
 
-data class DeleteRoleCommand(val ids: Set<Long>) : Command
+data class DeleteRoleCommand(val ids: Set<String>) : Command

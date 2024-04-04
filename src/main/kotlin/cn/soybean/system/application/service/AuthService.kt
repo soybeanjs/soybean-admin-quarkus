@@ -33,9 +33,9 @@ class AuthService(
 
     fun pwdLogin(req: PwdLoginRequest): Uni<LoginRespVO> = tenantService.findAndVerifyTenant(req.tenantName)
         .flatMap { tenant ->
-            userService.findAndVerifyUserCredentials(req.userName, req.password, tenant.id!!)
+            userService.findAndVerifyUserCredentials(req.userName, req.password, tenant.id)
                 .flatMap { user ->
-                    roleService.getRoleCodesByUserId(user.id!!)
+                    roleService.getRoleCodesByUserId(user.id)
                         .map { roles -> Triple(tenant, user, roles) }
                 }
         }
@@ -51,7 +51,7 @@ class AuthService(
         roleCodes: Set<String>
     ): LoginRespVO {
         val tokenValue = Jwt.upn(systemUserEntity.accountName)
-            .subject(systemUserEntity.id.toString())
+            .subject(systemUserEntity.id)
             .groups(roleCodes + AppConstants.APP_COMMON_ROLE)
             .claim(TENANT_KEY, tenantEntity.id)
             .claim(USER_KEY, systemUserEntity.id)
@@ -60,11 +60,11 @@ class AuthService(
             .claim(Claims.nickname.name, systemUserEntity.nickName)
             .claim(Claims.gender.name, systemUserEntity.gender ?: "")
             .sign()
-        systemUserEntity.id?.let { UserPermActionEvent(it) }?.let { eventPublisher.publish(it) }
+        UserPermActionEvent(systemUserEntity.id).also { eventPublisher.publish(it) }
         return LoginRespVO(tokenValue, "")
     }
 
-    private fun saveLoginLog(user: SystemUserEntity, tenantId: Long?) {
+    private fun saveLoginLog(user: SystemUserEntity, tenantId: String) {
         val (ip, port) = getClientIPAndPort(routingContext.request())
         val loginLogEntity = SystemLoginLogEntity(
             loginType = DbEnums.LoginType.PC,

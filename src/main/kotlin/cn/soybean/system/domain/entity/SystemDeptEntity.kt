@@ -25,7 +25,7 @@ class SystemDeptEntity(
      * 父部门ID
      */
     @Column(name = "parent_id")
-    var parentId: Long? = null,
+    var parentId: String? = null,
 
     /**
      * 排序
@@ -37,7 +37,7 @@ class SystemDeptEntity(
      * 部门领导ID
      */
     @Column(name = "leader_user_id")
-    var leaderUserId: Long? = null,
+    var leaderUserId: String? = null,
 
     /**
      * 部门领导账号名称

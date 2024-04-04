@@ -26,7 +26,7 @@ import jakarta.validation.constraints.Null
 data class RoleRequest(
     @field:Null(groups = [ValidationGroups.OnCreate::class])
     @field:NotNull(groups = [ValidationGroups.OnUpdate::class])
-    var id: Long? = null,
+    var id: String? = null,
 
     @field:NotBlank
     var name: String? = null,
@@ -42,7 +42,7 @@ data class RoleRequest(
 
     var dataScope: DbEnums.DataPermission? = null,
 
-    var dataScopeDeptIds: Set<Long>? = null,
+    var dataScopeDeptIds: Set<String>? = null,
 
     var remark: String? = null
 )
@@ -60,7 +60,7 @@ data class RoleRequest(
 data class RouteRequest(
     @field:Null(groups = [ValidationGroups.OnCreate::class])
     @field:NotNull(groups = [ValidationGroups.OnUpdate::class])
-    var id: Long? = null,
+    var id: String? = null,
 
     @field:NotBlank
     var menuName: String? = null,
@@ -72,7 +72,7 @@ data class RouteRequest(
     var order: Int? = null,
 
     @field:NotNull
-    var parentId: Long? = null,
+    var parentId: String? = null,
 
     var icon: String? = null,
 
@@ -121,7 +121,7 @@ data class RouteRequest(
 data class UserRequest(
     @field:Null(groups = [ValidationGroups.OnCreate::class])
     @field:NotNull(groups = [ValidationGroups.OnUpdate::class])
-    var id: Long? = null,
+    var id: String? = null,
 
     @field:NotBlank
     var accountName: String? = null,
@@ -146,7 +146,7 @@ data class UserRequest(
 
     var avatar: String? = null,
 
-    var deptId: Long? = null,
+    var deptId: String? = null,
 
     var status: DbEnums.Status = DbEnums.Status.ENABLED
 )

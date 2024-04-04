@@ -22,13 +22,13 @@ object AggregateConstants {
 }
 
 abstract class AggregateRoot(
-    open val id: String,
+    open val aggregateId: String,
     val type: String,
     var version: Long = 0
 ) {
     val changes: MutableList<EventEntity> = mutableListOf()
 
-    constructor(id: String, aggregateType: String) : this(id, aggregateType, 0)
+    constructor(aggregateId: String, aggregateType: String) : this(aggregateId, aggregateType, 0)
 
     abstract fun whenCondition(eventEntity: EventEntity)
 
@@ -56,17 +56,17 @@ abstract class AggregateRoot(
 
     fun toSnapshot() = clearChanges()
 
-    fun string() = "id: {$id}, type: {$type}, version: {$version}, changes: {${changes.size}}"
+    fun string() = "aggregateId: {$aggregateId}, type: {$type}, version: {$version}, changes: {${changes.size}}"
 
     private fun validateEvent(eventEntity: EventEntity) {
-        if (eventEntity.aggregateId == this.id) return
+        if (eventEntity.aggregateId == this.aggregateId) return
         throw RuntimeException("Invalid event entity: $eventEntity")
     }
 
     protected fun createEvent(eventType: String, data: ByteArray, metaData: ByteArray?): EventEntity {
         val eventEntity = EventEntity()
         eventEntity.eventType = eventType
-        eventEntity.aggregateId = this.id
+        eventEntity.aggregateId = this.aggregateId
         eventEntity.aggregateType = this.type
         eventEntity.version = this.version
         eventEntity.data = data
@@ -75,5 +75,6 @@ abstract class AggregateRoot(
         return eventEntity
     }
 
-    override fun toString() = "AggregateRoot(id='$id', type='$type', version=$version, changes=${changes.size})"
+    override fun toString() =
+        "AggregateRoot(aggregateId='$aggregateId', type='$type', version=$version, changes=${changes.size})"
 }

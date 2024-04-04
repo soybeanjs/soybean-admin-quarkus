@@ -11,7 +11,7 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class RoleService(private val systemRoleRepository: SystemRoleRepository) {
 
-    fun getRoleCodesByUserId(userId: Long): Uni<Set<String>> = systemRoleRepository.getRoleCodesByUserId(userId)
+    fun getRoleCodesByUserId(userId: String): Uni<Set<String>> = systemRoleRepository.getRoleCodesByUserId(userId)
 
     fun getRoleList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemRoleEntity> =
         systemRoleRepository.getRoleList(query, sort, params)

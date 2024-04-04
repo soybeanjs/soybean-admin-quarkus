@@ -11,7 +11,7 @@ import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
 class SystemRoleRepositoryImpl : SystemRoleRepository, PanacheRepository<SystemRoleEntity> {
-    override fun getRoleCodesByUserId(userId: Long): Uni<Set<String>> = list(
+    override fun getRoleCodesByUserId(userId: String): Uni<Set<String>> = list(
         "select r from SystemRoleEntity r, SystemUserRoleEntity ur where r.id = ur.roleId and ur.userId = ?1",
         userId
     ).map { roles -> roles.mapNotNull { it.code }.toSet() }

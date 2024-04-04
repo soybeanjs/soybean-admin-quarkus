@@ -3,7 +3,7 @@ package cn.soybean.system.domain.entity
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.domain.model.BaseTenantEntity
 import cn.soybean.infrastructure.config.consts.DbConstants
-import cn.soybean.infrastructure.persistence.converters.JsonLongSetTypeHandler
+import cn.soybean.infrastructure.persistence.converters.JsonStringSetTypeHandler
 import cn.soybean.system.interfaces.rest.vo.RoleRespVO
 import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
@@ -62,8 +62,8 @@ class SystemRoleEntity(
      * 数据权限部门ID
      */
     @Column(name = "data_scope_dept_ids")
-    @Convert(converter = JsonLongSetTypeHandler::class)
-    val dataScopeDeptIds: Set<Long>? = null,
+    @Convert(converter = JsonStringSetTypeHandler::class)
+    val dataScopeDeptIds: Set<String>? = null,
 
     @Column(name = "remark")
     var remark: String? = null,

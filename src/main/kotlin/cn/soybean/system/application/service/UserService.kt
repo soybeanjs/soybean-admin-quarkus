@@ -15,7 +15,7 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class UserService(private val systemUserRepository: SystemUserRepository) {
 
-    fun findAndVerifyUserCredentials(username: String, password: String, tenantId: Long): Uni<SystemUserEntity> =
+    fun findAndVerifyUserCredentials(username: String, password: String, tenantId: String): Uni<SystemUserEntity> =
         systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(username, tenantId)
             .onItem().ifNull().failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
             .flatMap { user -> verifyUserCredentials(user, password) }

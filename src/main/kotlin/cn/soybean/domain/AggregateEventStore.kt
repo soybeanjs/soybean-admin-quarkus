@@ -98,7 +98,7 @@ class EventStore(private val eventBus: EventBus) : EventStoreDB {
             .map { snapshot -> getSnapshotFromClass(snapshot, aggregateId, aggregateType) }
             .flatMap { aggregate ->
                 loadEvents(
-                    aggregate.id,
+                    aggregate.aggregateId,
                     aggregate.version
                 ).flatMap { events -> raiseAggregateEvents(aggregate, events) }
             }
@@ -174,7 +174,7 @@ class EventStore(private val eventBus: EventBus) : EventStoreDB {
             }
 
             else -> when (aggregate.version) {
-                0L -> Uni.createFrom().failure(RuntimeException(aggregate.id))
+                0L -> Uni.createFrom().failure(RuntimeException(aggregate.aggregateId))
                 else -> Uni.createFrom().item(aggregate)
             }
         }
@@ -185,7 +185,7 @@ object EventSourcingUtils {
     fun <T : AggregateRoot> snapshotFromAggregate(aggregate: T): SnapshotEntity {
         val bytes = SerializerUtils.serializeToJsonBytes(aggregate)
         val snapshotEntity = SnapshotEntity()
-        snapshotEntity.aggregateId = aggregate.id
+        snapshotEntity.aggregateId = aggregate.aggregateId
         snapshotEntity.aggregateType = aggregate.type
         snapshotEntity.version = aggregate.version
         snapshotEntity.data = bytes

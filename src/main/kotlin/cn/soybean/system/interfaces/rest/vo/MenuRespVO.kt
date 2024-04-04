@@ -3,11 +3,11 @@ package cn.soybean.system.interfaces.rest.vo
 import cn.soybean.domain.enums.DbEnums
 
 data class MenuRespVO(
-    var id: Long? = null,
+    var id: String? = null,
     var menuName: String? = null,
     var menuType: DbEnums.MenuItemType? = null,
     var order: Int? = null,
-    var parentId: Long? = null,
+    var parentId: String? = null,
     var icon: String? = null,
     var iconType: String? = null,
     var routeName: String? = null,

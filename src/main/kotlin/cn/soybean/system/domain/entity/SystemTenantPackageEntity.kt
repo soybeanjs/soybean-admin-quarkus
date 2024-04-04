@@ -3,7 +3,7 @@ package cn.soybean.system.domain.entity
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.domain.model.BaseEntity
 import cn.soybean.infrastructure.config.consts.DbConstants
-import cn.soybean.infrastructure.persistence.converters.JsonLongSetTypeHandler
+import cn.soybean.infrastructure.persistence.converters.JsonStringSetTypeHandler
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -35,6 +35,6 @@ class SystemTenantPackageEntity(
      * 租户套餐菜单编号集合
      */
     @Column(name = "menu_ids")
-    @Convert(converter = JsonLongSetTypeHandler::class)
-    var menuIds: Set<Long>? = null
+    @Convert(converter = JsonStringSetTypeHandler::class)
+    var menuIds: Set<String>? = null
 ) : BaseEntity()

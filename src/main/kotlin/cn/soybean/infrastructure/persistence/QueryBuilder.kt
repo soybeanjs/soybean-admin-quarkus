@@ -2,7 +2,7 @@ package cn.soybean.infrastructure.persistence
 
 import io.quarkus.panache.common.Parameters
 
-class QueryBuilder(tenantId: Long) {
+class QueryBuilder(tenantId: String) {
     private val conditions = mutableListOf<String>()
     private val parameters = mutableMapOf<String, Any>()
 

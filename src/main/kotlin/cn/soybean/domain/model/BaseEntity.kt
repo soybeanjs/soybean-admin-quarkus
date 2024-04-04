@@ -2,7 +2,7 @@ package cn.soybean.domain.model
 
 import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.infrastructure.persistence.listeners.BaseEntityListener
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntity
+import cn.soybean.system.domain.DomainEntity
 import jakarta.persistence.Column
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.MappedSuperclass
@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(BaseEntityListener::class)
-abstract class BaseEntity : PanacheEntity(), Serializable {
+abstract class BaseEntity : DomainEntity(), Serializable {
 
     /**
      * 创建时间
@@ -33,7 +33,7 @@ abstract class BaseEntity : PanacheEntity(), Serializable {
      * 创建人
      */
     @Column(name = "create_by", updatable = false)
-    open var createBy: Long? = null
+    open var createBy: String? = null
 
     /**
      * 创建人名称
@@ -45,7 +45,7 @@ abstract class BaseEntity : PanacheEntity(), Serializable {
      * 更新人
      */
     @Column(name = "update_by", insertable = false)
-    open var updateBy: Long? = null
+    open var updateBy: String? = null
 
     /**
      * 更新人名称

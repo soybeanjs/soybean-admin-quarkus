@@ -7,7 +7,7 @@ data class CreateRouteCommand(
     var menuName: String,
     var menuType: DbEnums.MenuItemType,
     var order: Int,
-    var parentId: Long,
+    var parentId: String,
     var icon: String? = null,
     var iconType: String? = null,
     var routeName: String,
@@ -25,11 +25,11 @@ data class CreateRouteCommand(
 ) : Command
 
 data class UpdateRouteCommand(
-    var id: Long,
+    var id: String,
     var menuName: String,
     var menuType: DbEnums.MenuItemType,
     var order: Int,
-    var parentId: Long,
+    var parentId: String,
     var icon: String? = null,
     var iconType: String? = null,
     var routeName: String,
@@ -46,4 +46,4 @@ data class UpdateRouteCommand(
     var href: String? = null
 ) : Command
 
-data class DeleteRouteCommand(val ids: Set<Long>) : Command
+data class DeleteRouteCommand(val ids: Set<String>) : Command
