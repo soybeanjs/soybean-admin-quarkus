@@ -1,6 +1,7 @@
 package cn.soybean.domain
 
 import java.time.LocalDateTime
+import java.util.concurrent.CopyOnWriteArrayList
 
 abstract class BaseAggregateEvent(aggregateId: String) {
     init {
@@ -26,7 +27,7 @@ abstract class AggregateRoot(
     val type: String,
     var version: Long = 0
 ) {
-    val changes: MutableList<EventEntity> = mutableListOf()
+    val changes: MutableList<EventEntity> = CopyOnWriteArrayList()
 
     constructor(aggregateId: String, aggregateType: String) : this(aggregateId, aggregateType, 0)
 

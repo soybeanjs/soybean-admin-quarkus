@@ -6,6 +6,7 @@ import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.replaceWithUnit
 import io.smallrye.reactive.messaging.kafka.KafkaClientService
+import io.vertx.core.Vertx
 import jakarta.enterprise.context.ApplicationScoped
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.eclipse.microprofile.config.inject.ConfigProperty
@@ -26,34 +27,43 @@ class KafkaEventBus(
 
     @WithSpan
     override fun publish(eventEntities: List<EventEntity>): Uni<Unit> {
+        val context = Vertx.currentContext()
+        if (context == null) {
+            Log.error("Not in a Vert.x context!")
+            return Uni.createFrom().failure(IllegalStateException("Not in a Vert.x context"))
+        }
+
         if (eventEntities.isEmpty()) {
             Log.debug("No events to publish.")
             return Uni.createFrom().item(Unit)
         }
 
-        val firstEventType = eventEntities.first().eventType
-        val eventsBytes = serializeToJsonBytes(eventEntities.toTypedArray())
-        val record = ProducerRecord(eventStoreTopic, firstEventType, eventsBytes)
-
-        return kafkaClientService.getProducer<String, ByteArray>("eventstore-out")
-            .send(record)
-            .ifNoItem().after(Duration.ofMillis(PUBLISH_TIMEOUT)).fail()
-            .onFailure().invoke { throwable: Throwable ->
-                Log.errorf(
-                    throwable,
-                    "Error publishing events to Kafka topic $eventStoreTopic. Payload: %s",
-                    String(record.value())
-                )
+        return Uni.createFrom().item {
+            context.runOnContext {
+                val firstEventType = eventEntities.first().eventType
+                val eventsBytes = serializeToJsonBytes(eventEntities.toTypedArray())
+                val record = ProducerRecord(eventStoreTopic, firstEventType, eventsBytes)
+                kafkaClientService.getProducer<String, ByteArray>("eventstore-out")
+                    .send(record)
+                    .ifNoItem().after(Duration.ofMillis(PUBLISH_TIMEOUT)).fail()
+                    .onFailure().invoke { throwable: Throwable ->
+                        Log.errorf(
+                            throwable,
+                            "Error publishing events to Kafka topic $eventStoreTopic. Payload: %s",
+                            String(record.value())
+                        )
+                    }
+                    .onFailure().retry().withBackOff(Duration.ofMillis(BACKOFF_TIMEOUT)).atMost(RETRY_COUNT)
+                    .onItem().invoke { _ ->
+                        Log.debugf(
+                            "Successfully published events to Kafka topic key %s. Payload: %s",
+                            record.key(),
+                            String(record.value())
+                        )
+                    }
+                    .subscribeAsCompletionStage()
             }
-            .onFailure().retry().withBackOff(Duration.ofMillis(BACKOFF_TIMEOUT)).atMost(RETRY_COUNT)
-            .onItem().invoke { _ ->
-                Log.debugf(
-                    "Successfully published events to Kafka topic key %s. Payload: %s",
-                    record.key(),
-                    String(record.value())
-                )
-            }
-            .replaceWithUnit()
+        }.replaceWithUnit()
     }
 
     companion object {
