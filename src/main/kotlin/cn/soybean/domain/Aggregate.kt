@@ -7,6 +7,12 @@ abstract class BaseAggregateEvent(aggregateId: String) {
     init {
         require(aggregateId.isNotBlank()) { "BaseAggregateEvent aggregateId is required" }
     }
+
+    var tenantId: String? = null
+    var createBy: String? = null
+    var createAccountName: String? = null
+    var updateBy: String? = null
+    var updateAccountName: String? = null
 }
 
 object AggregateConstants {

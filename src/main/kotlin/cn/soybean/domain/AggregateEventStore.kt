@@ -42,9 +42,11 @@ class EventStore(private val eventBus: EventBus) : EventStoreDB {
         }
 
         return EventEntity.persist(eventEntityList)
-            .onItem().invoke { _ -> Log.debugf("(saveEvents) Successfully saved %d events", eventEntityList.size) }
+            .onItem()
+            .invoke { _ -> Log.debugf("[EventStore] (saveEvents) Successfully saved %d events", eventEntityList.size) }
             .replaceWithUnit()
-            .onFailure().invoke { ex -> Log.errorf(ex, "(saveEvents) Error saving events. Details: %s", ex.message) }
+            .onFailure()
+            .invoke { ex -> Log.errorf(ex, "[EventStore] (saveEvents) Error saving events. Details: %s", ex.message) }
     }
 
     @WithSpan
@@ -54,10 +56,9 @@ class EventStore(private val eventBus: EventBus) : EventStoreDB {
             .onFailure().invoke { ex ->
                 Log.errorf(
                     ex,
-                    "(loadEvents) Error querying events for aggregateId: %s, version: %d. Error: %s",
+                    "[EventStore] (loadEvents) Error querying events for aggregateId: %s, version: %d.",
                     aggregateId,
-                    version,
-                    ex.message
+                    version
                 )
             }
 
@@ -66,16 +67,19 @@ class EventStore(private val eventBus: EventBus) : EventStoreDB {
         val changesCopy = aggregate.changes.toMutableList()
         return saveEvents(aggregate.changes).flatMap { _ ->
             when {
-                aggregate.version % snapshotFrequency == 0L -> saveSnapshot(aggregate)
-                else -> Uni.createFrom().nullItem()
+                aggregate.version % snapshotFrequency == 0L -> saveSnapshot(aggregate).onItem()
+                    .invoke { _ -> Log.debug("[EventStore] AFTER SAVE SNAPSHOT: Snapshot saved successfully") }
+
+                else -> Uni.createFrom().nullItem<Unit>().onItem()
+                    .invoke { _ -> Log.debug("[EventStore] SNAPSHOT NOT SAVED: Conditions not met for saving snapshot") }
             }
-        }.onItem().invoke { _ -> Log.debug("AFTER SAVE SNAPSHOT: Snapshot saved successfully") }
-            .flatMap { _ -> eventBus.publish(changesCopy) }
-            .onItem().invoke { _ -> Log.debug("AFTER EVENT BUS PUBLISH: Events published to event bus successfully") }
+        }.flatMap { _ -> eventBus.publish(changesCopy) }
+            .onItem()
+            .invoke { _ -> Log.debug("[EventStore] AFTER EVENT BUS PUBLISH: Events published to event bus successfully") }
             .onFailure().invoke { ex ->
                 Log.errorf(
                     ex,
-                    "(save) Error during saving snapshot or publishing events to event bus. Error: %s",
+                    "[EventStore] (save) Error during saving snapshot or publishing events to event bus. Error: %s",
                     ex.message
                 )
             }
@@ -88,7 +92,7 @@ class EventStore(private val eventBus: EventBus) : EventStoreDB {
         val snapshot = EventSourcingUtils.snapshotFromAggregate(aggregate)
         return SnapshotEntity.persist(snapshot)
             .onFailure()
-            .invoke { ex -> Log.errorf(ex, "(saveSnapshot) Error executing preparedQuery. Error: %s", ex.message) }
+            .invoke { ex -> Log.errorf(ex, "[EventStore] (saveSnapshot) Error executing preparedQuery.") }
             .replaceWithUnit()
     }
 
@@ -108,16 +112,16 @@ class EventStore(private val eventBus: EventBus) : EventStoreDB {
         SnapshotEntity.find("aggregateId", Sort.by(AggregateConstants.VERSION, Sort.Direction.Descending), aggregateId)
             .firstResult()
             .onFailure()
-            .invoke { ex -> Log.errorf(ex, "(getSnapshot) Error executing preparedQuery. Error: %s", ex.message) }
+            .invoke { ex -> Log.errorf(ex, "[EventStore] (getSnapshot) Error executing preparedQuery.") }
             .map { result ->
                 when (result) {
                     null -> {
-                        Log.debugf("(getSnapshot) No snapshot found for aggregateId: %s", aggregateId)
+                        Log.debugf("[EventStore] (getSnapshot) No snapshot found for aggregateId: %s", aggregateId)
                         null
                     }
 
                     else -> {
-                        Log.debugf("(getSnapshot) Snapshot version: %d", result.version)
+                        Log.debugf("[EventStore] (getSnapshot) Snapshot version: %d", result.version)
                         result
                     }
                 }
@@ -129,9 +133,8 @@ class EventStore(private val eventBus: EventBus) : EventStoreDB {
         .onFailure().invoke { ex ->
             Log.errorf(
                 ex,
-                "(exists) Error checking existence for aggregateId: %s. Error: %s",
-                aggregateId,
-                ex.message
+                "[EventStore] (exists) Error checking existence for aggregateId: %s.",
+                aggregateId
             )
         }
 
@@ -168,7 +171,7 @@ class EventStore(private val eventBus: EventBus) : EventStoreDB {
             events.isNotEmpty() -> {
                 events.forEach { event ->
                     aggregate.raiseEvent(event)
-                    Log.debugf("(raiseAggregateEvents) Event version: %d", event.version)
+                    Log.debugf("[EventStore] (raiseAggregateEvents) Event version: %d", event.version)
                 }
                 Uni.createFrom().item(aggregate)
             }

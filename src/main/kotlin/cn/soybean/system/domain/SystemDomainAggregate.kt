@@ -50,7 +50,7 @@ class RoleAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
         this.remark = event.remark
     }
 
-    fun createRole(command: CreateRoleCommand) {
+    fun createRole(command: CreateRoleCommand, tenantId: String, userId: String, accountName: String) {
         val data = RoleCreatedOrUpdatedEvent(
             aggregateId,
             command.name,
@@ -60,14 +60,18 @@ class RoleAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
             command.dataScope,
             command.dataScopeDeptIds,
             command.remark
-        )
+        ).also {
+            it.tenantId = tenantId
+            it.createBy = userId
+            it.createAccountName = accountName
+        }
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(RoleCreatedOrUpdatedEvent.ROLE_CREATED_V1, dataBytes, null)
         this.apply(event)
     }
 
-    fun updateRole(command: UpdateRoleCommand) {
+    fun updateRole(command: UpdateRoleCommand, tenantId: String, userId: String, accountName: String) {
         val data = RoleCreatedOrUpdatedEvent(
             aggregateId,
             command.name,
@@ -77,7 +81,11 @@ class RoleAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
             command.dataScope,
             command.dataScopeDeptIds,
             command.remark
-        )
+        ).also {
+            it.tenantId = tenantId
+            it.updateBy = userId
+            it.updateAccountName = accountName
+        }
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(RoleCreatedOrUpdatedEvent.ROLE_UPDATED_V1, dataBytes, null)

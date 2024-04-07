@@ -56,14 +56,14 @@ class SystemRoleEntity(
      * 数据权限
      */
     @Column(name = "data_scope")
-    val dataScope: DbEnums.DataPermission? = null,
+    var dataScope: DbEnums.DataPermission? = null,
 
     /**
      * 数据权限部门ID
      */
     @Column(name = "data_scope_dept_ids")
     @Convert(converter = JsonStringSetTypeHandler::class)
-    val dataScopeDeptIds: Set<String>? = null,
+    var dataScopeDeptIds: Set<String>? = null,
 
     @Column(name = "remark")
     var remark: String? = null,

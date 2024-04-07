@@ -18,7 +18,7 @@ class CreateUserCommandHandler(private val eventStoreDB: EventStoreDB) : Command
         val aggregate = UserAggregate(YitIdHelper.nextId().toString())
         aggregate.createUser(command)
         return eventStoreDB.save(aggregate).replaceWith(true)
-            .onFailure().invoke { ex -> Log.debugf(ex, "CreateUserCommandHandler fail") }
+            .onFailure().invoke { ex -> Log.errorf(ex, "CreateUserCommandHandler fail") }
     }
 
     override fun canHandle(command: Command): Boolean = command is CreateUserCommand
@@ -34,7 +34,7 @@ class UpdateUserCommandHandler(private val eventStoreDB: EventStoreDB) : Command
             }
             .flatMap { aggregate -> eventStoreDB.save(aggregate) }
             .replaceWith(true)
-            .onFailure().invoke { ex -> Log.debugf(ex, "UpdateUserCommandHandler fail") }
+            .onFailure().invoke { ex -> Log.errorf(ex, "UpdateUserCommandHandler fail") }
 
     override fun canHandle(command: Command): Boolean = command is UpdateUserCommand
 }

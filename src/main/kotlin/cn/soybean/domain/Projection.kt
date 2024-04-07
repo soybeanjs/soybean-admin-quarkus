@@ -23,7 +23,7 @@ class ProjectionInvoker(private val handlers: Instance<Projection>) {
 
         return when {
             supportedHandlers.isEmpty() -> {
-                Log.warnf("No Projection found for event type: %s", eventEntity.eventType)
+                Log.warnf("[ProjectionInvoker] No Projection found for event type: %s", eventEntity.eventType)
                 Uni.createFrom().item(Unit)
             }
 
@@ -32,14 +32,14 @@ class ProjectionInvoker(private val handlers: Instance<Projection>) {
                     handler.process(eventEntity)
                         .onItem().invoke { _ ->
                             Log.debugf(
-                                "Processed event %s by %s",
+                                "[ProjectionInvoker] Processed event %s by %s",
                                 eventEntity.eventType,
                                 handler::class.java.simpleName
                             )
                         }.onFailure().invoke { ex ->
                             Log.errorf(
                                 ex,
-                                "Error processing event %s by %s",
+                                "[ProjectionInvoker] Error processing event %s by %s",
                                 eventEntity.eventType,
                                 handler::class.java.simpleName
                             )
@@ -53,20 +53,26 @@ class ProjectionInvoker(private val handlers: Instance<Projection>) {
     @Incoming(value = "eventstore-in")
     @WithSpan
     fun process(message: Message<ByteArray>): Uni<Unit> {
-        Log.debugf("(consumer) process events: >>>>> %s", String(message.payload))
+        Log.debugf("[ProjectionInvoker] (consumer) process events: >>>>> %s", String(message.payload))
         val events = SerializerUtils.deserializeEventsFromJsonBytes(message.payload)
 
         return when {
             events.isEmpty() -> Uni.createFrom().item(Unit)
-                .onItem().invoke { _ -> Log.warn("empty events list") }
+                .onItem().invoke { _ -> Log.warn("[ProjectionInvoker] empty events list") }
                 .onItem().invoke { _ -> message.ack() }
-                .onFailure().invoke { ex -> Log.errorf(ex, "(process) msg ack exception") }
+                .onFailure().invoke { ex -> Log.errorf(ex, "[ProjectionInvoker] (process) msg ack exception") }
 
             else -> Multi.createFrom().iterable(events.toList())
                 .onItem().call { event -> distributionProcess(event) }.toUni().replaceWithUnit()
                 .onItem().invoke { _ -> message.ack() }
                 .onFailure()
-                .invoke { ex -> Log.errorf(ex, "consumer process events aggregateId: %s", events[0].aggregateId) }
+                .invoke { ex ->
+                    Log.errorf(
+                        ex,
+                        "[ProjectionInvoker] consumer process events aggregateId: %s",
+                        events[0].aggregateId
+                    )
+                }
         }
     }
 }

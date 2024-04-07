@@ -18,7 +18,7 @@ class CreateRouteCommandHandler(private val eventStoreDB: EventStoreDB) : Comman
         val aggregate = RouteAggregate(YitIdHelper.nextId().toString())
         aggregate.createRoute(command)
         return eventStoreDB.save(aggregate).replaceWith(true)
-            .onFailure().invoke { ex -> Log.debugf(ex, "CreateRouteCommandHandler fail") }
+            .onFailure().invoke { ex -> Log.errorf(ex, "CreateRouteCommandHandler fail") }
     }
 
     override fun canHandle(command: Command): Boolean = command is CreateRouteCommand
@@ -34,7 +34,7 @@ class UpdateRouteCommandHandler(private val eventStoreDB: EventStoreDB) : Comman
             }
             .flatMap { aggregate -> eventStoreDB.save(aggregate) }
             .replaceWith(true)
-            .onFailure().invoke { ex -> Log.debugf(ex, "UpdateRouteCommandHandler fail") }
+            .onFailure().invoke { ex -> Log.errorf(ex, "UpdateRouteCommandHandler fail") }
 
     override fun canHandle(command: Command): Boolean = command is UpdateRouteCommand
 }

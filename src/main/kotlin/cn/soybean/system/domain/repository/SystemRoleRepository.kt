@@ -9,4 +9,6 @@ import io.smallrye.mutiny.Uni
 interface SystemRoleRepository {
     fun getRoleCodesByUserId(userId: String): Uni<Set<String>>
     fun getRoleList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemRoleEntity>
+    fun saveOrUpdate(entity: SystemRoleEntity): Uni<SystemRoleEntity>
+    fun getById(id: String): Uni<SystemRoleEntity>
 }

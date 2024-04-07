@@ -3,12 +3,12 @@ package cn.soybean.system.infrastructure.persistence.repository
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.domain.repository.SystemMenuRepository
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepository
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepository<SystemMenuEntity> {
+class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<SystemMenuEntity, String> {
     override fun all(): Uni<List<SystemMenuEntity>> = listAll()
 
     override fun allByUserId(userId: String): Uni<List<SystemMenuEntity>> = list(

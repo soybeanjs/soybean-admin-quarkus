@@ -39,8 +39,8 @@ class SystemEventHandler(
             statelessSession.insert(loginLogEntity)
         }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
             .subscribe().with(
-                { Log.trace("LoginLog event processed successfully") },
-                { throwable -> Log.error("Error processing LoginLog event: ${throwable.message}") }
+                { Log.trace("[SystemEventHandler] LoginLog event processed successfully") },
+                { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing LoginLog event") }
             )
     }
 
@@ -52,8 +52,8 @@ class SystemEventHandler(
                     SystemApisEntity.deleteAll()
                         .flatMap { SystemApisEntity.persist(item.map { it.toSystemApisEntity() }.toList()) }
                 }.subscribe().with(
-                    { Log.trace("ApisEntity event processed successfully") },
-                    { throwable -> Log.error("Error processing ApisEntity event: ${throwable.message}") }
+                    { Log.trace("[SystemEventHandler] ApisEntity event processed successfully") },
+                    { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing ApisEntity event") }
                 )
             }
         )
@@ -70,8 +70,8 @@ class SystemEventHandler(
             }
         }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
             .subscribe().with(
-                { Log.trace("UserPermActionEvent event processed successfully. userId: ${userPermActionEvent.userId}") },
-                { throwable -> Log.error("Error processing UserPermActionEvent event: ${throwable.message}") }
+                { Log.trace("[SystemEventHandler] UserPermActionEvent event processed successfully. userId: ${userPermActionEvent.userId}") },
+                { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing UserPermActionEvent event") }
             )
     }
 

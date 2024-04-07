@@ -29,12 +29,12 @@ class KafkaEventBus(
     override fun publish(eventEntities: List<EventEntity>): Uni<Unit> {
         val context = Vertx.currentContext()
         if (context == null) {
-            Log.error("Not in a Vert.x context!")
+            Log.error("[KafkaEventBus] Not in a Vert.x context!")
             return Uni.createFrom().failure(IllegalStateException("Not in a Vert.x context"))
         }
 
         if (eventEntities.isEmpty()) {
-            Log.debug("No events to publish.")
+            Log.debug("[KafkaEventBus] No events to publish.")
             return Uni.createFrom().item(Unit)
         }
 
@@ -46,17 +46,17 @@ class KafkaEventBus(
                 kafkaClientService.getProducer<String, ByteArray>("eventstore-out")
                     .send(record)
                     .ifNoItem().after(Duration.ofMillis(PUBLISH_TIMEOUT)).fail()
-                    .onFailure().invoke { throwable: Throwable ->
+                    .onFailure().invoke { ex ->
                         Log.errorf(
-                            throwable,
-                            "Error publishing events to Kafka topic $eventStoreTopic. Payload: %s",
+                            ex,
+                            "[KafkaEventBus] Error publishing events to Kafka topic $eventStoreTopic. Payload: %s",
                             String(record.value())
                         )
                     }
                     .onFailure().retry().withBackOff(Duration.ofMillis(BACKOFF_TIMEOUT)).atMost(RETRY_COUNT)
                     .onItem().invoke { _ ->
                         Log.debugf(
-                            "Successfully published events to Kafka topic key %s. Payload: %s",
+                            "[KafkaEventBus] Successfully published events to Kafka topic key %s. Payload: %s",
                             record.key(),
                             String(record.value())
                         )
