@@ -21,4 +21,7 @@ class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<Sys
         userId,
         DbEnums.Status.ENABLED
     )
+
+    override fun saveOrUpdate(entity: SystemMenuEntity): Uni<SystemMenuEntity> = persist(entity)
+    override fun getById(id: String): Uni<SystemMenuEntity> = findById(id)
 } 

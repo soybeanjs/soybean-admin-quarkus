@@ -1,7 +1,11 @@
 package cn.soybean.system.interfaces.rest
 
+import cn.soybean.application.exceptions.ErrorCode
+import cn.soybean.application.exceptions.ServiceException
 import cn.soybean.domain.CommandInvoker
+import cn.soybean.domain.enums.DbEnums
 import cn.soybean.infrastructure.config.consts.AppConstants
+import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.command.CreateRouteCommand
@@ -9,6 +13,7 @@ import cn.soybean.system.application.command.DeleteRouteCommand
 import cn.soybean.system.application.command.UpdateRouteCommand
 import cn.soybean.system.application.query.GetRoutesByUserIdQuery
 import cn.soybean.system.application.query.ListTreeRoutesByUserIdQuery
+import cn.soybean.system.application.query.RouteByIdQuery
 import cn.soybean.system.application.query.service.RouteQueryService
 import cn.soybean.system.interfaces.rest.dto.request.RouteRequest
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
@@ -69,14 +74,35 @@ class RouteResource(
     @WithTransaction
     @Operation(summary = "创建路由", description = "创建路由信息")
     fun createRoute(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RouteRequest): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<CreateRouteCommand, Boolean>(req.toCreateRouteCommand()).map { ResponseEntity.ok(it) }
+        validateParentMenu(req.parentId, req.id).flatMap {
+            commandInvoker.dispatch<CreateRouteCommand, Boolean>(req.toCreateRouteCommand())
+                .map { ResponseEntity.ok(it) }
+        }
+
+    private fun validateParentMenu(parentId: String?, childId: String?): Uni<Unit> = when (parentId) {
+        null, DbConstants.PARENT_ID_ROOT -> Uni.createFrom().item(Unit)
+        childId -> Uni.createFrom().failure(ServiceException(ErrorCode.SELF_PARENT_MENU_NOT_ALLOWED))
+        else -> routeQueryService.handle(RouteByIdQuery(parentId))
+            .onItem().ifNull().failWith(ServiceException(ErrorCode.PARENT_MENU_NOT_FOUND))
+            .flatMap { menu ->
+                when {
+                    menu.menuType != DbEnums.MenuItemType.DIRECTORY -> Uni.createFrom()
+                        .failure(ServiceException(ErrorCode.PARENT_MENU_TYPE_INVALID))
+
+                    else -> Uni.createFrom().item(Unit)
+                }
+            }
+    }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新路由", description = "更新路由信息")
     fun updateRoute(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RouteRequest): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<UpdateRouteCommand, Boolean>(req.toUpdateRouteCommand()).map { ResponseEntity.ok(it) }
+        validateParentMenu(req.parentId, req.id).flatMap {
+            commandInvoker.dispatch<UpdateRouteCommand, Boolean>(req.toUpdateRouteCommand())
+                .map { ResponseEntity.ok(it) }
+        }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.delete")
     @DELETE

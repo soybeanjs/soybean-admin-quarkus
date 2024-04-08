@@ -3,10 +3,12 @@ package cn.soybean.system.domain
 import cn.soybean.domain.EventEntity
 import cn.soybean.domain.Projection
 import cn.soybean.domain.SerializerUtils
+import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.domain.entity.SystemRoleEntity
 import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEvent
 import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEvent
 import cn.soybean.system.domain.event.UserCreatedOrUpdatedEvent
+import cn.soybean.system.domain.repository.SystemMenuRepository
 import cn.soybean.system.domain.repository.SystemRoleRepository
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
@@ -82,18 +84,67 @@ class UserUpdatedProjection : Projection {
 }
 
 @ApplicationScoped
-class RouteCreatedProjection : Projection {
+class RouteCreatedProjection(private val menuRepository: SystemMenuRepository) : Projection {
     override fun process(eventEntity: EventEntity): Uni<Unit> {
-        TODO("Not yet implemented")
+        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteCreatedOrUpdatedEvent::class.java)
+        val systemMenuEntity = SystemMenuEntity(
+            menuName = event.menuName,
+            menuType = event.menuType,
+            order = event.order,
+            parentId = event.parentId,
+            icon = event.icon,
+            iconType = event.iconType,
+            routeName = event.routeName,
+            routePath = event.routePath,
+            component = event.component,
+            i18nKey = event.i18nKey,
+            multiTab = event.multiTab,
+            activeMenu = event.activeMenu,
+            hideInMenu = event.hideInMenu,
+            status = event.status,
+            keepAlive = event.keepAlive,
+            constant = event.constant,
+            href = event.href
+        ).also {
+            it.id = event.aggregateId
+            it.createBy = event.createBy
+            it.createAccountName = event.createAccountName
+        }
+        return menuRepository.saveOrUpdate(systemMenuEntity).replaceWithUnit()
     }
 
     override fun supports(eventType: String): Boolean = eventType == RouteCreatedOrUpdatedEvent.ROUTE_CREATED_V1
 }
 
 @ApplicationScoped
-class RouteUpdatedProjection : Projection {
+class RouteUpdatedProjection(private val menuRepository: SystemMenuRepository) : Projection {
     override fun process(eventEntity: EventEntity): Uni<Unit> {
-        TODO("Not yet implemented")
+        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteCreatedOrUpdatedEvent::class.java)
+        return menuRepository.getById(event.aggregateId)
+            .flatMap { menu ->
+                menu.also {
+                    menu.menuName = event.menuName
+                    menu.menuType = event.menuType
+                    menu.order = event.order
+                    menu.parentId = event.parentId
+                    menu.icon = event.icon
+                    menu.iconType = event.iconType
+                    menu.routeName = event.routeName
+                    menu.routePath = event.routePath
+                    menu.component = event.component
+                    menu.i18nKey = event.i18nKey
+                    menu.multiTab = event.multiTab
+                    menu.activeMenu = event.activeMenu
+                    menu.hideInMenu = event.hideInMenu
+                    menu.status = event.status
+                    menu.keepAlive = event.keepAlive
+                    menu.constant = event.constant
+                    menu.href = event.href
+                    menu.updateBy = event.updateBy
+                    menu.updateAccountName = event.updateAccountName
+                }
+                menuRepository.saveOrUpdate(menu)
+            }.replaceWithUnit()
     }
 
     override fun supports(eventType: String): Boolean = eventType == RouteCreatedOrUpdatedEvent.ROUTE_UPDATED_V1

@@ -11,4 +11,6 @@ class MenuService(private val systemMenuRepository: SystemMenuRepository) {
     fun all(): Uni<List<SystemMenuEntity>> = systemMenuRepository.all()
 
     fun allByUserId(userId: String): Uni<List<SystemMenuEntity>> = systemMenuRepository.allByUserId(userId)
+
+    fun getById(id: String): Uni<SystemMenuEntity> = systemMenuRepository.getById(id)
 }

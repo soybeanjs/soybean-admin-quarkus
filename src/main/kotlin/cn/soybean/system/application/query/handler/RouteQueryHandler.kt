@@ -5,6 +5,7 @@ import cn.soybean.interfaces.rest.util.isSuperUser
 import cn.soybean.system.application.convert.convertToMenuRespVO
 import cn.soybean.system.application.query.GetRoutesByUserIdQuery
 import cn.soybean.system.application.query.ListTreeRoutesByUserIdQuery
+import cn.soybean.system.application.query.RouteByIdQuery
 import cn.soybean.system.application.query.service.RouteQueryService
 import cn.soybean.system.application.service.MenuService
 import cn.soybean.system.domain.entity.SystemMenuEntity
@@ -52,6 +53,8 @@ class RouteQueryHandler(private val menuService: MenuService) : RouteQueryServic
             )
         }
     }
+
+    override fun handle(query: RouteByIdQuery): Uni<SystemMenuEntity> = menuService.getById(query.id)
 
     private fun getRoutesByUserId(userId: String): Uni<List<SystemMenuEntity>> = when {
         isSuperUser(userId) -> menuService.all()

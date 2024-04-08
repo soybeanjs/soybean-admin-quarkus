@@ -6,4 +6,6 @@ import io.smallrye.mutiny.Uni
 interface SystemMenuRepository {
     fun all(): Uni<List<SystemMenuEntity>>
     fun allByUserId(userId: String): Uni<List<SystemMenuEntity>>
+    fun saveOrUpdate(entity: SystemMenuEntity): Uni<SystemMenuEntity>
+    fun getById(id: String): Uni<SystemMenuEntity>
 }
