@@ -2,6 +2,7 @@ package cn.soybean.system.interfaces.rest
 
 import cn.soybean.domain.CommandInvoker
 import cn.soybean.infrastructure.config.consts.AppConstants
+import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.infrastructure.persistence.QueryBuilder
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.dto.response.PageResult
@@ -10,6 +11,8 @@ import cn.soybean.system.application.command.CreateRoleCommand
 import cn.soybean.system.application.command.DeleteRoleCommand
 import cn.soybean.system.application.command.UpdateRoleCommand
 import cn.soybean.system.application.query.PageRoleQuery
+import cn.soybean.system.application.query.RoleByIdBuiltInQuery
+import cn.soybean.system.application.query.RoleExistsQuery
 import cn.soybean.system.application.query.service.RoleQueryService
 import cn.soybean.system.interfaces.rest.dto.query.RoleQuery
 import cn.soybean.system.interfaces.rest.dto.request.RoleRequest
@@ -68,14 +71,55 @@ class RoleResource(
     @WithTransaction
     @Operation(summary = "创建角色", description = "创建角色信息")
     fun createRole(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RoleRequest): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<CreateRoleCommand, Boolean>(req.toCreateRoleCommand()).map { ResponseEntity.ok(it) }
+        checkRoleCode(req).flatMap { (flag, msg) ->
+            when {
+                flag -> commandInvoker.dispatch<CreateRoleCommand, Boolean>(req.toCreateRoleCommand())
+                    .map { ResponseEntity.ok(it) }
+
+                else -> Uni.createFrom().item(ResponseEntity.fail(msg))
+            }
+        }.onFailure().recoverWithItem { _ ->
+            ResponseEntity.fail("An error occurred during role creation.")
+        }
+
+    private fun checkRoleCode(req: RoleRequest): Uni<Pair<Boolean, String>> = when (req.code) {
+        DbConstants.SUPER_ROLE_CODE ->
+            Uni.createFrom().item(Pair(false, "Role code usage is not permitted."))
+
+        else -> roleQueryService.handle(RoleExistsQuery(req.code, loginHelper.getTenantId()))
+            .flatMap { codeExists ->
+                when {
+                    codeExists -> Uni.createFrom().item(Pair(false, "Role code already exists."))
+                    else -> Uni.createFrom().item(Pair(true, ""))
+                }
+            }
+    }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}role.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新角色", description = "更新角色信息")
     fun updateRole(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RoleRequest): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<UpdateRoleCommand, Boolean>(req.toUpdateRoleCommand()).map { ResponseEntity.ok(it) }
+        when {
+            req.id.isNullOrBlank() -> Uni.createFrom().item(ResponseEntity.fail("ID cannot be null or blank."))
+            else -> checkRoleCode(req).flatMap { (flag, msg) ->
+                when {
+                    flag -> roleQueryService.handle(RoleByIdBuiltInQuery(req.id)).flatMap { builtin ->
+                        when {
+                            builtin -> Uni.createFrom()
+                                .item(ResponseEntity.fail("Built-in roles cannot be modified."))
+
+                            else -> commandInvoker.dispatch<UpdateRoleCommand, Boolean>(req.toUpdateRoleCommand())
+                                .map { ResponseEntity.ok(it) }
+                        }
+                    }
+
+                    else -> Uni.createFrom().item(ResponseEntity.fail(msg))
+                }
+            }.onFailure().recoverWithItem { _ ->
+                ResponseEntity.fail("An error occurred during role update.")
+            }
+        }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}role.delete")
     @DELETE

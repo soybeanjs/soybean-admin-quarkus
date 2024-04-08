@@ -15,4 +15,8 @@ class RoleService(private val systemRoleRepository: SystemRoleRepository) {
 
     fun getRoleList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemRoleEntity> =
         systemRoleRepository.getRoleList(query, sort, params)
+
+    fun getById(id: String) = systemRoleRepository.getById(id)
+
+    fun existsByCode(code: String, tenantId: String): Uni<Boolean> = systemRoleRepository.existsByCode(code, tenantId)
 }

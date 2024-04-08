@@ -14,6 +14,7 @@ import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.interfaces.rest.dto.request.PwdLoginRequest
 import cn.soybean.system.interfaces.rest.vo.LoginRespVO
+import com.github.yitter.idgen.YitIdHelper
 import io.smallrye.jwt.build.Jwt
 import io.smallrye.mutiny.Uni
 import io.vertx.ext.web.RoutingContext
@@ -74,6 +75,7 @@ class AuthService(
             userPort = port,
             userAgent = routingContext.request().getHeader("User-Agent") ?: "Unknown",
         )
+        loginLogEntity.id = YitIdHelper.nextId().toString()
         loginLogEntity.tenantId = tenantId
         loginLogEntity.createBy = user.id
         loginLogEntity.createAccountName = user.accountName

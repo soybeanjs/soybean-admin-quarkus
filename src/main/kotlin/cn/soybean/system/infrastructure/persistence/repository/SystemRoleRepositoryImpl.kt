@@ -21,4 +21,11 @@ class SystemRoleRepositoryImpl : SystemRoleRepository, PanacheRepositoryBase<Sys
 
     override fun saveOrUpdate(entity: SystemRoleEntity): Uni<SystemRoleEntity> = persist(entity)
     override fun getById(id: String): Uni<SystemRoleEntity> = findById(id)
+    override fun existsByCode(code: String, tenantId: String): Uni<Boolean> =
+        find("code = ?1 and tenantId = ?2", code, tenantId).count().map {
+            when {
+                it > 0 -> true
+                else -> false
+            }
+        }
 }

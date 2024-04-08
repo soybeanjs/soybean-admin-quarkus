@@ -32,7 +32,7 @@ data class RoleRequest(
     var name: String? = null,
 
     @field:NotBlank
-    var code: String? = null,
+    var code: String,
 
     @field:NotNull
     var order: Int? = null,
