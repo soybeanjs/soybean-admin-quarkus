@@ -92,6 +92,11 @@ configurations {
 group = projectGroup
 version = projectVersion
 
+allprojects {
+    group = group
+    version = version
+}
+
 // 为了兼容 konvert
 project.afterEvaluate {
     // 定义要调整依赖的任务名称列表
