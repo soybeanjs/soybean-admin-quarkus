@@ -1,35 +1,21 @@
 package cn.soybean.system.application.service
 
-import cn.soybean.application.exceptions.ErrorCode
-import cn.soybean.application.exceptions.ServiceException
-import cn.soybean.domain.enums.DbEnums
-import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.domain.repository.SystemUserRepository
-import io.quarkus.elytron.security.common.BcryptUtil
-import io.quarkus.hibernate.reactive.panache.kotlin.PanacheQuery
-import io.quarkus.panache.common.Parameters
-import io.quarkus.panache.common.Sort
+import cn.soybean.application.command.CommandInvoker
+import cn.soybean.system.application.command.CreateUserCommand
+import cn.soybean.system.application.command.DeleteUserCommand
+import cn.soybean.system.application.command.UpdateUserCommand
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class UserService(private val systemUserRepository: SystemUserRepository) {
+class UserService(private val commandInvoker: CommandInvoker) {
 
-    fun findAndVerifyUserCredentials(username: String, password: String, tenantId: String): Uni<SystemUserEntity> =
-        systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(username, tenantId)
-            .onItem().ifNull().failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
-            .flatMap { user -> verifyUserCredentials(user, password) }
+    fun createUser(command: CreateUserCommand): Uni<Boolean> =
+        commandInvoker.dispatch<CreateUserCommand, Boolean>(command).map { it }
 
-    fun verifyUserCredentials(user: SystemUserEntity, password: String): Uni<SystemUserEntity> = when {
-        !BcryptUtil.matches(password, user.accountPassword) -> Uni.createFrom()
-            .failure(ServiceException(ErrorCode.ACCOUNT_CREDENTIALS_INVALID))
+    fun updateUser(command: UpdateUserCommand): Uni<Boolean> =
+        commandInvoker.dispatch<UpdateUserCommand, Boolean>(command).map { it }
 
-        user.status == DbEnums.Status.DISABLED -> Uni.createFrom()
-            .failure(ServiceException(ErrorCode.ACCOUNT_DISABLED))
-
-        else -> Uni.createFrom().item(user)
-    }
-
-    fun getUserList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemUserEntity> =
-        systemUserRepository.getUserList(query, sort, params)
+    fun deleteUser(command: DeleteUserCommand): Uni<Boolean> =
+        commandInvoker.dispatch<DeleteUserCommand, Boolean>(command).map { it }
 }
