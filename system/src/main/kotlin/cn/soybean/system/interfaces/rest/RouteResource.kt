@@ -1,19 +1,13 @@
 package cn.soybean.system.interfaces.rest
 
-import cn.soybean.application.command.CommandInvoker
-import cn.soybean.application.exceptions.ErrorCode
-import cn.soybean.application.exceptions.ServiceException
-import cn.soybean.domain.enums.DbEnums
 import cn.soybean.infrastructure.config.consts.AppConstants
-import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.response.ResponseEntity
-import cn.soybean.system.application.command.CreateRouteCommand
-import cn.soybean.system.application.command.UpdateRouteCommand
+import cn.soybean.system.application.command.DeleteRouteCommand
 import cn.soybean.system.application.query.GetRoutesByUserIdQuery
 import cn.soybean.system.application.query.ListTreeRoutesByUserIdQuery
-import cn.soybean.system.application.query.RouteByIdQuery
 import cn.soybean.system.application.query.service.RouteQueryService
+import cn.soybean.system.application.service.RouteService
 import cn.soybean.system.interfaces.rest.dto.request.RouteRequest
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
 import cn.soybean.system.interfaces.rest.dto.request.toCreateRouteCommand
@@ -48,7 +42,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Tag(name = "Route", description = "Operations related to routes")
 class RouteResource(
     private val routeQueryService: RouteQueryService,
-    private val commandInvoker: CommandInvoker,
+    private val routeService: RouteService,
     private val loginHelper: LoginHelper
 ) {
 
@@ -73,46 +67,21 @@ class RouteResource(
     @WithTransaction
     @Operation(summary = "创建路由", description = "创建路由信息")
     fun createRoute(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RouteRequest): Uni<ResponseEntity<Boolean>> =
-        validateParentMenu(req.parentId, req.id).flatMap {
-            commandInvoker.dispatch<CreateRouteCommand, Boolean>(req.toCreateRouteCommand())
-                .map { ResponseEntity.ok(it) }
-        }
-
-    private fun validateParentMenu(parentId: String?, childId: String?): Uni<Unit> = when (parentId) {
-        null, DbConstants.PARENT_ID_ROOT -> Uni.createFrom().item(Unit)
-        childId -> Uni.createFrom().failure(ServiceException(ErrorCode.SELF_PARENT_MENU_NOT_ALLOWED))
-        else -> routeQueryService.handle(RouteByIdQuery(parentId))
-            .onItem().ifNull().failWith(ServiceException(ErrorCode.PARENT_MENU_NOT_FOUND))
-            .flatMap { menu ->
-                when {
-                    menu.menuType != DbEnums.MenuItemType.DIRECTORY -> Uni.createFrom()
-                        .failure(ServiceException(ErrorCode.PARENT_MENU_TYPE_INVALID))
-
-                    else -> Uni.createFrom().item(Unit)
-                }
-            }
-    }
+        routeService.createRoute(req.toCreateRouteCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新路由", description = "更新路由信息")
     fun updateRoute(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RouteRequest): Uni<ResponseEntity<Boolean>> =
-        validateParentMenu(req.parentId, req.id).flatMap {
-            commandInvoker.dispatch<UpdateRouteCommand, Boolean>(req.toUpdateRouteCommand())
-                .map { ResponseEntity.ok(it) }
-        }
+        routeService.updateRoute(req.toUpdateRouteCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.delete")
     @DELETE
     @WithTransaction
     @Operation(summary = "删除路由", description = "删除路由信息")
     fun deleteRoute(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<cn.soybean.system.application.command.DeleteRouteCommand, Boolean>(
-            cn.soybean.system.application.command.DeleteRouteCommand(
-                ids
-            )
-        ).map { ResponseEntity.ok(it) }
+        routeService.deleteRoute(DeleteRouteCommand(ids)).map { ResponseEntity.ok(it) }
 
     @Path("/getConstantRoutes")
     @GET

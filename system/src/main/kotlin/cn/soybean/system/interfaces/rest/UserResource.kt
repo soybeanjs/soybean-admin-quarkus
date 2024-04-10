@@ -1,15 +1,14 @@
 package cn.soybean.system.interfaces.rest
 
-import cn.soybean.application.command.CommandInvoker
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.infrastructure.persistence.QueryBuilder
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.interfaces.rest.response.ResponseEntity
-import cn.soybean.system.application.command.CreateUserCommand
-import cn.soybean.system.application.command.UpdateUserCommand
+import cn.soybean.system.application.command.DeleteUserCommand
 import cn.soybean.system.application.query.PageUserQuery
 import cn.soybean.system.application.query.service.UserQueryService
+import cn.soybean.system.application.service.UserService
 import cn.soybean.system.interfaces.rest.dto.query.UserQuery
 import cn.soybean.system.interfaces.rest.dto.request.UserRequest
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
@@ -43,7 +42,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Tag(name = "Users", description = "Operations related to users")
 class UserResource(
     private val userQueryService: UserQueryService,
-    private val commandInvoker: CommandInvoker,
+    private val userService: UserService,
     private val loginHelper: LoginHelper
 ) {
 
@@ -70,23 +69,19 @@ class UserResource(
     @WithTransaction
     @Operation(summary = "创建用户", description = "创建用户信息")
     fun createUser(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: UserRequest): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<CreateUserCommand, Boolean>(req.toCreateUserCommand()).map { ResponseEntity.ok(it) }
+        userService.createUser(req.toCreateUserCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}user.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新用户", description = "更新用户信息")
     fun updateUser(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: UserRequest): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<UpdateUserCommand, Boolean>(req.toUpdateUserCommand()).map { ResponseEntity.ok(it) }
+        userService.updateUser(req.toUpdateUserCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}user.delete")
     @DELETE
     @WithTransaction
     @Operation(summary = "删除用户", description = "删除用户信息")
     fun deleteUser(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
-        commandInvoker.dispatch<cn.soybean.system.application.command.DeleteUserCommand, Boolean>(
-            cn.soybean.system.application.command.DeleteUserCommand(
-                ids
-            )
-        ).map { ResponseEntity.ok(it) }
+        userService.deleteUser(DeleteUserCommand(ids)).map { ResponseEntity.ok(it) }
 }

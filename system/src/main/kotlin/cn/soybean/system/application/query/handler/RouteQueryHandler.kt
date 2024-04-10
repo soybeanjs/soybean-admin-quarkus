@@ -7,15 +7,15 @@ import cn.soybean.system.application.query.GetRoutesByUserIdQuery
 import cn.soybean.system.application.query.ListTreeRoutesByUserIdQuery
 import cn.soybean.system.application.query.RouteByIdQuery
 import cn.soybean.system.application.query.service.RouteQueryService
-import cn.soybean.system.application.service.MenuService
 import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.domain.entity.toMenuRespVO
+import cn.soybean.system.domain.repository.SystemMenuRepository
 import cn.soybean.system.interfaces.rest.vo.MenuRespVO
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class RouteQueryHandler(private val menuService: MenuService) : RouteQueryService {
+class RouteQueryHandler(private val systemMenuRepository: SystemMenuRepository) : RouteQueryService {
 
     override fun handle(query: GetRoutesByUserIdQuery): Uni<Map<String, Any>> {
         val (userId) = query
@@ -54,11 +54,11 @@ class RouteQueryHandler(private val menuService: MenuService) : RouteQueryServic
         }
     }
 
-    override fun handle(query: RouteByIdQuery): Uni<SystemMenuEntity> = menuService.getById(query.id)
+    override fun handle(query: RouteByIdQuery): Uni<SystemMenuEntity> = systemMenuRepository.getById(query.id)
 
     private fun getRoutesByUserId(userId: String): Uni<List<SystemMenuEntity>> = when {
-        isSuperUser(userId) -> menuService.all()
-        else -> menuService.allByUserId(userId)
+        isSuperUser(userId) -> systemMenuRepository.all()
+        else -> systemMenuRepository.allByUserId(userId)
     }
 
     private fun <T, R> buildTree(

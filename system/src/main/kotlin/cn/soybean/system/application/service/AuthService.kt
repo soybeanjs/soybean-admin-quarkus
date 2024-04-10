@@ -1,5 +1,7 @@
 package cn.soybean.system.application.service
 
+import cn.soybean.application.exceptions.ErrorCode
+import cn.soybean.application.exceptions.ServiceException
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.domain.event.DomainEventPublisher
 import cn.soybean.infrastructure.config.consts.AppConstants
@@ -12,31 +14,36 @@ import cn.soybean.system.application.event.UserPermActionEvent
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
 import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.entity.SystemUserEntity
+import cn.soybean.system.domain.repository.SystemRoleRepository
+import cn.soybean.system.domain.repository.SystemTenantRepository
+import cn.soybean.system.domain.repository.SystemUserRepository
 import cn.soybean.system.interfaces.rest.dto.request.PwdLoginRequest
 import cn.soybean.system.interfaces.rest.vo.LoginRespVO
 import com.github.yitter.idgen.YitIdHelper
+import io.quarkus.elytron.security.common.BcryptUtil
 import io.smallrye.jwt.build.Jwt
 import io.smallrye.mutiny.Uni
 import io.vertx.ext.web.RoutingContext
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Event
 import org.eclipse.microprofile.jwt.Claims
+import java.time.LocalDateTime
 
 @ApplicationScoped
 class AuthService(
-    private val tenantService: TenantService,
-    private val userService: UserService,
-    private val roleService: RoleService,
+    private val systemTenantRepository: SystemTenantRepository,
+    private val systemUserRepository: SystemUserRepository,
+    private val systemRoleRepository: SystemRoleRepository,
     private val routingContext: RoutingContext,
     private val eventBus: Event<SystemLoginLogEntity>,
     private val eventPublisher: DomainEventPublisher
 ) {
 
-    fun pwdLogin(req: PwdLoginRequest): Uni<LoginRespVO> = tenantService.findAndVerifyTenant(req.tenantName)
+    fun pwdLogin(req: PwdLoginRequest): Uni<LoginRespVO> = findAndVerifyTenant(req.tenantName)
         .flatMap { tenant ->
-            userService.findAndVerifyUserCredentials(req.userName, req.password, tenant.id)
+            findAndVerifyUserCredentials(req.userName, req.password, tenant.id)
                 .flatMap { user ->
-                    roleService.getRoleCodesByUserId(user.id)
+                    systemRoleRepository.getRoleCodesByUserId(user.id)
                         .map { roles -> Triple(tenant, user, roles) }
                 }
         }
@@ -45,6 +52,35 @@ class AuthService(
                 saveLoginLog(user, tenant.id)
             }
         }
+
+    fun findAndVerifyTenant(tenantName: String): Uni<SystemTenantEntity> = systemTenantRepository.findByName(tenantName)
+        .onItem().ifNull().failWith(ServiceException(ErrorCode.TENANT_NOT_FOUND))
+        .flatMap { tenant -> verifyTenantStatus(tenant) }
+
+    fun verifyTenantStatus(tenant: SystemTenantEntity): Uni<SystemTenantEntity> = when {
+        tenant.status == DbEnums.Status.DISABLED -> Uni.createFrom()
+            .failure(ServiceException(ErrorCode.TENANT_DISABLED))
+
+        LocalDateTime.now().isAfter(tenant.expireTime) ->
+            Uni.createFrom().failure(ServiceException(ErrorCode.TENANT_EXPIRED))
+
+        else -> Uni.createFrom().item(tenant)
+    }
+
+    fun findAndVerifyUserCredentials(username: String, password: String, tenantId: String): Uni<SystemUserEntity> =
+        systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(username, tenantId)
+            .onItem().ifNull().failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
+            .flatMap { user -> verifyUserCredentials(user, password) }
+
+    fun verifyUserCredentials(user: SystemUserEntity, password: String): Uni<SystemUserEntity> = when {
+        !BcryptUtil.matches(password, user.accountPassword) -> Uni.createFrom()
+            .failure(ServiceException(ErrorCode.ACCOUNT_CREDENTIALS_INVALID))
+
+        user.status == DbEnums.Status.DISABLED -> Uni.createFrom()
+            .failure(ServiceException(ErrorCode.ACCOUNT_DISABLED))
+
+        else -> Uni.createFrom().item(user)
+    }
 
     private fun createLoginRespVO(
         tenantEntity: SystemTenantEntity,

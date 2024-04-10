@@ -5,19 +5,19 @@ import cn.soybean.system.application.query.PageRoleQuery
 import cn.soybean.system.application.query.RoleByIdBuiltInQuery
 import cn.soybean.system.application.query.RoleExistsQuery
 import cn.soybean.system.application.query.service.RoleQueryService
-import cn.soybean.system.application.service.RoleService
 import cn.soybean.system.domain.entity.toRoleRespVO
+import cn.soybean.system.domain.repository.SystemRoleRepository
 import cn.soybean.system.interfaces.rest.vo.RoleRespVO
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class RoleQueryHandler(private val roleService: RoleService) : RoleQueryService {
+class RoleQueryHandler(private val systemRoleRepository: SystemRoleRepository) : RoleQueryService {
 
     override fun handle(query: PageRoleQuery): Uni<PageResult<RoleRespVO>> {
         val (q, params, page) = query
-        val panacheQuery = roleService.getRoleList(q, Sort.by("order"), params).page(page)
+        val panacheQuery = systemRoleRepository.getRoleList(q, Sort.by("order"), params).page(page)
         return panacheQuery.list().flatMap { resultList ->
             panacheQuery.count().map { count ->
                 PageResult(resultList.map { it.toRoleRespVO() }, page.index + 1, page.size, count)
@@ -25,7 +25,9 @@ class RoleQueryHandler(private val roleService: RoleService) : RoleQueryService 
         }
     }
 
-    override fun handle(query: RoleExistsQuery): Uni<Boolean> = roleService.existsByCode(query.code, query.tenantId)
+    override fun handle(query: RoleExistsQuery): Uni<Boolean> =
+        systemRoleRepository.existsByCode(query.code, query.tenantId)
+
     override fun handle(query: RoleByIdBuiltInQuery): Uni<Boolean> =
-        query.id?.let { roleService.getById(query.id).map { it.builtin } } ?: Uni.createFrom().item(false)
+        query.id?.let { systemRoleRepository.getById(query.id).map { it.builtin } } ?: Uni.createFrom().item(false)
 }
