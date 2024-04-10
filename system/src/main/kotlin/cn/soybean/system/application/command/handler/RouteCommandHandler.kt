@@ -1,11 +1,13 @@
 package cn.soybean.system.application.command.handler
 
+import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.shared.application.command.Command
 import cn.soybean.shared.application.command.CommandHandler
 import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.CreateRouteCommand
 import cn.soybean.system.application.command.DeleteRouteCommand
 import cn.soybean.system.application.command.UpdateRouteCommand
+import cn.soybean.system.application.command.toRouteCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.aggregate.RouteAggregate
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.logging.Log
@@ -25,11 +27,18 @@ class CreateRouteCommandHandler(private val eventStoreDB: EventStoreDB) : Comman
 }
 
 @ApplicationScoped
-class UpdateRouteCommandHandler(private val eventStoreDB: EventStoreDB) : CommandHandler<UpdateRouteCommand, Boolean> {
+class UpdateRouteCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
+    CommandHandler<UpdateRouteCommand, Boolean> {
     override fun handle(command: UpdateRouteCommand): Uni<Boolean> =
         eventStoreDB.load(command.id, RouteAggregate::class.java)
             .map { aggregate ->
-                aggregate.updateRoute(command)
+                aggregate.updateRoute(
+                    command.toRouteCreatedOrUpdatedEventBase().also {
+                        it.tenantId = loginHelper.getTenantId()
+                        it.updateBy = loginHelper.getUserId()
+                        it.updateAccountName = loginHelper.getAccountName()
+                    }
+                )
                 aggregate
             }
             .flatMap { aggregate -> eventStoreDB.save(aggregate) }

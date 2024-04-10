@@ -7,6 +7,7 @@ import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.CreateRoleCommand
 import cn.soybean.system.application.command.DeleteRoleCommand
 import cn.soybean.system.application.command.UpdateRoleCommand
+import cn.soybean.system.application.command.toRoleCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.aggregate.RoleAggregate
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.logging.Log
@@ -33,10 +34,11 @@ class UpdateRoleCommandHandler(private val eventStoreDB: EventStoreDB, private v
         eventStoreDB.load(command.id, RoleAggregate::class.java)
             .map { aggregate ->
                 aggregate.updateRole(
-                    command,
-                    loginHelper.getTenantId(),
-                    loginHelper.getUserId(),
-                    loginHelper.getAccountName()
+                    command.toRoleCreatedOrUpdatedEventBase().also {
+                        it.tenantId = loginHelper.getTenantId()
+                        it.updateBy = loginHelper.getUserId()
+                        it.updateAccountName = loginHelper.getAccountName()
+                    }
                 )
                 aggregate
             }

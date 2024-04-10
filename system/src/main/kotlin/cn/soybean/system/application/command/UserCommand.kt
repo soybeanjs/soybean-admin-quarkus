@@ -2,6 +2,9 @@ package cn.soybean.system.application.command
 
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.shared.application.command.Command
+import cn.soybean.system.domain.event.UserCreatedOrUpdatedEventBase
+import io.mcarle.konvert.api.KonvertTo
+import io.mcarle.konvert.api.Mapping
 
 data class CreateUserCommand(
     var accountName: String,
@@ -18,6 +21,12 @@ data class CreateUserCommand(
     var status: DbEnums.Status
 ) : Command
 
+@KonvertTo(
+    UserCreatedOrUpdatedEventBase::class,
+    mappings = [
+        Mapping(source = "id", target = "aggregateId")
+    ]
+)
 data class UpdateUserCommand(
     var id: String,
     var accountName: String,

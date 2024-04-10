@@ -2,6 +2,9 @@ package cn.soybean.system.application.command
 
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.shared.application.command.Command
+import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEventBase
+import io.mcarle.konvert.api.KonvertTo
+import io.mcarle.konvert.api.Mapping
 
 data class CreateRouteCommand(
     var menuName: String,
@@ -24,6 +27,12 @@ data class CreateRouteCommand(
     var href: String? = null
 ) : Command
 
+@KonvertTo(
+    RouteCreatedOrUpdatedEventBase::class,
+    mappings = [
+        Mapping(source = "id", target = "aggregateId")
+    ]
+)
 data class UpdateRouteCommand(
     var id: String,
     var menuName: String,

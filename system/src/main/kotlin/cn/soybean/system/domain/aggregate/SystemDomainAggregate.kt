@@ -7,9 +7,6 @@ import cn.soybean.shared.util.SerializerUtils
 import cn.soybean.system.application.command.CreateRoleCommand
 import cn.soybean.system.application.command.CreateRouteCommand
 import cn.soybean.system.application.command.CreateUserCommand
-import cn.soybean.system.application.command.UpdateRoleCommand
-import cn.soybean.system.application.command.UpdateRouteCommand
-import cn.soybean.system.application.command.UpdateUserCommand
 import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.event.UserCreatedOrUpdatedEventBase
@@ -71,22 +68,7 @@ class RoleAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
         this.apply(event)
     }
 
-    fun updateRole(command: UpdateRoleCommand, tenantId: String, userId: String, accountName: String) {
-        val data = RoleCreatedOrUpdatedEventBase(
-            aggregateId,
-            command.name,
-            command.code,
-            command.order,
-            command.status,
-            command.dataScope,
-            command.dataScopeDeptIds,
-            command.remark
-        ).also {
-            it.tenantId = tenantId
-            it.updateBy = userId
-            it.updateAccountName = accountName
-        }
-
+    fun updateRole(data: RoleCreatedOrUpdatedEventBase) {
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(RoleCreatedOrUpdatedEventBase.ROLE_UPDATED_V1, dataBytes, null)
         this.apply(event)
@@ -163,23 +145,7 @@ class UserAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
         this.apply(event)
     }
 
-    fun updateUser(command: UpdateUserCommand) {
-        val data = UserCreatedOrUpdatedEventBase(
-            aggregateId,
-            command.accountName,
-            command.accountPassword,
-            command.nickName,
-            command.personalProfile,
-            command.email,
-            command.countryCode,
-            command.phoneCode,
-            command.phoneNumber,
-            command.gender,
-            command.avatar,
-            command.deptId,
-            command.status
-        )
-
+    fun updateUser(data: UserCreatedOrUpdatedEventBase) {
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(UserCreatedOrUpdatedEventBase.USER_UPDATED_V1, dataBytes, null)
         this.apply(event)
@@ -274,29 +240,7 @@ class RouteAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggre
         this.apply(event)
     }
 
-    fun updateRoute(command: UpdateRouteCommand) {
-        val data = RouteCreatedOrUpdatedEventBase(
-            aggregateId,
-            command.menuName,
-            command.menuType,
-            command.order,
-            command.parentId,
-            command.icon,
-            command.iconType,
-            command.routeName,
-            command.routePath,
-            command.component,
-            command.i18nKey,
-            command.multiTab,
-            command.activeMenu,
-            command.hideInMenu,
-            command.status,
-            command.roles,
-            command.keepAlive,
-            command.constant,
-            command.href
-        )
-
+    fun updateRoute(data: RouteCreatedOrUpdatedEventBase) {
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(RouteCreatedOrUpdatedEventBase.ROUTE_UPDATED_V1, dataBytes, null)
         this.apply(event)
