@@ -1,6 +1,8 @@
 package cn.soybean.domain
 
-import cn.soybean.domain.SerializerUtils.serializeToJsonBytes
+import cn.soybean.shared.domain.aggregate.AggregateEventEntity
+import cn.soybean.shared.eventsourcing.EventBus
+import cn.soybean.shared.util.SerializerUtils.serializeToJsonBytes
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
@@ -12,10 +14,6 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import java.time.Duration
 
-fun interface EventBus {
-    fun publish(eventEntities: List<EventEntity>): Uni<Unit>
-}
-
 @ApplicationScoped
 class KafkaEventBus(
     private val kafkaClientService: KafkaClientService,
@@ -26,7 +24,7 @@ class KafkaEventBus(
 ) : EventBus {
 
     @WithSpan
-    override fun publish(eventEntities: List<EventEntity>): Uni<Unit> {
+    override fun publish(eventEntities: MutableList<AggregateEventEntity>): Uni<Unit> {
         val context = Vertx.currentContext()
         if (context == null) {
             Log.error("[KafkaEventBus] Not in a Vert.x context!")

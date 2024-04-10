@@ -1,5 +1,8 @@
 package cn.soybean.domain
 
+import cn.soybean.shared.domain.aggregate.AggregateEventEntity
+import cn.soybean.shared.projection.Projection
+import cn.soybean.shared.util.SerializerUtils
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
@@ -10,15 +13,10 @@ import jakarta.enterprise.inject.Instance
 import org.eclipse.microprofile.reactive.messaging.Incoming
 import org.eclipse.microprofile.reactive.messaging.Message
 
-interface Projection {
-    fun process(eventEntity: EventEntity): Uni<Unit>
-    fun supports(eventType: String): Boolean
-}
-
 @ApplicationScoped
 class ProjectionInvoker(private val handlers: Instance<Projection>) {
 
-    fun distributionProcess(eventEntity: EventEntity): Uni<Unit> {
+    fun distributionProcess(eventEntity: AggregateEventEntity): Uni<Unit> {
         val supportedHandlers = handlers.filter { it.supports(eventEntity.eventType) }
 
         return when {

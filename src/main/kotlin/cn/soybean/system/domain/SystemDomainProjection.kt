@@ -1,13 +1,13 @@
 package cn.soybean.system.domain
 
-import cn.soybean.domain.EventEntity
-import cn.soybean.domain.Projection
-import cn.soybean.domain.SerializerUtils
+import cn.soybean.shared.domain.aggregate.AggregateEventEntity
+import cn.soybean.shared.projection.Projection
+import cn.soybean.shared.util.SerializerUtils
 import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.domain.entity.SystemRoleEntity
-import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEvent
-import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEvent
-import cn.soybean.system.domain.event.UserCreatedOrUpdatedEvent
+import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEventBase
+import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEventBase
+import cn.soybean.system.domain.event.UserCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.repository.SystemMenuRepository
 import cn.soybean.system.domain.repository.SystemRoleRepository
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
@@ -19,8 +19,9 @@ import jakarta.enterprise.context.ApplicationScoped
 class RoleCreatedProjection(private val roleRepository: SystemRoleRepository) : Projection {
 
     @WithTransaction
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
-        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RoleCreatedOrUpdatedEvent::class.java)
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
+        val event =
+            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RoleCreatedOrUpdatedEventBase::class.java)
         val systemRoleEntity = SystemRoleEntity(
             name = event.name,
             code = event.code,
@@ -38,13 +39,14 @@ class RoleCreatedProjection(private val roleRepository: SystemRoleRepository) : 
         return roleRepository.saveOrUpdate(systemRoleEntity).replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean = eventType == RoleCreatedOrUpdatedEvent.ROLE_CREATED_V1
+    override fun supports(eventType: String): Boolean = eventType == RoleCreatedOrUpdatedEventBase.ROLE_CREATED_V1
 }
 
 @ApplicationScoped
 class RoleUpdatedProjection(private val roleRepository: SystemRoleRepository) : Projection {
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
-        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RoleCreatedOrUpdatedEvent::class.java)
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
+        val event =
+            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RoleCreatedOrUpdatedEventBase::class.java)
         return roleRepository.getById(event.aggregateId)
             .flatMap { role ->
                 role.also {
@@ -62,31 +64,32 @@ class RoleUpdatedProjection(private val roleRepository: SystemRoleRepository) : 
             }.replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean = eventType == RoleCreatedOrUpdatedEvent.ROLE_UPDATED_V1
+    override fun supports(eventType: String): Boolean = eventType == RoleCreatedOrUpdatedEventBase.ROLE_UPDATED_V1
 }
 
 @ApplicationScoped
 class UserCreatedProjection : Projection {
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         TODO("Not yet implemented")
     }
 
-    override fun supports(eventType: String): Boolean = eventType == UserCreatedOrUpdatedEvent.USER_CREATED_V1
+    override fun supports(eventType: String): Boolean = eventType == UserCreatedOrUpdatedEventBase.USER_CREATED_V1
 }
 
 @ApplicationScoped
 class UserUpdatedProjection : Projection {
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         TODO("Not yet implemented")
     }
 
-    override fun supports(eventType: String): Boolean = eventType == UserCreatedOrUpdatedEvent.USER_UPDATED_V1
+    override fun supports(eventType: String): Boolean = eventType == UserCreatedOrUpdatedEventBase.USER_UPDATED_V1
 }
 
 @ApplicationScoped
 class RouteCreatedProjection(private val menuRepository: SystemMenuRepository) : Projection {
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
-        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteCreatedOrUpdatedEvent::class.java)
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
+        val event =
+            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteCreatedOrUpdatedEventBase::class.java)
         val systemMenuEntity = SystemMenuEntity(
             menuName = event.menuName,
             menuType = event.menuType,
@@ -113,13 +116,14 @@ class RouteCreatedProjection(private val menuRepository: SystemMenuRepository) :
         return menuRepository.saveOrUpdate(systemMenuEntity).replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean = eventType == RouteCreatedOrUpdatedEvent.ROUTE_CREATED_V1
+    override fun supports(eventType: String): Boolean = eventType == RouteCreatedOrUpdatedEventBase.ROUTE_CREATED_V1
 }
 
 @ApplicationScoped
 class RouteUpdatedProjection(private val menuRepository: SystemMenuRepository) : Projection {
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
-        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteCreatedOrUpdatedEvent::class.java)
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
+        val event =
+            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteCreatedOrUpdatedEventBase::class.java)
         return menuRepository.getById(event.aggregateId)
             .flatMap { menu ->
                 menu.also {
@@ -147,5 +151,5 @@ class RouteUpdatedProjection(private val menuRepository: SystemMenuRepository) :
             }.replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean = eventType == RouteCreatedOrUpdatedEvent.ROUTE_UPDATED_V1
+    override fun supports(eventType: String): Boolean = eventType == RouteCreatedOrUpdatedEventBase.ROUTE_UPDATED_V1
 }

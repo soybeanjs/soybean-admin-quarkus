@@ -1,4 +1,4 @@
-package cn.soybean.infrastructure.persistence.converters
+package cn.soybean.shared.infrastructure.persistence.converters
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper

@@ -1,4 +1,4 @@
-package cn.soybean.infrastructure.persistence.converters
+package cn.soybean.shared.infrastructure.persistence.converters
 
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter

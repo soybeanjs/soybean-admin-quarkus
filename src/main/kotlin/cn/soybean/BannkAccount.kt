@@ -1,11 +1,11 @@
 package cn.soybean
 
-import cn.soybean.domain.AggregateRoot
-import cn.soybean.domain.BaseAggregateEvent
-import cn.soybean.domain.EventEntity
-import cn.soybean.domain.EventStoreDB
-import cn.soybean.domain.Projection
-import cn.soybean.domain.SerializerUtils
+import cn.soybean.shared.domain.aggregate.AggregateEventBase
+import cn.soybean.shared.domain.aggregate.AggregateEventEntity
+import cn.soybean.shared.domain.aggregate.AggregateRoot
+import cn.soybean.shared.eventsourcing.EventStoreDB
+import cn.soybean.shared.projection.Projection
+import cn.soybean.shared.util.SerializerUtils
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.yitter.idgen.YitIdHelper
@@ -105,39 +105,39 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
     }
 }
 
-data class BankAccountCreatedAggregateEvent(
+data class BankAccountCreatedAggregateEventBase(
     val aggregateId: String,
     val email: String,
     val userName: String,
     val address: String
-) : BaseAggregateEvent(aggregateId) {
+) : AggregateEventBase(aggregateId) {
     companion object {
         const val BANK_ACCOUNT_CREATED_V1 = "BANK_ACCOUNT_CREATED_V1"
     }
 }
 
-data class EmailChangedAggregateEvent(
+data class EmailChangedAggregateEventBase(
     val aggregateId: String,
     val newEmail: String
-) : BaseAggregateEvent(aggregateId) {
+) : AggregateEventBase(aggregateId) {
     companion object {
         const val EMAIL_CHANGED_V1 = "EMAIL_CHANGED_V1"
     }
 }
 
-data class AddressUpdatedAggregateEvent(
+data class AddressUpdatedAggregateEventBase(
     val aggregateId: String,
     val newAddress: String
-) : BaseAggregateEvent(aggregateId) {
+) : AggregateEventBase(aggregateId) {
     companion object {
         const val ADDRESS_UPDATED_V1 = "ADDRESS_UPDATED_V1"
     }
 }
 
-data class BalanceDepositedAggregateEvent(
+data class BalanceDepositedAggregateEventBase(
     val aggregateId: String,
     val amount: BigDecimal
-) : BaseAggregateEvent(aggregateId) {
+) : AggregateEventBase(aggregateId) {
     companion object {
         const val BALANCE_DEPOSITED_V1 = "BALANCE_DEPOSITED_V1"
     }
@@ -151,33 +151,33 @@ class BankAccountAggregate @JsonCreator constructor(@JsonProperty("aggregateId")
     private var address: String = ""
     private var balance: BigDecimal = BigDecimal.ZERO
 
-    override fun whenCondition(eventEntity: EventEntity) {
+    override fun whenCondition(eventEntity: AggregateEventEntity) {
         when (eventEntity.eventType) {
-            BankAccountCreatedAggregateEvent.BANK_ACCOUNT_CREATED_V1 -> handle(
+            BankAccountCreatedAggregateEventBase.BANK_ACCOUNT_CREATED_V1 -> handle(
                 SerializerUtils.deserializeFromJsonBytes(
                     eventEntity.data,
-                    BankAccountCreatedAggregateEvent::class.java
+                    BankAccountCreatedAggregateEventBase::class.java
                 )
             )
 
-            EmailChangedAggregateEvent.EMAIL_CHANGED_V1 -> handle(
+            EmailChangedAggregateEventBase.EMAIL_CHANGED_V1 -> handle(
                 SerializerUtils.deserializeFromJsonBytes(
                     eventEntity.data,
-                    EmailChangedAggregateEvent::class.java
+                    EmailChangedAggregateEventBase::class.java
                 )
             )
 
-            AddressUpdatedAggregateEvent.ADDRESS_UPDATED_V1 -> handle(
+            AddressUpdatedAggregateEventBase.ADDRESS_UPDATED_V1 -> handle(
                 SerializerUtils.deserializeFromJsonBytes(
                     eventEntity.data,
-                    AddressUpdatedAggregateEvent::class.java
+                    AddressUpdatedAggregateEventBase::class.java
                 )
             )
 
-            BalanceDepositedAggregateEvent.BALANCE_DEPOSITED_V1 -> handle(
+            BalanceDepositedAggregateEventBase.BALANCE_DEPOSITED_V1 -> handle(
                 SerializerUtils.deserializeFromJsonBytes(
                     eventEntity.data,
-                    BalanceDepositedAggregateEvent::class.java
+                    BalanceDepositedAggregateEventBase::class.java
                 )
             )
 
@@ -185,54 +185,54 @@ class BankAccountAggregate @JsonCreator constructor(@JsonProperty("aggregateId")
         }
     }
 
-    private fun handle(event: BankAccountCreatedAggregateEvent) {
+    private fun handle(event: BankAccountCreatedAggregateEventBase) {
         this.email = event.email
         this.userName = event.userName
         this.address = event.address
         this.balance = BigDecimal.valueOf(0)
     }
 
-    private fun handle(event: EmailChangedAggregateEvent) {
+    private fun handle(event: EmailChangedAggregateEventBase) {
         this.email = event.newEmail
     }
 
-    private fun handle(event: AddressUpdatedAggregateEvent) {
+    private fun handle(event: AddressUpdatedAggregateEventBase) {
         this.address = event.newAddress
     }
 
-    private fun handle(event: BalanceDepositedAggregateEvent) {
+    private fun handle(event: BalanceDepositedAggregateEventBase) {
         this.balance = balance.add(event.amount)
     }
 
     fun createBankAccount(email: String, address: String, userName: String) {
-        val data = BankAccountCreatedAggregateEvent(aggregateId, email, address, userName)
+        val data = BankAccountCreatedAggregateEventBase(aggregateId, email, address, userName)
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
-        val event = this.createEvent(BankAccountCreatedAggregateEvent.BANK_ACCOUNT_CREATED_V1, dataBytes, null)
+        val event = this.createEvent(BankAccountCreatedAggregateEventBase.BANK_ACCOUNT_CREATED_V1, dataBytes, null)
         this.apply(event)
     }
 
     fun changeEmail(newEmail: String) {
-        val data = EmailChangedAggregateEvent(aggregateId, newEmail)
+        val data = EmailChangedAggregateEventBase(aggregateId, newEmail)
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
-        val event = this.createEvent(EmailChangedAggregateEvent.EMAIL_CHANGED_V1, dataBytes, null)
+        val event = this.createEvent(EmailChangedAggregateEventBase.EMAIL_CHANGED_V1, dataBytes, null)
         this.apply(event)
     }
 
     fun changeAddress(newAddress: String) {
-        val data = AddressUpdatedAggregateEvent(aggregateId, newAddress)
+        val data = AddressUpdatedAggregateEventBase(aggregateId, newAddress)
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
-        val event = this.createEvent(AddressUpdatedAggregateEvent.ADDRESS_UPDATED_V1, dataBytes, null)
+        val event = this.createEvent(AddressUpdatedAggregateEventBase.ADDRESS_UPDATED_V1, dataBytes, null)
         this.apply(event)
     }
 
     fun depositBalance(amount: BigDecimal) {
-        val data = BalanceDepositedAggregateEvent(aggregateId, amount)
+        val data = BalanceDepositedAggregateEventBase(aggregateId, amount)
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
-        val event = this.createEvent(BalanceDepositedAggregateEvent.BALANCE_DEPOSITED_V1, dataBytes, null)
+        val event = this.createEvent(BalanceDepositedAggregateEventBase.BALANCE_DEPOSITED_V1, dataBytes, null)
         this.apply(event)
     }
 
@@ -258,15 +258,15 @@ class BankAccountCreatedEventProjection : Projection {
     @WithSpan
     @Retry(maxRetries = 3, delay = 500)
     @Timeout(value = 5000)
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         Log.debugf(
-            "(when) BankAccountCreatedAggregateEvent: %s, aggregateID: %s",
+            "(when) BankAccountCreatedAggregateEventBase: %s, aggregateID: %s",
             eventEntity,
             eventEntity.aggregateId
         )
 
         val event =
-            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, BankAccountCreatedAggregateEvent::class.java)
+            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, BankAccountCreatedAggregateEventBase::class.java)
 
         val bankAccountDocument = BankAccountDocument()
         bankAccountDocument.aggregateId = event.aggregateId
@@ -288,7 +288,7 @@ class BankAccountCreatedEventProjection : Projection {
     }
 
     override fun supports(eventType: String): Boolean =
-        eventType == BankAccountCreatedAggregateEvent.BANK_ACCOUNT_CREATED_V1
+        eventType == BankAccountCreatedAggregateEventBase.BANK_ACCOUNT_CREATED_V1
 }
 
 @ApplicationScoped
@@ -297,20 +297,21 @@ class EmailChangedEventProjection : Projection {
     @WithSpan
     @Retry(maxRetries = 3, delay = 500)
     @Timeout(value = 5000)
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         Log.debugf(
-            "(when) EmailChangedAggregateEvent: %s, aggregateID: %s",
+            "(when) EmailChangedAggregateEventBase: %s, aggregateID: %s",
             eventEntity,
             eventEntity.aggregateId
         )
 
-        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, EmailChangedAggregateEvent::class.java)
+        val event =
+            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, EmailChangedAggregateEventBase::class.java)
 
         return BankAccountDocument.find("aggregateId", event.aggregateId).firstResult()
             .onFailure().invoke { ex ->
                 Log.errorf(
                     ex,
-                    "handle EmailChangedAggregateEvent findByAggregateId aggregateID: %s",
+                    "handle EmailChangedAggregateEventBase findByAggregateId aggregateID: %s",
                     event.aggregateId
                 )
             }
@@ -325,20 +326,20 @@ class EmailChangedEventProjection : Projection {
             .onFailure().invoke { ex ->
                 Log.errorf(
                     ex,
-                    "handle EmailChangedAggregateEvent update aggregateID: %s",
+                    "handle EmailChangedAggregateEventBase update aggregateID: %s",
                     event.aggregateId
                 )
             }
             .onItem().invoke { updatedDocument ->
                 Log.debugf(
-                    "(EmailChangedAggregateEvent) updatedDocument: %s",
+                    "(EmailChangedAggregateEventBase) updatedDocument: %s",
                     updatedDocument
                 )
             }
             .replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean = eventType == EmailChangedAggregateEvent.EMAIL_CHANGED_V1
+    override fun supports(eventType: String): Boolean = eventType == EmailChangedAggregateEventBase.EMAIL_CHANGED_V1
 }
 
 @ApplicationScoped
@@ -347,20 +348,21 @@ class AddressUpdatedEventProjection : Projection {
     @WithSpan
     @Retry(maxRetries = 3, delay = 500)
     @Timeout(value = 5000)
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         Log.debugf(
-            "(when) AddressUpdatedAggregateEvent: %s, aggregateID: %s",
+            "(when) AddressUpdatedAggregateEventBase: %s, aggregateID: %s",
             eventEntity,
             eventEntity.aggregateId
         )
 
-        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, AddressUpdatedAggregateEvent::class.java)
+        val event =
+            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, AddressUpdatedAggregateEventBase::class.java)
 
         return BankAccountDocument.find("aggregateId", event.aggregateId).firstResult()
             .onFailure().invoke { ex ->
                 Log.errorf(
                     ex,
-                    "handle AddressUpdatedAggregateEvent findByAggregateId aggregateID: %s",
+                    "handle AddressUpdatedAggregateEventBase findByAggregateId aggregateID: %s",
                     event.aggregateId
                 )
             }
@@ -375,20 +377,20 @@ class AddressUpdatedEventProjection : Projection {
             .onFailure().invoke { ex ->
                 Log.errorf(
                     ex,
-                    "handle AddressUpdatedAggregateEvent update aggregateID: %s",
+                    "handle AddressUpdatedAggregateEventBase update aggregateID: %s",
                     event.aggregateId
                 )
             }
             .onItem().invoke { updatedDocument ->
                 Log.debugf(
-                    "(AddressUpdatedAggregateEvent) updatedDocument: %s",
+                    "(AddressUpdatedAggregateEventBase) updatedDocument: %s",
                     updatedDocument
                 )
             }
             .replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean = eventType == AddressUpdatedAggregateEvent.ADDRESS_UPDATED_V1
+    override fun supports(eventType: String): Boolean = eventType == AddressUpdatedAggregateEventBase.ADDRESS_UPDATED_V1
 }
 
 @ApplicationScoped
@@ -397,21 +399,21 @@ class BalanceDepositedEventProjection : Projection {
     @WithSpan
     @Retry(maxRetries = 3, delay = 500)
     @Timeout(value = 5000)
-    override fun process(eventEntity: EventEntity): Uni<Unit> {
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         Log.debugf(
-            "(when) BalanceDepositedAggregateEvent: %s, aggregateID: %s",
+            "(when) BalanceDepositedAggregateEventBase: %s, aggregateID: %s",
             eventEntity,
             eventEntity.aggregateId
         )
 
         val event =
-            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, BalanceDepositedAggregateEvent::class.java)
+            SerializerUtils.deserializeFromJsonBytes(eventEntity.data, BalanceDepositedAggregateEventBase::class.java)
 
         return BankAccountDocument.find("aggregateId", event.aggregateId).firstResult()
             .onFailure().invoke { ex ->
                 Log.errorf(
                     ex,
-                    "handle BalanceDepositedAggregateEvent findByAggregateId aggregateID: %s",
+                    "handle BalanceDepositedAggregateEventBase findByAggregateId aggregateID: %s",
                     event.aggregateId
                 )
             }
@@ -426,20 +428,21 @@ class BalanceDepositedEventProjection : Projection {
             .onFailure().invoke { ex ->
                 Log.errorf(
                     ex,
-                    "handle BalanceDepositedAggregateEvent update aggregateID: %s",
+                    "handle BalanceDepositedAggregateEventBase update aggregateID: %s",
                     event.aggregateId
                 )
             }
             .onItem().invoke { updatedDocument ->
                 Log.debugf(
-                    "(BalanceDepositedAggregateEvent) updatedDocument: %s",
+                    "(BalanceDepositedAggregateEventBase) updatedDocument: %s",
                     updatedDocument
                 )
             }
             .replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean = eventType == BalanceDepositedAggregateEvent.BALANCE_DEPOSITED_V1
+    override fun supports(eventType: String): Boolean =
+        eventType == BalanceDepositedAggregateEventBase.BALANCE_DEPOSITED_V1
 }
 
 data class CreateBankAccountRequestDTO(

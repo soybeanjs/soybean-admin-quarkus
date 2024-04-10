@@ -16,8 +16,8 @@ class SnapshotEntity : ReactivePanacheMongoEntity() {
     @field:BsonProperty(AggregateConstants.AGGREGATE_TYPE)
     lateinit var aggregateType: String
 
-    @field:BsonProperty(AggregateConstants.VERSION)
-    var version: Long = 0
+    @field:BsonProperty(AggregateConstants.AGGREGATE_VERSION)
+    var aggregateVersion: Long = 0
 
     @field:BsonProperty(AggregateConstants.DATA)
     lateinit var data: ByteArray

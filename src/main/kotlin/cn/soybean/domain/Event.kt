@@ -1,15 +1,10 @@
 package cn.soybean.domain
 
+import cn.soybean.shared.domain.event.DomainEvent
+import cn.soybean.shared.domain.event.DomainEventListener
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Event
 import jakarta.enterprise.inject.Instance
-
-interface DomainEvent
-
-interface DomainEventListener<E : DomainEvent> {
-    fun onEvent(event: E)
-    fun supports(event: DomainEvent): Boolean
-}
 
 @ApplicationScoped
 class EventInvoker(private val handlers: Instance<DomainEventListener<*>>) {

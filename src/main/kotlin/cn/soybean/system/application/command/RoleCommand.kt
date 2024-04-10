@@ -1,7 +1,7 @@
 package cn.soybean.system.application.command
 
-import cn.soybean.domain.Command
 import cn.soybean.domain.enums.DbEnums
+import cn.soybean.shared.application.command.Command
 
 data class CreateRoleCommand(
     var name: String,

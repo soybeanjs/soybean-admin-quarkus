@@ -70,6 +70,8 @@ dependencies {
     implementation("io.mcarle:konvert-api:$konvertVersion")
     implementation("io.mcarle:konvert-cdi-annotations:$konvertVersion")
 
+    implementation(project(":shared"))
+
     kapt("jakarta.persistence:jakarta.persistence-api:${jakartaPersistenceVersion}")
 
     ksp("io.mcarle:konvert:$konvertVersion")
@@ -92,7 +94,18 @@ configurations {
 group = projectGroup
 version = projectVersion
 
-allprojects {
+subprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    apply(plugin = "kotlin")
+
+    dependencies {
+        implementation(platform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+    }
+
     group = group
     version = version
 }

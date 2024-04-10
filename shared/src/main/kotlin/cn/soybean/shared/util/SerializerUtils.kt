@@ -1,21 +1,22 @@
-package cn.soybean.domain
+package cn.soybean.shared.util
 
+import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 
 object SerializerUtils {
-    private val objectMapper: ObjectMapper = JsonMapper.builder()
-        .addModule(ParameterNamesModule())
-        .addModule(Jdk8Module())
-        .addModule(JavaTimeModule())
-        .build()
+    private val objectMapper: ObjectMapper = jacksonObjectMapper().apply {
+        registerModule(ParameterNamesModule())
+        registerModule(Jdk8Module())
+        registerModule(JavaTimeModule())
+    }
 
     @JvmStatic
     fun serializeToJsonBytes(obj: Any): ByteArray = try {
@@ -32,8 +33,8 @@ object SerializerUtils {
     }
 
     @JvmStatic
-    fun deserializeEventsFromJsonBytes(jsonBytes: ByteArray): Array<EventEntity> = try {
-        objectMapper.readValue(jsonBytes, Array<EventEntity>::class.java)
+    fun deserializeEventsFromJsonBytes(jsonBytes: ByteArray): Array<AggregateEventEntity> = try {
+        objectMapper.readValue(jsonBytes, Array<AggregateEventEntity>::class.java)
     } catch (e: IOException) {
         throw RuntimeException(e.message, e)
     }

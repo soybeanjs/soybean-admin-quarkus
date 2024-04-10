@@ -1,10 +1,10 @@
 package cn.soybean.system.domain.event
 
-import cn.soybean.domain.BaseAggregateEvent
-import cn.soybean.domain.DomainEvent
 import cn.soybean.domain.enums.DbEnums
+import cn.soybean.shared.domain.aggregate.AggregateEventBase
+import cn.soybean.shared.domain.event.DomainEvent
 
-data class RoleCreatedOrUpdatedEvent(
+data class RoleCreatedOrUpdatedEventBase(
     val aggregateId: String,
     val name: String,
     val code: String,
@@ -13,14 +13,14 @@ data class RoleCreatedOrUpdatedEvent(
     val dataScope: DbEnums.DataPermission? = null,
     val dataScopeDeptIds: Set<String>? = null,
     val remark: String? = null
-) : BaseAggregateEvent(aggregateId), DomainEvent {
+) : AggregateEventBase(aggregateId), DomainEvent {
     companion object {
         const val ROLE_CREATED_V1 = "ROLE_CREATED_V1"
         const val ROLE_UPDATED_V1 = "ROLE_UPDATED_V1"
     }
 }
 
-data class UserCreatedOrUpdatedEvent(
+data class UserCreatedOrUpdatedEventBase(
     val aggregateId: String,
     val accountName: String,
     val accountPassword: String,
@@ -34,14 +34,14 @@ data class UserCreatedOrUpdatedEvent(
     val avatar: String? = null,
     val deptId: String? = null,
     val status: DbEnums.Status
-) : BaseAggregateEvent(aggregateId), DomainEvent {
+) : AggregateEventBase(aggregateId), DomainEvent {
     companion object {
         const val USER_CREATED_V1 = "USER_CREATED_V1"
         const val USER_UPDATED_V1 = "USER_UPDATED_V1"
     }
 }
 
-data class RouteCreatedOrUpdatedEvent(
+data class RouteCreatedOrUpdatedEventBase(
     val aggregateId: String,
     val menuName: String,
     val menuType: DbEnums.MenuItemType,
@@ -61,7 +61,7 @@ data class RouteCreatedOrUpdatedEvent(
     val keepAlive: Boolean? = null,
     val constant: Boolean? = null,
     val href: String? = null
-) : BaseAggregateEvent(aggregateId), DomainEvent {
+) : AggregateEventBase(aggregateId), DomainEvent {
     companion object {
         const val ROUTE_CREATED_V1 = "ROUTE_CREATED_V1"
         const val ROUTE_UPDATED_V1 = "ROUTE_UPDATED_V1"

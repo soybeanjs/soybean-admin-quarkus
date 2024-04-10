@@ -1,15 +1,10 @@
 package cn.soybean.domain
 
+import cn.soybean.shared.application.command.Command
+import cn.soybean.shared.application.command.CommandHandler
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Instance
-
-interface Command
-
-interface CommandHandler<C : Command, R> {
-    fun handle(command: C): Uni<R>
-    fun canHandle(command: Command): Boolean
-}
 
 @ApplicationScoped
 class CommandInvoker(private val handlers: Instance<CommandHandler<*, *>>) {

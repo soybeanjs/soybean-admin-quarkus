@@ -1,9 +1,9 @@
 package cn.soybean.system.application.command.handler
 
-import cn.soybean.domain.Command
-import cn.soybean.domain.CommandHandler
-import cn.soybean.domain.EventStoreDB
 import cn.soybean.infrastructure.security.LoginHelper
+import cn.soybean.shared.application.command.Command
+import cn.soybean.shared.application.command.CommandHandler
+import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.CreateRoleCommand
 import cn.soybean.system.application.command.DeleteRoleCommand
 import cn.soybean.system.application.command.UpdateRoleCommand
