@@ -24,6 +24,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import jakarta.ws.rs.Consumes
+import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
@@ -39,12 +40,14 @@ data class CreateBankAccountCommand(val email: String, val userName: String, val
 data class ChangeEmailCommand(val aggregateID: String, val newEmail: String)
 data class ChangeAddressCommand(val aggregateID: String, val newAddress: String)
 data class DepositAmountCommand(val aggregateID: String, val amount: BigDecimal)
+data class DeleteBankAccountCommand(val aggregateID: String)
 
 interface BankAccountCommandService {
     fun handle(command: CreateBankAccountCommand): Uni<String>
     fun handle(command: ChangeEmailCommand): Uni<Unit>
     fun handle(command: ChangeAddressCommand): Uni<Unit>
     fun handle(command: DepositAmountCommand): Uni<Unit>
+    fun handle(command: DeleteBankAccountCommand): Uni<Boolean>
 }
 
 @ApplicationScoped
@@ -103,6 +106,22 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
                 )
             }
     }
+
+    override fun handle(command: DeleteBankAccountCommand): Uni<Boolean> {
+        return eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
+            .map { aggregate ->
+                aggregate.deleteBankAccount(command.aggregateID)
+                aggregate
+            }
+            .flatMap { aggregate -> eventStoreDB.save(aggregate) }
+            .map { true }
+            .onItem().invoke { _ ->
+                Log.debugf(
+                    "deleted bank account, aggregateId: %s",
+                    command.aggregateID
+                )
+            }
+    }
 }
 
 data class BankAccountCreatedAggregateEventBase(
@@ -143,6 +162,14 @@ data class BalanceDepositedAggregateEventBase(
     }
 }
 
+data class BankAccountDeletedAggregateEventBase(
+    val aggregateId: String
+) : AggregateEventBase(aggregateId) {
+    companion object {
+        const val BANK_ACCOUNT_DELETED_V1 = "BANK_ACCOUNT_DELETED_V1"
+    }
+}
+
 class BankAccountAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggregateId: String) :
     AggregateRoot(aggregateId, AGGREGATE_TYPE) {
 
@@ -180,6 +207,8 @@ class BankAccountAggregate @JsonCreator constructor(@JsonProperty("aggregateId")
                     BalanceDepositedAggregateEventBase::class.java
                 )
             )
+
+            BankAccountDeletedAggregateEventBase.BANK_ACCOUNT_DELETED_V1 -> Unit
 
             else -> throw RuntimeException(eventEntity.eventType)
         }
@@ -233,6 +262,14 @@ class BankAccountAggregate @JsonCreator constructor(@JsonProperty("aggregateId")
 
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(BalanceDepositedAggregateEventBase.BALANCE_DEPOSITED_V1, dataBytes, null)
+        this.apply(event)
+    }
+
+    fun deleteBankAccount(aggregateId: String) {
+        val data = BankAccountDeletedAggregateEventBase(aggregateId)
+
+        val dataBytes = SerializerUtils.serializeToJsonBytes(data)
+        val event = this.createEvent(BankAccountDeletedAggregateEventBase.BANK_ACCOUNT_DELETED_V1, dataBytes, null)
         this.apply(event)
     }
 
@@ -445,6 +482,47 @@ class BalanceDepositedEventProjection : Projection {
         eventType == BalanceDepositedAggregateEventBase.BALANCE_DEPOSITED_V1
 }
 
+@ApplicationScoped
+class BankAccountDeletedEventProjection : Projection {
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
+        Log.debugf(
+            "(when) BankAccountDeletedAggregateEventBase: %s, aggregateID: %s",
+            eventEntity,
+            eventEntity.aggregateId
+        )
+
+        return BankAccountDocument.delete("aggregateId", eventEntity.aggregateId)
+            .onItem().invoke { result -> Log.debugf("delete document result: %s", result) }
+            .onFailure().invoke { ex ->
+                Log.errorf(
+                    ex,
+                    "handle BankAccountDeletedEvent persist aggregateID: %s",
+                    eventEntity.aggregateId
+                )
+            }
+            .replaceWithUnit()
+    }
+
+    override fun supports(eventType: String): Boolean =
+        eventType == BankAccountDeletedAggregateEventBase.BANK_ACCOUNT_DELETED_V1
+}
+
+@ApplicationScoped
+class BankCardDeletedEventProjection : Projection {
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
+        Log.debugf(
+            "(when) BankCardDeletedEventProjection: %s, aggregateID: %s",
+            eventEntity,
+            eventEntity.aggregateId
+        )
+
+        return Uni.createFrom().item(Unit)
+    }
+
+    override fun supports(eventType: String): Boolean =
+        eventType == BankAccountDeletedAggregateEventBase.BANK_ACCOUNT_DELETED_V1
+}
+
 data class CreateBankAccountRequestDTO(
     @field:Size(min = 10, max = 250) @field:NotBlank @field:Email @param:Email @param:NotBlank @param:Size(
         min = 10,
@@ -538,6 +616,18 @@ class BankAccountResource(private val commandService: BankAccountCommandService)
     ): Uni<Response> {
         val command = DepositAmountCommand(aggregateID, dto.amount)
         Log.debugf("DepositAmountCommand: %s", command)
+        return commandService.handle(command).map { Response.status(Response.Status.NO_CONTENT).build() }
+    }
+
+    @DELETE
+    @Path("/{aggregateID}")
+    @WithSpan
+    @Retry(maxRetries = 3, delay = 300)
+    @Timeout(value = 5000)
+    @CircuitBreaker(requestVolumeThreshold = 30, delay = 3000, failureRatio = 0.6)
+    fun deleteBanAccount(@PathParam("aggregateID") aggregateID: String): Uni<Response> {
+        val command = DeleteBankAccountCommand(aggregateID)
+        Log.debugf("DeleteBankAccountCommand: %s", command)
         return commandService.handle(command).map { Response.status(Response.Status.NO_CONTENT).build() }
     }
 }

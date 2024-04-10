@@ -29,5 +29,5 @@ subprojects {
     }
 
     group = project.group
-    version = project.version
+    version = projectVersion
 }
