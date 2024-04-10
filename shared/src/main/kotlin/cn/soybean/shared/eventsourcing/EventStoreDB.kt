@@ -7,7 +7,7 @@ import io.smallrye.mutiny.Uni
 interface EventStoreDB {
     fun saveEvents(eventEntities: MutableList<AggregateEventEntity>): Uni<Unit>
 
-    fun loadEvents(aggregateId: String, version: Long): Uni<List<AggregateEventEntity>>
+    fun loadEvents(aggregateId: String, aggregateVersion: Long): Uni<List<AggregateEventEntity>>
 
     fun <T : AggregateRoot> save(aggregate: T): Uni<Unit>
 
