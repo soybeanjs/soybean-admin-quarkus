@@ -9,9 +9,12 @@ import cn.soybean.system.application.command.DeleteRoleCommand
 import cn.soybean.system.application.command.UpdateRoleCommand
 import cn.soybean.system.application.command.toRoleCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.aggregate.RoleAggregate
+import cn.soybean.system.domain.event.RoleDeletedEventBase
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.logging.Log
+import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
+import io.smallrye.mutiny.replaceWithUnit
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
@@ -50,9 +53,28 @@ class UpdateRoleCommandHandler(private val eventStoreDB: EventStoreDB, private v
 }
 
 @ApplicationScoped
-class DeleteRoleCommandHandler : CommandHandler<DeleteRoleCommand, Boolean> {
+class DeleteRoleCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
+    CommandHandler<DeleteRoleCommand, Boolean> {
     override fun handle(command: DeleteRoleCommand): Uni<Boolean> {
-        TODO("Not yet implemented")
+        return Multi.createFrom().iterable(command.ids)
+            .onItem().transformToUniAndMerge { id ->
+                eventStoreDB.load(id, RoleAggregate::class.java)
+                    .map { aggregate ->
+                        aggregate.deleteRole(RoleDeletedEventBase(id).also {
+                            it.tenantId = loginHelper.getTenantId()
+                            it.updateBy = loginHelper.getUserId()
+                            it.updateAccountName = loginHelper.getAccountName()
+                        })
+                        aggregate
+                    }
+                    .flatMap { aggregate -> eventStoreDB.save(aggregate) }
+                    .onFailure().invoke { ex ->
+                        Log.errorf(ex, "Failed to delete role with ID: $id")
+                    }.replaceWithUnit()
+            }
+            .collect().asList()
+            .replaceWith(true)
+            .onFailure().invoke { ex -> Log.errorf(ex, "DeleteRoleCommandHandler fail") }
     }
 
     override fun canHandle(command: Command): Boolean = command is DeleteRoleCommand

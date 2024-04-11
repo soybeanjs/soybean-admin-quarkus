@@ -6,6 +6,7 @@ import cn.soybean.shared.util.SerializerUtils
 import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.domain.entity.SystemRoleEntity
 import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEventBase
+import cn.soybean.system.domain.event.RoleDeletedEventBase
 import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.event.UserCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.repository.SystemMenuRepository
@@ -67,6 +68,19 @@ class RoleUpdatedProjection(private val roleRepository: SystemRoleRepository) : 
     }
 
     override fun supports(eventType: String): Boolean = eventType == RoleCreatedOrUpdatedEventBase.ROLE_UPDATED_V1
+}
+
+@ApplicationScoped
+class RoleDeletedProjection(private val roleRepository: SystemRoleRepository) : Projection {
+
+    @WithTransaction
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
+        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RoleDeletedEventBase::class.java)
+        return event.tenantId?.let { roleRepository.delById(event.aggregateId, it).replaceWithUnit() }
+            ?: Uni.createFrom().item(Unit)
+    }
+
+    override fun supports(eventType: String): Boolean = eventType == RoleDeletedEventBase.ROLE_DELETED_V1
 }
 
 @ApplicationScoped

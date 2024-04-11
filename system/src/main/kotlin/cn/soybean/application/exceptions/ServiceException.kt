@@ -13,5 +13,7 @@ enum class ErrorCode(val code: Int, val message: String) {
 
     SELF_PARENT_MENU_NOT_ALLOWED(1201, "Setting oneself as the parent menu is not allowed."),
     PARENT_MENU_NOT_FOUND(1202, "The parent menu does not exist."),
-    PARENT_MENU_TYPE_INVALID(1203, "The parent menu's type must be either 'Directory' or 'Menu'.")
+    PARENT_MENU_TYPE_INVALID(1203, "The parent menu's type must be either 'Directory' or 'Menu'."),
+
+    ROLE_NOT_FOUND(1301, "The role does not exist.")
 }

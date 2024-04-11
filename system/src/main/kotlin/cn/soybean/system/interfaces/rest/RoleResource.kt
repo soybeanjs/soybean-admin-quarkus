@@ -90,7 +90,7 @@ class RoleResource(
     @WithTransaction
     @Operation(summary = "删除角色", description = "删除角色信息")
     fun deleteRole(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
-        roleService.deleteRole(DeleteRoleCommand(ids)).map { (isSuccess, message) ->
+        roleService.deleteRole(DeleteRoleCommand(ids), loginHelper.getTenantId()).map { (isSuccess, message) ->
             when {
                 isSuccess -> ResponseEntity.ok(true)
                 else -> ResponseEntity.fail(message, false)

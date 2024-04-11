@@ -8,6 +8,7 @@ import cn.soybean.system.application.command.CreateRoleCommand
 import cn.soybean.system.application.command.CreateRouteCommand
 import cn.soybean.system.application.command.CreateUserCommand
 import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEventBase
+import cn.soybean.system.domain.event.RoleDeletedEventBase
 import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.event.UserCreatedOrUpdatedEventBase
 import com.fasterxml.jackson.annotation.JsonCreator
@@ -31,6 +32,11 @@ class RoleAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
                     eventEntity.data,
                     RoleCreatedOrUpdatedEventBase::class.java
                 )
+            )
+
+            RoleDeletedEventBase.ROLE_DELETED_V1 -> SerializerUtils.deserializeFromJsonBytes(
+                eventEntity.data,
+                RoleDeletedEventBase::class.java
             )
 
             else -> throw RuntimeException(eventEntity.eventType)
@@ -71,6 +77,12 @@ class RoleAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
     fun updateRole(data: RoleCreatedOrUpdatedEventBase) {
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(RoleCreatedOrUpdatedEventBase.ROLE_UPDATED_V1, dataBytes, null)
+        this.apply(event)
+    }
+
+    fun deleteRole(data: RoleDeletedEventBase) {
+        val dataBytes = SerializerUtils.serializeToJsonBytes(data)
+        val event = this.createEvent(RoleDeletedEventBase.ROLE_DELETED_V1, dataBytes, null)
         this.apply(event)
     }
 

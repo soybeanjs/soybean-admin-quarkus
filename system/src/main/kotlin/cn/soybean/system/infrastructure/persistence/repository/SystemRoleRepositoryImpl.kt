@@ -21,6 +21,9 @@ class SystemRoleRepositoryImpl : SystemRoleRepository, PanacheRepositoryBase<Sys
 
     override fun saveOrUpdate(entity: SystemRoleEntity): Uni<SystemRoleEntity> = persist(entity)
     override fun getById(id: String): Uni<SystemRoleEntity> = findById(id)
+    override fun getById(id: String, tenantId: String): Uni<SystemRoleEntity?> =
+        find("id = ?1 and tenantId = ?2", id, tenantId).firstResult()
+
     override fun existsByCode(code: String, tenantId: String): Uni<Boolean> =
         find("code = ?1 and tenantId = ?2", code, tenantId).count().map {
             when {
@@ -28,4 +31,6 @@ class SystemRoleRepositoryImpl : SystemRoleRepository, PanacheRepositoryBase<Sys
                 else -> false
             }
         }
+
+    override fun delById(id: String, tenantId: String): Uni<Long> = delete("id = ?1 and tenantId = ?2", id, tenantId)
 }

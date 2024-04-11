@@ -20,6 +20,14 @@ data class RoleCreatedOrUpdatedEventBase(
     }
 }
 
+data class RoleDeletedEventBase(
+    val aggregateId: String
+) : AggregateEventBase(aggregateId), DomainEvent {
+    companion object {
+        const val ROLE_DELETED_V1 = "ROLE_DELETED_V1"
+    }
+}
+
 data class UserCreatedOrUpdatedEventBase(
     val aggregateId: String,
     val accountName: String,

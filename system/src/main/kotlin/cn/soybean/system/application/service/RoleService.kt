@@ -9,6 +9,7 @@ import cn.soybean.system.application.query.RoleById
 import cn.soybean.system.application.query.RoleByIdBuiltInQuery
 import cn.soybean.system.application.query.RoleExistsQuery
 import cn.soybean.system.application.query.service.RoleQueryService
+import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
@@ -29,9 +30,9 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
     fun updateRole(command: UpdateRoleCommand, tenantId: String): Uni<Pair<Boolean, String>> {
         return when {
             command.id.isBlank() -> Uni.createFrom().item(Pair(false, "ID cannot be null or blank."))
-            else -> checkRoleCodeForUpdate(command.code, command.id).flatMap { (flag, msg) ->
+            else -> checkRoleCodeForUpdate(command.code, tenantId, command.id).flatMap { (flag, msg) ->
                 when {
-                    flag -> roleQueryService.handle(RoleByIdBuiltInQuery(command.id)).flatMap { builtin ->
+                    flag -> roleQueryService.handle(RoleByIdBuiltInQuery(command.id, tenantId)).flatMap { builtin ->
                         when {
                             builtin -> Uni.createFrom().item(Pair(false, "Built-in roles cannot be modified."))
 
@@ -47,9 +48,28 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
         }
     }
 
-    fun deleteRole(command: DeleteRoleCommand): Uni<Pair<Boolean, String>> {
-        TODO("Not yet implemented")
-    }
+    fun deleteRole(command: DeleteRoleCommand, tenantId: String): Uni<Pair<Boolean, String>> =
+        Multi.createFrom().iterable(command.ids)
+            .onItem().transformToUniAndConcatenate { id ->
+                roleQueryService.handle(RoleByIdBuiltInQuery(id, tenantId))
+                    .flatMap { isBuiltIn ->
+                        when {
+                            isBuiltIn -> Uni.createFrom()
+                                .item(Pair(false, "Role does not exist or Built-in roles cannot be modified."))
+                            else -> Uni.createFrom().nullItem()
+                        }
+                    }
+            }
+            .collect().asList()
+            .flatMap { results ->
+                val errorResult = results.find { !it.first }
+                when {
+                    errorResult != null -> Uni.createFrom().item(errorResult)
+                    else -> commandInvoker.dispatch<DeleteRoleCommand, Boolean>(command).map { Pair(it, "") }
+                }
+            }.onFailure().recoverWithItem { _ ->
+                Pair(false, "An error occurred during role delete.")
+            }
 
     private fun checkRoleCode(code: String, tenantId: String): Uni<Pair<Boolean, String>> = when (code) {
         DbConstants.SUPER_ROLE_CODE ->
@@ -64,12 +84,12 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
             }
     }
 
-    private fun checkRoleCodeForUpdate(currentCode: String, id: String): Uni<Pair<Boolean, String>> =
+    private fun checkRoleCodeForUpdate(currentCode: String, tenantId: String, id: String): Uni<Pair<Boolean, String>> =
         when (currentCode) {
             DbConstants.SUPER_ROLE_CODE ->
                 Uni.createFrom().item(Pair(false, "Role code usage is not permitted."))
 
-            else -> roleQueryService.handle(RoleById(id))
+            else -> roleQueryService.handle(RoleById(id, tenantId))
                 .flatMap { role ->
                     when {
                         role.code != currentCode -> Uni.createFrom()
