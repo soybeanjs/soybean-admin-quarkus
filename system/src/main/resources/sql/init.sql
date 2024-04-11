@@ -71,8 +71,8 @@ VALUES ('1', 'builtin', '-1', '2024-01-01 00:00:00.000000', null, null, null, tr
         '2099-12-31 00:00:00.000000', 'Soybean', '0', 0, 'https://soybean.pro')
 ON CONFLICT (id) DO NOTHING;
 
--- sys_user_role
-INSERT INTO public.sys_user_role (id, create_account_name, create_by, create_time, update_account_name, update_by,
+-- sys_role_user
+INSERT INTO public.sys_role_user (id, create_account_name, create_by, create_time, update_account_name, update_by,
                                   update_time, tenant_id, role_id, user_id)
 VALUES ('1', 'builtin', '-1', '2024-01-01 00:00:00.000000', null, null, null, '1', '1', '1')
 ON CONFLICT (id) DO NOTHING;

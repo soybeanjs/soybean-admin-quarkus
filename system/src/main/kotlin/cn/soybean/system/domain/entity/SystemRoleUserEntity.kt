@@ -8,14 +8,14 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(
-    name = "sys_user_role", indexes = [
+    name = "sys_role_user", indexes = [
         Index(columnList = "tenant_id"),
         Index(columnList = "user_id, role_id"),
         Index(columnList = "user_id"),
         Index(columnList = "role_id")
     ]
 )
-class SystemUserRoleEntity(
+class SystemRoleUserEntity(
 
     /**
      * 用户ID

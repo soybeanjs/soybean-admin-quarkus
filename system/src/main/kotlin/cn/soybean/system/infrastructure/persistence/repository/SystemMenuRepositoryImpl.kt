@@ -15,7 +15,7 @@ class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<Sys
         """
                     select m from SystemMenuEntity m
                     left join SystemRoleMenuEntity rm on m.id = rm.menuId
-                    left join SystemUserRoleEntity ur on rm.roleId = ur.roleId
+                    left join SystemRoleUserEntity ur on rm.roleId = ur.roleId
                     where ur.userId = ?1 and m.status = ?2
                 """,
         userId,

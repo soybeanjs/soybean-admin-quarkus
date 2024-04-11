@@ -12,7 +12,7 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class SystemRoleRepositoryImpl : SystemRoleRepository, PanacheRepositoryBase<SystemRoleEntity, String> {
     override fun getRoleCodesByUserId(userId: String): Uni<Set<String>> = list(
-        "select r from SystemRoleEntity r, SystemUserRoleEntity ur where r.id = ur.roleId and ur.userId = ?1",
+        "select r from SystemRoleEntity r, SystemRoleUserEntity ur where r.id = ur.roleId and ur.userId = ?1",
         userId
     ).map { roles -> roles.mapNotNull { it.code }.toSet() }
 
