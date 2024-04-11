@@ -5,6 +5,7 @@ import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.system.application.command.CreateRoleCommand
 import cn.soybean.system.application.command.DeleteRoleCommand
 import cn.soybean.system.application.command.UpdateRoleCommand
+import cn.soybean.system.application.query.RoleById
 import cn.soybean.system.application.query.RoleByIdBuiltInQuery
 import cn.soybean.system.application.query.RoleExistsQuery
 import cn.soybean.system.application.query.service.RoleQueryService
@@ -28,7 +29,7 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
     fun updateRole(command: UpdateRoleCommand, tenantId: String): Uni<Pair<Boolean, String>> {
         return when {
             command.id.isBlank() -> Uni.createFrom().item(Pair(false, "ID cannot be null or blank."))
-            else -> checkRoleCode(command.code, tenantId).flatMap { (flag, msg) ->
+            else -> checkRoleCodeForUpdate(command.code, command.id).flatMap { (flag, msg) ->
                 when {
                     flag -> roleQueryService.handle(RoleByIdBuiltInQuery(command.id)).flatMap { builtin ->
                         when {
@@ -62,4 +63,20 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
                 }
             }
     }
+
+    private fun checkRoleCodeForUpdate(currentCode: String, id: String): Uni<Pair<Boolean, String>> =
+        when (currentCode) {
+            DbConstants.SUPER_ROLE_CODE ->
+                Uni.createFrom().item(Pair(false, "Role code usage is not permitted."))
+
+            else -> roleQueryService.handle(RoleById(id))
+                .flatMap { role ->
+                    when {
+                        role.code != currentCode -> Uni.createFrom()
+                            .item(Pair(false, "Role code modification is not permitted."))
+
+                        else -> Uni.createFrom().item(Pair(true, ""))
+                    }
+                }
+        }
 }

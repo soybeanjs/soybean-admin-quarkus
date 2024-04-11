@@ -44,6 +44,8 @@ class RoleCreatedProjection(private val roleRepository: SystemRoleRepository) : 
 
 @ApplicationScoped
 class RoleUpdatedProjection(private val roleRepository: SystemRoleRepository) : Projection {
+
+    @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =
             SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RoleCreatedOrUpdatedEventBase::class.java)

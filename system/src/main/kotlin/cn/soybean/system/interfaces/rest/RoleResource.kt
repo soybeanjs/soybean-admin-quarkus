@@ -68,7 +68,7 @@ class RoleResource(
     fun createRole(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RoleRequest): Uni<ResponseEntity<Boolean>> =
         roleService.createRole(req.toCreateRoleCommand(), loginHelper.getTenantId()).map { (isSuccess, message) ->
             when {
-                isSuccess -> ResponseEntity.ok(message, true)
+                isSuccess -> ResponseEntity.ok(true)
                 else -> ResponseEntity.fail(message, false)
             }
         }
@@ -80,7 +80,7 @@ class RoleResource(
     fun updateRole(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RoleRequest): Uni<ResponseEntity<Boolean>> =
         roleService.updateRole(req.toUpdateRoleCommand(), loginHelper.getTenantId()).map { (isSuccess, message) ->
             when {
-                isSuccess -> ResponseEntity.ok(message, true)
+                isSuccess -> ResponseEntity.ok(true)
                 else -> ResponseEntity.fail(message, false)
             }
         }
@@ -92,7 +92,7 @@ class RoleResource(
     fun deleteRole(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
         roleService.deleteRole(DeleteRoleCommand(ids)).map { (isSuccess, message) ->
             when {
-                isSuccess -> ResponseEntity.ok(message, true)
+                isSuccess -> ResponseEntity.ok(true)
                 else -> ResponseEntity.fail(message, false)
             }
         }

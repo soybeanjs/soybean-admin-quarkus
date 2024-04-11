@@ -2,9 +2,11 @@ package cn.soybean.system.application.query.handler
 
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.application.query.PageRoleQuery
+import cn.soybean.system.application.query.RoleById
 import cn.soybean.system.application.query.RoleByIdBuiltInQuery
 import cn.soybean.system.application.query.RoleExistsQuery
 import cn.soybean.system.application.query.service.RoleQueryService
+import cn.soybean.system.domain.entity.SystemRoleEntity
 import cn.soybean.system.domain.entity.toRoleRespVO
 import cn.soybean.system.domain.repository.SystemRoleRepository
 import cn.soybean.system.interfaces.rest.vo.RoleRespVO
@@ -30,4 +32,6 @@ class RoleQueryHandler(private val systemRoleRepository: SystemRoleRepository) :
 
     override fun handle(query: RoleByIdBuiltInQuery): Uni<Boolean> =
         query.id?.let { systemRoleRepository.getById(query.id).map { it.builtin } } ?: Uni.createFrom().item(false)
+
+    override fun handle(query: RoleById): Uni<SystemRoleEntity> = systemRoleRepository.getById(query.id)
 }
