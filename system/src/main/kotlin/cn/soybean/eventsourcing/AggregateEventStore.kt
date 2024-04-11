@@ -58,11 +58,10 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
     override fun loadEvents(aggregateId: String, aggregateVersion: Long): Uni<List<AggregateEventEntity>> =
         EventEntity.find(
             "aggregateId = ?1 and aggregateVersion > ?2",
-            Sort.by("aggregateVersion"),
+            Sort.by(AggregateConstants.AGGREGATE_VERSION),
             aggregateId,
             aggregateVersion
-        )
-            .list()
+        ).list()
             .map { it.map { entity -> entity.toAggregateEventEntity() } }
             .onFailure().invoke { ex ->
                 Log.errorf(
@@ -93,15 +92,26 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
                     "[AggregateEventStore] (save) Error during saving snapshot or publishing events to event bus. Error: %s",
                     ex.message
                 )
-            }
-            .replaceWithUnit()
+            }.replaceWithUnit()
     }
 
     @WithSpan
     fun <T : AggregateRoot> saveSnapshot(aggregate: T): Uni<Unit> {
         aggregate.toSnapshot()
         val snapshot = EventSourcingUtils.snapshotFromAggregate(aggregate)
-        return SnapshotEntity.persist(snapshot.toSnapshotEntity())
+        return SnapshotEntity.find("aggregateId", snapshot.aggregateId).firstResult()
+            .flatMap { existingSnapshot ->
+                if (existingSnapshot != null) {
+                    existingSnapshot.data = snapshot.data
+                    existingSnapshot.metaData = snapshot.metaData
+                    existingSnapshot.aggregateVersion = snapshot.aggregateVersion
+                    existingSnapshot.timeStamp = snapshot.timeStamp
+                    existingSnapshot.update<SnapshotEntity>().replaceWithUnit()
+                } else {
+                    val newSnapshot = snapshot.toSnapshotEntity()
+                    SnapshotEntity.persist(newSnapshot).replaceWithUnit()
+                }
+            }
             .onFailure()
             .invoke { ex -> Log.errorf(ex, "[AggregateEventStore] (saveSnapshot) Error executing preparedQuery.") }
             .replaceWithUnit()
@@ -122,10 +132,9 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
     fun getSnapshot(aggregateId: String): Uni<SnapshotEntity?> =
         SnapshotEntity.find(
             "aggregateId",
-            Sort.by(AggregateConstants.AGGREGATE_VERSION, Sort.Direction.Descending),
+            Sort.descending(AggregateConstants.AGGREGATE_VERSION),
             aggregateId
-        )
-            .firstResult()
+        ).firstResult()
             .onFailure()
             .invoke { ex -> Log.errorf(ex, "[AggregateEventStore] (getSnapshot) Error executing preparedQuery.") }
             .map { result ->
