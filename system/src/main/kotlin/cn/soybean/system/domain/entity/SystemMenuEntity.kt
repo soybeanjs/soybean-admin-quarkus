@@ -96,4 +96,10 @@ class SystemMenuEntity(
 
     @Column(name = "href", length = DbConstants.LENGTH_64)
     var href: String? = null,
+
+    /**
+     * 是否内置
+     */
+    @Column(name = "builtin", nullable = false)
+    val builtin: Boolean = false
 ) : BaseEntity()

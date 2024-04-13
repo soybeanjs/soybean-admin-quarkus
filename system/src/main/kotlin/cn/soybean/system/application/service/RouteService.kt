@@ -8,8 +8,10 @@ import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.system.application.command.CreateRouteCommand
 import cn.soybean.system.application.command.DeleteRouteCommand
 import cn.soybean.system.application.command.UpdateRouteCommand
+import cn.soybean.system.application.query.RouteByIdBuiltInQuery
 import cn.soybean.system.application.query.RouteByIdQuery
 import cn.soybean.system.application.query.service.RouteQueryService
+import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
@@ -30,8 +32,29 @@ class RouteService(private val routeQueryService: RouteQueryService, private val
             ).map { it }
         }
 
-    fun deleteRoute(command: DeleteRouteCommand): Uni<Boolean> =
-        commandInvoker.dispatch<DeleteRouteCommand, Boolean>(command).map { it }
+    fun deleteRoute(command: DeleteRouteCommand): Uni<Pair<Boolean, String>> =
+        Multi.createFrom().iterable(command.ids)
+            .onItem().transformToUniAndConcatenate { id ->
+                routeQueryService.handle(RouteByIdBuiltInQuery(id))
+                    .flatMap { isBuiltIn ->
+                        when {
+                            isBuiltIn -> Uni.createFrom()
+                                .item(Pair(false, "Route does not exist or Built-in routes cannot be modified."))
+
+                            else -> Uni.createFrom().nullItem()
+                        }
+                    }
+            }
+            .collect().asList()
+            .flatMap { results ->
+                val errorResult = results.find { !it.first }
+                when {
+                    errorResult != null -> Uni.createFrom().item(errorResult)
+                    else -> commandInvoker.dispatch<DeleteRouteCommand, Boolean>(command).map { Pair(it, "") }
+                }
+            }.onFailure().recoverWithItem { _ ->
+                Pair(false, "An error occurred during route delete.")
+            }
 
     private fun validateParentMenu(parentId: String?, childId: String?): Uni<Unit> = when (parentId) {
         null, DbConstants.PARENT_ID_ROOT -> Uni.createFrom().item(Unit)

@@ -8,6 +8,7 @@ import cn.soybean.system.domain.entity.SystemRoleEntity
 import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.event.RoleDeletedEventBase
 import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEventBase
+import cn.soybean.system.domain.event.RouteDeletedEventBase
 import cn.soybean.system.domain.event.UserCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.repository.SystemMenuRepository
 import cn.soybean.system.domain.repository.SystemRoleMenuRepository
@@ -113,6 +114,8 @@ class UserUpdatedProjection : Projection {
 
 @ApplicationScoped
 class RouteCreatedProjection(private val menuRepository: SystemMenuRepository) : Projection {
+
+    @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =
             SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteCreatedOrUpdatedEventBase::class.java)
@@ -147,6 +150,8 @@ class RouteCreatedProjection(private val menuRepository: SystemMenuRepository) :
 
 @ApplicationScoped
 class RouteUpdatedProjection(private val menuRepository: SystemMenuRepository) : Projection {
+
+    @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =
             SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteCreatedOrUpdatedEventBase::class.java)
@@ -178,4 +183,16 @@ class RouteUpdatedProjection(private val menuRepository: SystemMenuRepository) :
     }
 
     override fun supports(eventType: String): Boolean = eventType == RouteCreatedOrUpdatedEventBase.ROUTE_UPDATED_V1
+}
+
+@ApplicationScoped
+class RouteDeletedProjection(private val menuRepository: SystemMenuRepository) : Projection {
+
+    @WithTransaction
+    override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
+        val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteDeletedEventBase::class.java)
+        return menuRepository.delById(event.aggregateId).replaceWithUnit()
+    }
+
+    override fun supports(eventType: String): Boolean = eventType == RouteDeletedEventBase.ROUTE_DELETED_V1
 }

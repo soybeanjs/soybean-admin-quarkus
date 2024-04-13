@@ -1,5 +1,7 @@
 package cn.soybean.eventsourcing
 
+import cn.soybean.application.exceptions.ErrorCode
+import cn.soybean.application.exceptions.ServiceException
 import cn.soybean.domain.aggregate.AggregateConstants
 import cn.soybean.eventsourcing.entity.EventEntity
 import cn.soybean.eventsourcing.entity.SnapshotEntity
@@ -210,7 +212,7 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
             }
 
             else -> when (aggregate.aggregateVersion) {
-                0L -> Uni.createFrom().failure(RuntimeException(aggregate.aggregateId))
+                0L -> Uni.createFrom().failure(ServiceException(ErrorCode.AGGREGATE_EVENT_NOT_FOUND))
                 else -> Uni.createFrom().item(aggregate)
             }
         }

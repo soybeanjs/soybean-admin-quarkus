@@ -22,7 +22,14 @@ class CreateRoleCommandHandler(private val eventStoreDB: EventStoreDB, private v
     CommandHandler<CreateRoleCommand, Boolean> {
     override fun handle(command: CreateRoleCommand): Uni<Boolean> {
         val aggregate = RoleAggregate(YitIdHelper.nextId().toString())
-        aggregate.createRole(command, loginHelper.getTenantId(), loginHelper.getUserId(), loginHelper.getAccountName())
+        aggregate.createRole(
+            command.toRoleCreatedOrUpdatedEventBase(
+                aggregate.aggregateId,
+                loginHelper.getTenantId(),
+                loginHelper.getUserId(),
+                loginHelper.getAccountName()
+            )
+        )
         return eventStoreDB.save(aggregate).replaceWith(true)
             .onFailure().invoke { ex -> Log.errorf(ex, "CreateRoleCommandHandler fail") }
     }
@@ -55,27 +62,25 @@ class UpdateRoleCommandHandler(private val eventStoreDB: EventStoreDB, private v
 @ApplicationScoped
 class DeleteRoleCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
     CommandHandler<DeleteRoleCommand, Boolean> {
-    override fun handle(command: DeleteRoleCommand): Uni<Boolean> {
-        return Multi.createFrom().iterable(command.ids)
-            .onItem().transformToUniAndMerge { id ->
-                eventStoreDB.load(id, RoleAggregate::class.java)
-                    .map { aggregate ->
-                        aggregate.deleteRole(RoleDeletedEventBase(id).also {
-                            it.tenantId = loginHelper.getTenantId()
-                            it.updateBy = loginHelper.getUserId()
-                            it.updateAccountName = loginHelper.getAccountName()
-                        })
-                        aggregate
-                    }
-                    .flatMap { aggregate -> eventStoreDB.save(aggregate) }
-                    .onFailure().invoke { ex ->
-                        Log.errorf(ex, "Failed to delete role with ID: $id")
-                    }.replaceWithUnit()
-            }
-            .collect().asList()
-            .replaceWith(true)
-            .onFailure().invoke { ex -> Log.errorf(ex, "DeleteRoleCommandHandler fail") }
-    }
+    override fun handle(command: DeleteRoleCommand): Uni<Boolean> = Multi.createFrom().iterable(command.ids)
+        .onItem().transformToUniAndMerge { id ->
+            eventStoreDB.load(id, RoleAggregate::class.java)
+                .map { aggregate ->
+                    aggregate.deleteRole(RoleDeletedEventBase(id).also {
+                        it.tenantId = loginHelper.getTenantId()
+                        it.updateBy = loginHelper.getUserId()
+                        it.updateAccountName = loginHelper.getAccountName()
+                    })
+                    aggregate
+                }
+                .flatMap { aggregate -> eventStoreDB.save(aggregate) }
+                .onFailure().invoke { ex ->
+                    Log.errorf(ex, "Failed to delete role with ID: $id")
+                }.replaceWithUnit()
+        }
+        .collect().asList()
+        .replaceWith(true)
+        .onFailure().invoke { ex -> Log.errorf(ex, "DeleteRoleCommandHandler fail") }
 
     override fun canHandle(command: Command): Boolean = command is DeleteRoleCommand
 }

@@ -75,3 +75,11 @@ data class RouteCreatedOrUpdatedEventBase(
         const val ROUTE_UPDATED_V1 = "ROUTE_UPDATED_V1"
     }
 }
+
+data class RouteDeletedEventBase(
+    val aggregateId: String
+) : AggregateEventBase(aggregateId), DomainEvent {
+    companion object {
+        const val ROUTE_DELETED_V1 = "ROUTE_DELETED_V1"
+    }
+}

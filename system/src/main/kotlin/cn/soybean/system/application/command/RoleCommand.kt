@@ -6,11 +6,6 @@ import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEventBase
 import io.mcarle.konvert.api.KonvertTo
 import io.mcarle.konvert.api.Mapping
 
-//@KonvertTo(RoleCreatedOrUpdatedEventBase::class,
-//    mappings = [
-//        Mapping(target = "aggregateId", ignore = true)
-//    ]
-//)
 data class CreateRoleCommand(
     var name: String,
     var code: String,
@@ -20,6 +15,27 @@ data class CreateRoleCommand(
     var dataScopeDeptIds: Set<String>? = null,
     var remark: String? = null
 ) : Command
+
+fun CreateRoleCommand.toRoleCreatedOrUpdatedEventBase(
+    id: String,
+    tenantId: String,
+    userId: String,
+    accountName: String
+): RoleCreatedOrUpdatedEventBase =
+    RoleCreatedOrUpdatedEventBase(
+        aggregateId = id,
+        name = name,
+        code = code,
+        order = order,
+        status = status,
+        dataScope = dataScope,
+        dataScopeDeptIds = dataScopeDeptIds,
+        remark = remark
+    ).also {
+        it.tenantId = tenantId
+        it.createBy = userId
+        it.createAccountName = accountName
+    }
 
 @KonvertTo(
     RoleCreatedOrUpdatedEventBase::class,

@@ -96,7 +96,7 @@ data class RouteRequest(
 
     var hideInMenu: Boolean? = null,
 
-    @field:NotBlank
+    @field:NotNull
     var status: DbEnums.Status = DbEnums.Status.ENABLED,
 
     var roles: List<String>? = null,

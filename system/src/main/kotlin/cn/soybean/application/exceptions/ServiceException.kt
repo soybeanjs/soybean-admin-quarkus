@@ -3,6 +3,8 @@ package cn.soybean.application.exceptions
 class ServiceException(errorCode: ErrorCode) : RuntimeException(errorCode.message)
 
 enum class ErrorCode(val code: Int, val message: String) {
+    AGGREGATE_EVENT_NOT_FOUND(501, "The aggregate event does not exist."),
+
     TENANT_NOT_FOUND(1001, "The tenant does not exist."),
     TENANT_EXPIRED(1002, "The tenant has expired."),
     TENANT_DISABLED(1003, "The tenant has been disabled."),

@@ -4,12 +4,11 @@ import cn.soybean.domain.enums.DbEnums
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import cn.soybean.shared.domain.aggregate.AggregateRoot
 import cn.soybean.shared.util.SerializerUtils
-import cn.soybean.system.application.command.CreateRoleCommand
-import cn.soybean.system.application.command.CreateRouteCommand
 import cn.soybean.system.application.command.CreateUserCommand
 import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.event.RoleDeletedEventBase
 import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEventBase
+import cn.soybean.system.domain.event.RouteDeletedEventBase
 import cn.soybean.system.domain.event.UserCreatedOrUpdatedEventBase
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -53,22 +52,7 @@ class RoleAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
         this.remark = event.remark
     }
 
-    fun createRole(command: CreateRoleCommand, tenantId: String, userId: String, accountName: String) {
-        val data = RoleCreatedOrUpdatedEventBase(
-            aggregateId,
-            command.name,
-            command.code,
-            command.order,
-            command.status,
-            command.dataScope,
-            command.dataScopeDeptIds,
-            command.remark
-        ).also {
-            it.tenantId = tenantId
-            it.createBy = userId
-            it.createAccountName = accountName
-        }
-
+    fun createRole(data: RoleCreatedOrUpdatedEventBase) {
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(RoleCreatedOrUpdatedEventBase.ROLE_CREATED_V1, dataBytes, null)
         this.apply(event)
@@ -199,6 +183,11 @@ class RouteAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggre
                 )
             )
 
+            RouteDeletedEventBase.ROUTE_DELETED_V1 -> SerializerUtils.deserializeFromJsonBytes(
+                eventEntity.data,
+                RouteDeletedEventBase::class.java
+            )
+
             else -> throw RuntimeException(eventEntity.eventType)
         }
     }
@@ -224,29 +213,7 @@ class RouteAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggre
         this.href = event.href
     }
 
-    fun createRoute(command: CreateRouteCommand) {
-        val data = RouteCreatedOrUpdatedEventBase(
-            aggregateId,
-            command.menuName,
-            command.menuType,
-            command.order,
-            command.parentId,
-            command.icon,
-            command.iconType,
-            command.routeName,
-            command.routePath,
-            command.component,
-            command.i18nKey,
-            command.multiTab,
-            command.activeMenu,
-            command.hideInMenu,
-            command.status,
-            command.roles,
-            command.keepAlive,
-            command.constant,
-            command.href
-        )
-
+    fun createRoute(data: RouteCreatedOrUpdatedEventBase) {
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(RouteCreatedOrUpdatedEventBase.ROUTE_CREATED_V1, dataBytes, null)
         this.apply(event)
@@ -255,6 +222,12 @@ class RouteAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggre
     fun updateRoute(data: RouteCreatedOrUpdatedEventBase) {
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(RouteCreatedOrUpdatedEventBase.ROUTE_UPDATED_V1, dataBytes, null)
+        this.apply(event)
+    }
+
+    fun deleteRoute(data: RouteDeletedEventBase) {
+        val dataBytes = SerializerUtils.serializeToJsonBytes(data)
+        val event = this.createEvent(RouteDeletedEventBase.ROUTE_DELETED_V1, dataBytes, null)
         this.apply(event)
     }
 
