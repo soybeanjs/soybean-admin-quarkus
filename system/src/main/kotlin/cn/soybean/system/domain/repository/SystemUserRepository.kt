@@ -9,4 +9,9 @@ import io.smallrye.mutiny.Uni
 interface SystemUserRepository {
     fun findByAccountNameOrEmailOrPhoneNumber(username: String, tenantId: String): Uni<SystemUserEntity>
     fun getUserList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemUserEntity>
+    fun getById(id: String, tenantId: String): Uni<SystemUserEntity?>
+    fun getByAccountName(accountName: String, tenantId: String): Uni<SystemUserEntity?>
+    fun getByPhoneNumber(phoneNumber: String, tenantId: String): Uni<SystemUserEntity?>
+    fun getByEmail(email: String, tenantId: String): Uni<SystemUserEntity?>
+    fun saveOrUpdate(entity: SystemUserEntity): Uni<SystemUserEntity>
 }

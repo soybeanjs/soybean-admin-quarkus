@@ -17,9 +17,7 @@ class BaseTenantEntityListener {
     fun setTenantId(obj: Any) {
         when (obj) {
             is BaseTenantEntity -> {
-                if (obj.tenantId == null) {
-                    obj.tenantId = loginHelper.getTenantId()
-                }
+                if (obj.tenantId == null) loginHelper.getTenantId().also { obj.tenantId = it }
             }
         }
     }

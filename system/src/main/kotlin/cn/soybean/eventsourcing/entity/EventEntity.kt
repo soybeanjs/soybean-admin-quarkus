@@ -32,7 +32,6 @@ class EventEntity : ReactivePanacheMongoEntity() {
     @field:BsonProperty(AggregateConstants.TIMESTAMP)
     lateinit var timeStamp: LocalDateTime
 
-    override fun toString(): String {
-        return "EventEntity(eventType='$eventType', aggregateId='$aggregateId', aggregateType='$aggregateType', aggregateVersion=$aggregateVersion, data=${data.contentToString()}, metaData=${metaData?.contentToString()}, timeStamp=$timeStamp)"
-    }
+    override fun toString(): String =
+        "EventEntity(eventType='$eventType', aggregateId='$aggregateId', aggregateType='$aggregateType', aggregateVersion=$aggregateVersion, data=${data.contentToString()}, metaData=${metaData?.contentToString()}, timeStamp=$timeStamp)"
 }

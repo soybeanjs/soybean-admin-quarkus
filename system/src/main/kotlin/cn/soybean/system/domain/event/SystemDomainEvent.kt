@@ -31,7 +31,7 @@ data class RoleDeletedEventBase(
 data class UserCreatedOrUpdatedEventBase(
     val aggregateId: String,
     val accountName: String,
-    val accountPassword: String,
+    var accountPassword: String,
     val nickName: String,
     val personalProfile: String? = null,
     val email: String? = null,

@@ -2,7 +2,12 @@ package cn.soybean.system.application.query.handler
 
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.application.query.PageUserQuery
+import cn.soybean.system.application.query.UserByEmail
+import cn.soybean.system.application.query.UserById
+import cn.soybean.system.application.query.UserByPhoneNumber
+import cn.soybean.system.application.query.UserByaAccountName
 import cn.soybean.system.application.query.service.UserQueryService
+import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.domain.entity.toUserRespVO
 import cn.soybean.system.domain.repository.SystemUserRepository
 import cn.soybean.system.interfaces.rest.vo.UserRespVO
@@ -22,4 +27,16 @@ class UserQueryHandler(private val systemUserRepository: SystemUserRepository) :
             }
         }
     }
+
+    override fun handle(query: UserById): Uni<SystemUserEntity?> =
+        systemUserRepository.getById(query.id, query.tenantId)
+
+    override fun handle(query: UserByaAccountName): Uni<SystemUserEntity?> =
+        systemUserRepository.getByAccountName(query.accountName, query.tenantId)
+
+    override fun handle(query: UserByPhoneNumber): Uni<SystemUserEntity?> =
+        systemUserRepository.getByPhoneNumber(query.phoneNumber, query.tenantId)
+
+    override fun handle(query: UserByEmail): Uni<SystemUserEntity?> =
+        systemUserRepository.getByEmail(query.email, query.tenantId)
 }

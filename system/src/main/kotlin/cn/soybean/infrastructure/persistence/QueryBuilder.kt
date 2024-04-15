@@ -38,9 +38,7 @@ class QueryBuilder(tenantId: String) {
         return this
     }
 
-    fun build(): Pair<String, Map<String, Any>> {
-        return conditions.joinToString(" ") to parameters
-    }
+    fun build(): Pair<String, Map<String, Any>> = conditions.joinToString(" ") to parameters
 
     fun buildParameters(): Pair<String, Parameters> {
         val params = Parameters()

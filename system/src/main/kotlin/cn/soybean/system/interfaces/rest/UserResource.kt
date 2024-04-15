@@ -69,19 +69,19 @@ class UserResource(
     @WithTransaction
     @Operation(summary = "创建用户", description = "创建用户信息")
     fun createUser(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: UserRequest): Uni<ResponseEntity<Boolean>> =
-        userService.createUser(req.toCreateUserCommand()).map { ResponseEntity.ok(it) }
+        userService.createUser(req.toCreateUserCommand(), loginHelper.getTenantId()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}user.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新用户", description = "更新用户信息")
     fun updateUser(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: UserRequest): Uni<ResponseEntity<Boolean>> =
-        userService.updateUser(req.toUpdateUserCommand()).map { ResponseEntity.ok(it) }
+        userService.updateUser(req.toUpdateUserCommand(), loginHelper.getTenantId()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}user.delete")
     @DELETE
     @WithTransaction
     @Operation(summary = "删除用户", description = "删除用户信息")
     fun deleteUser(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
-        userService.deleteUser(DeleteUserCommand(ids)).map { ResponseEntity.ok(it) }
+        userService.deleteUser(DeleteUserCommand(ids), loginHelper.getTenantId()).map { ResponseEntity.ok(it) }
 }

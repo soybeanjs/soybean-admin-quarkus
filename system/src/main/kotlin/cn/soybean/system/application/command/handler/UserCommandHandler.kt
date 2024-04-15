@@ -15,10 +15,18 @@ import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class CreateUserCommandHandler(private val eventStoreDB: EventStoreDB) : CommandHandler<CreateUserCommand, Boolean> {
+class CreateUserCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
+    CommandHandler<CreateUserCommand, Boolean> {
     override fun handle(command: CreateUserCommand): Uni<Boolean> {
         val aggregate = UserAggregate(YitIdHelper.nextId().toString())
-        aggregate.createUser(command)
+        aggregate.createUser(
+            command.toUserCreatedOrUpdatedEventBase(
+                aggregate.aggregateId,
+                loginHelper.getTenantId(),
+                loginHelper.getUserId(),
+                loginHelper.getAccountName()
+            )
+        )
         return eventStoreDB.save(aggregate).replaceWith(true)
             .onFailure().invoke { ex -> Log.errorf(ex, "CreateUserCommandHandler fail") }
     }

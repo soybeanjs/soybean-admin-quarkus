@@ -20,7 +20,6 @@ class SystemRoleRepositoryImpl : SystemRoleRepository, PanacheRepositoryBase<Sys
         find(query, sort, params)
 
     override fun saveOrUpdate(entity: SystemRoleEntity): Uni<SystemRoleEntity> = persist(entity)
-    override fun getById(id: String): Uni<SystemRoleEntity> = findById(id)
     override fun getById(id: String, tenantId: String): Uni<SystemRoleEntity?> =
         find("id = ?1 and tenantId = ?2", id, tenantId).firstResult()
 

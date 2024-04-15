@@ -91,8 +91,8 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
                 )
             }
 
-    override fun handle(command: DepositAmountCommand): Uni<Unit> {
-        return eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
+    override fun handle(command: DepositAmountCommand): Uni<Unit> =
+        eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
             .map { aggregate ->
                 aggregate.depositBalance(command.amount)
                 aggregate
@@ -105,10 +105,9 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
                     command.aggregateID
                 )
             }
-    }
 
-    override fun handle(command: DeleteBankAccountCommand): Uni<Boolean> {
-        return eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
+    override fun handle(command: DeleteBankAccountCommand): Uni<Boolean> =
+        eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
             .map { aggregate ->
                 aggregate.deleteBankAccount(command.aggregateID)
                 aggregate
@@ -121,7 +120,6 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
                     command.aggregateID
                 )
             }
-    }
 }
 
 data class BankAccountCreatedAggregateEventBase(

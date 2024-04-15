@@ -4,7 +4,6 @@ import cn.soybean.domain.enums.DbEnums
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import cn.soybean.shared.domain.aggregate.AggregateRoot
 import cn.soybean.shared.util.SerializerUtils
-import cn.soybean.system.application.command.CreateUserCommand
 import cn.soybean.system.domain.event.RoleCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.event.RoleDeletedEventBase
 import cn.soybean.system.domain.event.RouteCreatedOrUpdatedEventBase
@@ -12,6 +11,7 @@ import cn.soybean.system.domain.event.RouteDeletedEventBase
 import cn.soybean.system.domain.event.UserCreatedOrUpdatedEventBase
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.quarkus.elytron.security.common.BcryptUtil
 
 class RoleAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggregateId: String) :
     AggregateRoot(aggregateId, AGGREGATE_TYPE) {
@@ -106,7 +106,7 @@ class UserAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
 
     private fun handle(event: UserCreatedOrUpdatedEventBase) {
         this.accountName = event.accountName
-        this.accountPassword = event.accountPassword
+        this.accountPassword = bcryptHashPassword(event.accountPassword)
         this.nickName = event.nickName
         this.personalProfile = event.personalProfile
         this.email = event.email
@@ -119,29 +119,17 @@ class UserAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
         this.status = event.status
     }
 
-    fun createUser(command: CreateUserCommand) {
-        val data = UserCreatedOrUpdatedEventBase(
-            aggregateId,
-            command.accountName,
-            command.accountPassword,
-            command.nickName,
-            command.personalProfile,
-            command.email,
-            command.countryCode,
-            command.phoneCode,
-            command.phoneNumber,
-            command.gender,
-            command.avatar,
-            command.deptId,
-            command.status
-        )
+    private fun bcryptHashPassword(password: String) = BcryptUtil.bcryptHash(password)
 
+    fun createUser(data: UserCreatedOrUpdatedEventBase) {
+        data.accountPassword = bcryptHashPassword(data.accountPassword)
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(UserCreatedOrUpdatedEventBase.USER_CREATED_V1, dataBytes, null)
         this.apply(event)
     }
 
     fun updateUser(data: UserCreatedOrUpdatedEventBase) {
+        data.accountPassword = bcryptHashPassword(data.accountPassword)
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
         val event = this.createEvent(UserCreatedOrUpdatedEventBase.USER_UPDATED_V1, dataBytes, null)
         this.apply(event)
