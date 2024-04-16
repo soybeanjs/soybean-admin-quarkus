@@ -3,14 +3,16 @@ package cn.soybean.system.application.service
 import cn.soybean.application.command.CommandInvoker
 import cn.soybean.application.exceptions.ErrorCode
 import cn.soybean.application.exceptions.ServiceException
-import cn.soybean.system.application.command.CreateUserCommand
-import cn.soybean.system.application.command.DeleteUserCommand
-import cn.soybean.system.application.command.UpdateUserCommand
-import cn.soybean.system.application.query.UserByEmail
-import cn.soybean.system.application.query.UserById
-import cn.soybean.system.application.query.UserByPhoneNumber
-import cn.soybean.system.application.query.UserByaAccountName
-import cn.soybean.system.application.query.service.UserQueryService
+import cn.soybean.system.application.command.user.CreateUserCommand
+import cn.soybean.system.application.command.user.DeleteUserCommand
+import cn.soybean.system.application.command.user.UpdateUserCommand
+import cn.soybean.system.application.query.user.UserByEmail
+import cn.soybean.system.application.query.user.UserById
+import cn.soybean.system.application.query.user.UserByIdBuiltInQuery
+import cn.soybean.system.application.query.user.UserByPhoneNumber
+import cn.soybean.system.application.query.user.UserByaAccountName
+import cn.soybean.system.application.query.user.service.UserQueryService
+import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.replaceWithUnit
 import jakarta.enterprise.context.ApplicationScoped
@@ -33,8 +35,29 @@ class UserService(private val userQueryService: UserQueryService, private val co
         commandInvoker.dispatch<UpdateUserCommand, Boolean>(command).map { it }
     }
 
-    fun deleteUser(command: DeleteUserCommand, tenantId: String): Uni<Boolean> =
-        commandInvoker.dispatch<DeleteUserCommand, Boolean>(command).map { it }
+    fun deleteUser(command: DeleteUserCommand, tenantId: String): Uni<Pair<Boolean, String>> =
+        Multi.createFrom().iterable(command.ids)
+            .onItem().transformToUniAndConcatenate { id ->
+                userQueryService.handle(UserByIdBuiltInQuery(id, tenantId))
+                    .flatMap { isBuiltIn ->
+                        when {
+                            isBuiltIn -> Uni.createFrom()
+                                .item(Pair(false, "User does not exist or Built-in users cannot be modified."))
+
+                            else -> Uni.createFrom().nullItem()
+                        }
+                    }
+            }
+            .collect().asList()
+            .flatMap { results ->
+                val errorResult = results.find { !it.first }
+                when {
+                    errorResult != null -> Uni.createFrom().item(errorResult)
+                    else -> commandInvoker.dispatch<DeleteUserCommand, Boolean>(command).map { Pair(it, "") }
+                }
+            }.onFailure().recoverWithItem { _ ->
+                Pair(false, "An error occurred during user delete.")
+            }
 
     private fun validateUserForCreateOrUpdate(
         id: String?,

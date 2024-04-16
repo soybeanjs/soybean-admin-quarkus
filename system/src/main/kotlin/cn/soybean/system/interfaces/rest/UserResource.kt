@@ -5,15 +5,15 @@ import cn.soybean.infrastructure.persistence.QueryBuilder
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.interfaces.rest.response.ResponseEntity
-import cn.soybean.system.application.command.DeleteUserCommand
-import cn.soybean.system.application.query.PageUserQuery
-import cn.soybean.system.application.query.service.UserQueryService
+import cn.soybean.system.application.command.user.DeleteUserCommand
+import cn.soybean.system.application.query.user.PageUserQuery
+import cn.soybean.system.application.query.user.service.UserQueryService
 import cn.soybean.system.application.service.UserService
 import cn.soybean.system.interfaces.rest.dto.query.UserQuery
-import cn.soybean.system.interfaces.rest.dto.request.UserRequest
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
-import cn.soybean.system.interfaces.rest.dto.request.toCreateUserCommand
-import cn.soybean.system.interfaces.rest.dto.request.toUpdateUserCommand
+import cn.soybean.system.interfaces.rest.dto.request.user.UserRequest
+import cn.soybean.system.interfaces.rest.dto.request.user.toCreateUserCommand
+import cn.soybean.system.interfaces.rest.dto.request.user.toUpdateUserCommand
 import cn.soybean.system.interfaces.rest.vo.UserRespVO
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
@@ -83,5 +83,10 @@ class UserResource(
     @WithTransaction
     @Operation(summary = "删除用户", description = "删除用户信息")
     fun deleteUser(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
-        userService.deleteUser(DeleteUserCommand(ids), loginHelper.getTenantId()).map { ResponseEntity.ok(it) }
+        userService.deleteUser(DeleteUserCommand(ids), loginHelper.getTenantId()).map { (isSuccess, message) ->
+            when {
+                isSuccess -> ResponseEntity.ok(true)
+                else -> ResponseEntity.fail(message, false)
+            }
+        }
 }

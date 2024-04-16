@@ -34,4 +34,6 @@ class SystemUserRepositoryImpl : SystemUserRepository, PanacheRepositoryBase<Sys
         find("email = ?1 and tenantId = ?2", email, tenantId).firstResult()
 
     override fun saveOrUpdate(entity: SystemUserEntity): Uni<SystemUserEntity> = persist(entity)
+
+    override fun delById(id: String, tenantId: String): Uni<Long> = delete("id = ?1 and tenantId = ?2", id, tenantId)
 }
