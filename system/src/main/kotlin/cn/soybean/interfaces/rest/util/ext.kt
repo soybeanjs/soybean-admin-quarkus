@@ -4,13 +4,16 @@ import cn.soybean.infrastructure.config.consts.DbConstants
 import io.vertx.core.http.HttpServerRequest
 
 fun getClientIPAndPort(request: HttpServerRequest): Pair<String, Int?> = Pair(
-    request.getHeader("X-Forwarded-For")?.split(":")?.first()?.trim()
-        ?: request.getHeader("X-Real-IP")?.trim()
-        ?: request.getHeader("Proxy-Client-IP")?.trim()
-        ?: request.getHeader("WL-Proxy-Client-IP")?.trim()
-        ?: request.getHeader("HTTP_CLIENT_IP")?.trim()
-        ?: request.getHeader("HTTP_X_FORWARDED_FOR")?.split(":")?.first()?.trim()
-        ?: request.remoteAddress().host(),
+    listOf(
+        "X-Forwarded-For",
+        "X-Real-IP",
+        "Proxy-Client-IP",
+        "WL-Proxy-Client-IP",
+        "HTTP_CLIENT_IP",
+        "HTTP_X_FORWARDED_FOR"
+    ).firstNotNullOfOrNull { header ->
+        request.getHeader(header)?.split(",")?.first()?.trim()?.split(":")?.first()?.trim()
+    } ?: request.remoteAddress().host(),
     request.remoteAddress().port()
 )
 

@@ -9,6 +9,7 @@ import cn.soybean.infrastructure.security.LoginHelper.Companion.DEPT_KEY
 import cn.soybean.infrastructure.security.LoginHelper.Companion.TENANT_KEY
 import cn.soybean.infrastructure.security.LoginHelper.Companion.USER_AVATAR
 import cn.soybean.infrastructure.security.LoginHelper.Companion.USER_KEY
+import cn.soybean.interfaces.rest.util.Ip2RegionUtil
 import cn.soybean.interfaces.rest.util.getClientIPAndPort
 import cn.soybean.system.application.event.UserPermActionEvent
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
@@ -107,8 +108,9 @@ class AuthService(
             loginType = DbEnums.LoginType.PC,
             userId = user.id,
             accountName = user.accountName,
-            userIp = ip,
-            userPort = port,
+            loginIp = ip,
+            loginRegion = Ip2RegionUtil.search(ip),
+            loginPort = port,
             userAgent = routingContext.request().getHeader("User-Agent") ?: "Unknown",
         )
         loginLogEntity.id = YitIdHelper.nextId().toString()

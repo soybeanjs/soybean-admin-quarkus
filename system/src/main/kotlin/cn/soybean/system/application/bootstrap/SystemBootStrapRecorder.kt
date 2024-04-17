@@ -1,6 +1,7 @@
 package cn.soybean.system.application.bootstrap
 
 import cn.soybean.domain.event.DomainEventPublisher
+import cn.soybean.interfaces.rest.util.Ip2RegionUtil
 import cn.soybean.system.application.event.ApiEndpointEvent
 import cn.soybean.system.domain.entity.SystemApiKeyEntity
 import cn.soybean.system.infrastructure.security.ApiKeyCache
@@ -26,6 +27,8 @@ class SystemBootStrapRecorder(
         initApiKeyCache()
 
         initYitterIdGenerator()
+
+        Ip2RegionUtil.initialize()
     }
 
     private fun initYitterIdGenerator() {

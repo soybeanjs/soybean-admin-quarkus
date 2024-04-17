@@ -32,11 +32,14 @@ class SystemLoginLogEntity(
     val accountName: String? = null,
 
     // IP
-    @Column(name = "user_ip", columnDefinition = "INET")
-    val userIp: String? = null,
+    @Column(name = "login_ip", length = DbConstants.LENGTH_20)
+    val loginIp: String? = null,
 
-    @Column(name = "user_port", nullable = true)
-    var userPort: Int? = null,
+    @Column(name = "login_region", length = DbConstants.LENGTH_64)
+    val loginRegion: String? = null,
+
+    @Column(name = "login_port", nullable = true)
+    var loginPort: Int? = null,
 
     // UA
     @Column(name = "user_agent")
