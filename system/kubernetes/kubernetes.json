@@ -1,0 +1,181 @@
+[{
+  "apiVersion" : "v1",
+  "kind" : "Service",
+  "metadata" : {
+    "annotations" : {
+      "app.quarkus.io/quarkus-version" : "3.9.3",
+      "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-java.git"
+    },
+    "labels" : {
+      "app.kubernetes.io/name" : "soybean-admin-backend",
+      "app.kubernetes.io/managed-by" : "quarkus"
+    },
+    "name" : "soybean-admin-backend",
+    "namespace" : "default"
+  },
+  "spec" : {
+    "ports" : [ {
+      "name" : "https",
+      "port" : 443,
+      "protocol" : "TCP",
+      "targetPort" : 8443
+    }, {
+      "name" : "http",
+      "port" : 80,
+      "protocol" : "TCP",
+      "targetPort" : 8080
+    } ],
+    "selector" : {
+      "app.kubernetes.io/name" : "soybean-admin-backend"
+    },
+    "type" : "ClusterIP"
+  }
+},{
+  "apiVersion" : "apps/v1",
+  "kind" : "Deployment",
+  "metadata" : {
+    "annotations" : {
+      "app.quarkus.io/quarkus-version" : "3.9.3",
+      "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-java.git"
+    },
+    "labels" : {
+      "app.kubernetes.io/name" : "soybean-admin-backend",
+      "app.kubernetes.io/managed-by" : "quarkus"
+    },
+    "name" : "soybean-admin-backend",
+    "namespace" : "default"
+  },
+  "spec" : {
+    "replicas" : 1,
+    "selector" : {
+      "matchLabels" : {
+        "app.kubernetes.io/name" : "soybean-admin-backend"
+      }
+    },
+    "template" : {
+      "metadata" : {
+        "annotations" : {
+          "app.quarkus.io/quarkus-version" : "3.9.3",
+          "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-java.git"
+        },
+        "labels" : {
+          "app.kubernetes.io/managed-by" : "quarkus",
+          "app.kubernetes.io/name" : "soybean-admin-backend"
+        },
+        "namespace" : "default"
+      },
+      "spec" : {
+        "containers" : [ {
+          "env" : [ {
+            "name" : "KUBERNETES_NAMESPACE",
+            "valueFrom" : {
+              "fieldRef" : {
+                "fieldPath" : "metadata.namespace"
+              }
+            }
+          } ],
+          "image" : "harbor.my-website.com/library/soybean-admin-backend:1.0.0-SNAPSHOT",
+          "imagePullPolicy" : "Always",
+          "livenessProbe" : {
+            "failureThreshold" : 3,
+            "httpGet" : {
+              "path" : "/q/health/live",
+              "port" : 8080,
+              "scheme" : "HTTP"
+            },
+            "initialDelaySeconds" : 5,
+            "periodSeconds" : 10,
+            "successThreshold" : 1,
+            "timeoutSeconds" : 10
+          },
+          "name" : "soybean-admin-backend",
+          "ports" : [ {
+            "containerPort" : 8443,
+            "name" : "https",
+            "protocol" : "TCP"
+          }, {
+            "containerPort" : 8080,
+            "name" : "http",
+            "protocol" : "TCP"
+          } ],
+          "readinessProbe" : {
+            "failureThreshold" : 3,
+            "httpGet" : {
+              "path" : "/q/health/ready",
+              "port" : 8080,
+              "scheme" : "HTTP"
+            },
+            "initialDelaySeconds" : 20,
+            "periodSeconds" : 45,
+            "successThreshold" : 1,
+            "timeoutSeconds" : 10
+          },
+          "resources" : {
+            "limits" : {
+              "cpu" : "1000m",
+              "memory" : "512Mi"
+            },
+            "requests" : {
+              "cpu" : "250m",
+              "memory" : "64Mi"
+            }
+          },
+          "startupProbe" : {
+            "failureThreshold" : 3,
+            "httpGet" : {
+              "path" : "/q/health/started",
+              "port" : 8080,
+              "scheme" : "HTTP"
+            },
+            "initialDelaySeconds" : 5,
+            "periodSeconds" : 10,
+            "successThreshold" : 1,
+            "timeoutSeconds" : 10
+          }
+        } ]
+      }
+    }
+  }
+},{
+  "apiVersion" : "networking.k8s.io/v1",
+  "kind" : "Ingress",
+  "metadata" : {
+    "annotations" : {
+      "app.quarkus.io/quarkus-version" : "3.9.3",
+      "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-java.git",
+      "cert-manager.io/cluster-issuer" : "dnspod",
+      "kubernetes.io/ingress.class" : "nginx",
+      "nginx.ingress.kubernetes.io/force-ssl-redirect" : "true",
+      "nginx.ingress.kubernetes.io/rewrite-target" : "/$1"
+    },
+    "labels" : {
+      "app.kubernetes.io/name" : "soybean-admin-backend",
+      "app.kubernetes.io/managed-by" : "quarkus"
+    },
+    "name" : "soybean-admin-backend",
+    "namespace" : "default"
+  },
+  "spec" : {
+    "rules" : [ {
+      "host" : "api.my-website.com",
+      "http" : {
+        "paths" : [ {
+          "backend" : {
+            "service" : {
+              "name" : "soybean-admin-backend",
+              "port" : {
+                "name" : "http"
+              }
+            }
+          },
+          "path" : "/v1/(.*)",
+          "pathType" : "Prefix"
+        } ]
+      }
+    } ],
+    "tls" : [ {
+      "hosts" : [ "api.my-website.com" ],
+      "secretName" : "soybean-tls"
+    } ]
+  }
+}]
