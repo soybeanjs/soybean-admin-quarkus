@@ -17,6 +17,7 @@ val konvertVersion = "3.0.1"
 val mutinyReactorVersion = "2.6.0"
 val idgeneratorVersion = "1.0.6"
 val jakartaPersistenceVersion = "3.2.0-M2"
+val jnrUnixsocketVersion = "0.38.22"
 
 dependencies {
     implementation("jakarta.persistence:jakarta.persistence-api")
@@ -33,7 +34,8 @@ dependencies {
     implementation("io.quarkus:quarkus-vertx")
     implementation("io.quarkus:quarkus-mongodb-panache-kotlin")
     implementation("io.quarkus:quarkus-hibernate-reactive-panache-kotlin")
-    implementation("io.quarkus:quarkus-smallrye-reactive-messaging-kafka")
+//    implementation("io.quarkus:quarkus-smallrye-reactive-messaging-kafka")
+    implementation("io.quarkus:quarkus-messaging-kafka")
 
     implementation("io.quarkus:quarkus-smallrye-openapi")
     implementation("io.quarkus:quarkus-opentelemetry")
@@ -55,11 +57,16 @@ dependencies {
 
     implementation(project(":shared"))
 
-    implementation("io.smallrye.reactive:mutiny-reactor:${mutinyReactorVersion}")
-    implementation("io.smallrye.reactive:mutiny-kotlin:${mutinyReactorVersion}")
+    //tips 2024-04-17 quarkus3.9.*如果需要native image 需要移除这两个依赖或者降级到2.5.8或者开启下方resolutionStrategy
+    //tips 另外除非需要一些响应式类库的互转比如reactor的flux和mono等或者kt协程等一般不需要smallrye转换类库
+//    implementation("io.smallrye.reactive:mutiny-reactor:${mutinyReactorVersion}")
+//    implementation("io.smallrye.reactive:mutiny-kotlin:${mutinyReactorVersion}")
 
     implementation("io.mcarle:konvert-api:$konvertVersion")
     implementation("io.mcarle:konvert-cdi-annotations:$konvertVersion")
+
+    //tips 2024-04-17 此依赖解决mongo底层jnr native编译问题 此外有另一种方案未采用 自行搜索相关issue
+    implementation("com.github.jnr:jnr-unixsocket:${jnrUnixsocketVersion}")
 
     ksp("io.mcarle:konvert:$konvertVersion")
     ksp("io.mcarle:konvert-cdi-injector:$konvertVersion")
@@ -70,14 +77,25 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured")
 }
 
-configurations {
-    all {
-        exclude(group = "javax.activation", module = "activation")
-        exclude(group = "javax.annotation", module = "javax.annotation-api")
-        exclude(group = "javax.cache", module = "cache-api")
+configurations.all {
+    exclude(group = "javax.activation", module = "activation")
+    exclude(group = "javax.annotation", module = "javax.annotation-api")
+    exclude(group = "javax.cache", module = "cache-api")
 //        exclude(group = "javax.inject", module = "javax.inject")
-        exclude(group = "javax.xml.bind", module = "jaxb-api")
-    }
+    exclude(group = "javax.xml.bind", module = "jaxb-api")
+
+    //tips 2024-04-17 quarkus3.9.*如果需要native image 需要强制升级以下依赖或者使用上方依赖降级方案
+//    resolutionStrategy {
+//        // 强制使用特定版本的依赖
+//        force("io.smallrye.reactive:smallrye-reactive-messaging-provider:4.21.0")
+//        force("io.smallrye.reactive:smallrye-reactive-messaging-kafka:4.21.0")
+//
+//        eachDependency {
+//            if (requested.group == "io.smallrye.reactive" && requested.name.startsWith("smallrye-reactive-messaging")) {
+//                useVersion("4.21.0")
+//            }
+//        }
+//    }
 }
 
 allOpen {
