@@ -8,7 +8,7 @@ import cn.soybean.system.application.query.user.UserByIdBuiltInQuery
 import cn.soybean.system.application.query.user.UserByPhoneNumber
 import cn.soybean.system.application.query.user.UserByaAccountName
 import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.interfaces.rest.vo.UserRespVO
+import cn.soybean.system.interfaces.rest.vo.user.UserRespVO
 import io.smallrye.mutiny.Uni
 
 interface UserQueryService {

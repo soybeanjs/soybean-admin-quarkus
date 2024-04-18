@@ -1,4 +1,4 @@
-package cn.soybean.system.interfaces.rest.vo
+package cn.soybean.system.interfaces.rest.vo.user
 
 import cn.soybean.domain.enums.DbEnums
 

@@ -3,6 +3,9 @@ package cn.soybean.eventsourcing
 import cn.soybean.application.exceptions.ErrorCode
 import cn.soybean.application.exceptions.ServiceException
 import cn.soybean.domain.aggregate.AggregateConstants
+import cn.soybean.eventsourcing.convert.toAggregateEventEntity
+import cn.soybean.eventsourcing.convert.toAggregateSnapshotEntity
+import cn.soybean.eventsourcing.convert.toSnapshotEntity
 import cn.soybean.eventsourcing.entity.EventEntity
 import cn.soybean.eventsourcing.entity.SnapshotEntity
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity

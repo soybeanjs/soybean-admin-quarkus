@@ -1,8 +1,9 @@
-package cn.soybean.system.application.command.user
+package cn.soybean.system.application.command.user.convert
 
+import cn.soybean.system.application.command.user.CreateUserCommand
 import cn.soybean.system.domain.event.user.UserCreatedOrUpdatedEventBase
 
-fun CreateUserCommand.toUserCreatedOrUpdatedEventBase(
+fun CreateUserCommand.convert2UserCreatedOrUpdatedEventBase(
     id: String,
     tenantId: String,
     userId: String,

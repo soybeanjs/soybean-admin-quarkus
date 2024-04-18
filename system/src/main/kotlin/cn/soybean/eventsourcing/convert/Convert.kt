@@ -1,4 +1,4 @@
-package cn.soybean.eventsourcing
+package cn.soybean.eventsourcing.convert
 
 import cn.soybean.eventsourcing.entity.EventEntity
 import cn.soybean.eventsourcing.entity.SnapshotEntity

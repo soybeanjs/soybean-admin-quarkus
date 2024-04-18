@@ -12,9 +12,9 @@ import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
 import cn.soybean.system.interfaces.rest.dto.request.route.RouteRequest
 import cn.soybean.system.interfaces.rest.dto.request.route.toCreateRouteCommand
 import cn.soybean.system.interfaces.rest.dto.request.route.toUpdateRouteCommand
-import cn.soybean.system.interfaces.rest.vo.MenuRespVO
-import cn.soybean.system.interfaces.rest.vo.MenuRoute
-import cn.soybean.system.interfaces.rest.vo.RouteMeta
+import cn.soybean.system.interfaces.rest.vo.route.MenuRespVO
+import cn.soybean.system.interfaces.rest.vo.route.MenuRoute
+import cn.soybean.system.interfaces.rest.vo.route.RouteMeta
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.Authenticated

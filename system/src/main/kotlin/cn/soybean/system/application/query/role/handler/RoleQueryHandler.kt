@@ -11,7 +11,7 @@ import cn.soybean.system.application.query.role.service.RoleQueryService
 import cn.soybean.system.domain.entity.SystemRoleEntity
 import cn.soybean.system.domain.entity.toRoleRespVO
 import cn.soybean.system.domain.repository.SystemRoleRepository
-import cn.soybean.system.interfaces.rest.vo.RoleRespVO
+import cn.soybean.system.interfaces.rest.vo.role.RoleRespVO
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped

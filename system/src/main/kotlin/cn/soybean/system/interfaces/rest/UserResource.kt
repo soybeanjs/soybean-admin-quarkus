@@ -9,12 +9,12 @@ import cn.soybean.system.application.command.user.DeleteUserCommand
 import cn.soybean.system.application.query.user.PageUserQuery
 import cn.soybean.system.application.query.user.service.UserQueryService
 import cn.soybean.system.application.service.UserService
-import cn.soybean.system.interfaces.rest.dto.query.UserQuery
+import cn.soybean.system.interfaces.rest.dto.query.user.UserQuery
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
 import cn.soybean.system.interfaces.rest.dto.request.user.UserRequest
 import cn.soybean.system.interfaces.rest.dto.request.user.toCreateUserCommand
 import cn.soybean.system.interfaces.rest.dto.request.user.toUpdateUserCommand
-import cn.soybean.system.interfaces.rest.vo.UserRespVO
+import cn.soybean.system.interfaces.rest.vo.user.UserRespVO
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.PermissionsAllowed

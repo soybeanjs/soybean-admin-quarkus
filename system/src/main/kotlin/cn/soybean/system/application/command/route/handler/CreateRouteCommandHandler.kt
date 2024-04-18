@@ -5,7 +5,7 @@ import cn.soybean.shared.application.command.Command
 import cn.soybean.shared.application.command.CommandHandler
 import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.route.CreateRouteCommand
-import cn.soybean.system.application.command.route.toRouteCreatedOrUpdatedEventBase
+import cn.soybean.system.application.command.route.convert.convert2RouteCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.aggregate.route.RouteAggregate
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.logging.Log
@@ -18,7 +18,7 @@ class CreateRouteCommandHandler(private val eventStoreDB: EventStoreDB, private 
     override fun handle(command: CreateRouteCommand): Uni<Boolean> {
         val aggregate = RouteAggregate(YitIdHelper.nextId().toString())
         aggregate.createRoute(
-            command.toRouteCreatedOrUpdatedEventBase(
+            command.convert2RouteCreatedOrUpdatedEventBase(
                 aggregate.aggregateId,
                 loginHelper.getTenantId(),
                 loginHelper.getUserId(),

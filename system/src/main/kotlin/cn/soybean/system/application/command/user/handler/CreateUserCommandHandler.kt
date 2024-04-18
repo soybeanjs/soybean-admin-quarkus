@@ -5,7 +5,7 @@ import cn.soybean.shared.application.command.Command
 import cn.soybean.shared.application.command.CommandHandler
 import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.user.CreateUserCommand
-import cn.soybean.system.application.command.user.toUserCreatedOrUpdatedEventBase
+import cn.soybean.system.application.command.user.convert.convert2UserCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.aggregate.user.UserAggregate
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.logging.Log
@@ -18,7 +18,7 @@ class CreateUserCommandHandler(private val eventStoreDB: EventStoreDB, private v
     override fun handle(command: CreateUserCommand): Uni<Boolean> {
         val aggregate = UserAggregate(YitIdHelper.nextId().toString())
         aggregate.createUser(
-            command.toUserCreatedOrUpdatedEventBase(
+            command.convert2UserCreatedOrUpdatedEventBase(
                 aggregate.aggregateId,
                 loginHelper.getTenantId(),
                 loginHelper.getUserId(),

@@ -1,4 +1,4 @@
-package cn.soybean.system.interfaces.rest.vo
+package cn.soybean.system.interfaces.rest.vo.route
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude

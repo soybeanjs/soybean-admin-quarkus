@@ -1,4 +1,4 @@
-package cn.soybean.system.interfaces.rest.dto.query
+package cn.soybean.system.interfaces.rest.dto.query.user
 
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.interfaces.rest.dto.request.BasePageParam

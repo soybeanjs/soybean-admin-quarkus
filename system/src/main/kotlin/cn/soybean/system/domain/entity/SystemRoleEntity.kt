@@ -4,7 +4,7 @@ import cn.soybean.domain.base.BaseTenantEntity
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.shared.infrastructure.persistence.converters.JsonStringSetTypeHandler
-import cn.soybean.system.interfaces.rest.vo.RoleRespVO
+import cn.soybean.system.interfaces.rest.vo.role.RoleRespVO
 import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
 import jakarta.persistence.Convert

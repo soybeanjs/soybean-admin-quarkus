@@ -18,8 +18,8 @@ import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.domain.repository.SystemRoleRepository
 import cn.soybean.system.domain.repository.SystemTenantRepository
 import cn.soybean.system.domain.repository.SystemUserRepository
-import cn.soybean.system.interfaces.rest.dto.request.PwdLoginRequest
-import cn.soybean.system.interfaces.rest.vo.LoginRespVO
+import cn.soybean.system.interfaces.rest.dto.request.auth.PwdLoginRequest
+import cn.soybean.system.interfaces.rest.vo.auth.LoginRespVO
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.elytron.security.common.BcryptUtil
 import io.smallrye.jwt.build.Jwt

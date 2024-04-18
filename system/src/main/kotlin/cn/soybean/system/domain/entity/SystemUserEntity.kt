@@ -3,7 +3,7 @@ package cn.soybean.system.domain.entity
 import cn.soybean.domain.base.BaseTenantEntity
 import cn.soybean.domain.enums.DbEnums
 import cn.soybean.infrastructure.config.consts.DbConstants
-import cn.soybean.system.interfaces.rest.vo.UserRespVO
+import cn.soybean.system.interfaces.rest.vo.user.UserRespVO
 import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

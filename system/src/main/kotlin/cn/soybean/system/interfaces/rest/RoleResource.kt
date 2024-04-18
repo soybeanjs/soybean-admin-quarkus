@@ -9,12 +9,12 @@ import cn.soybean.system.application.command.role.DeleteRoleCommand
 import cn.soybean.system.application.query.role.PageRoleQuery
 import cn.soybean.system.application.query.role.service.RoleQueryService
 import cn.soybean.system.application.service.RoleService
-import cn.soybean.system.interfaces.rest.dto.query.RoleQuery
+import cn.soybean.system.interfaces.rest.dto.query.role.RoleQuery
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
 import cn.soybean.system.interfaces.rest.dto.request.role.RoleRequest
 import cn.soybean.system.interfaces.rest.dto.request.role.toCreateRoleCommand
 import cn.soybean.system.interfaces.rest.dto.request.role.toUpdateRoleCommand
-import cn.soybean.system.interfaces.rest.vo.RoleRespVO
+import cn.soybean.system.interfaces.rest.vo.role.RoleRespVO
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.PermissionsAllowed

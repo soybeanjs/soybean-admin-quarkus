@@ -11,7 +11,7 @@ import cn.soybean.system.application.query.route.service.RouteQueryService
 import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.domain.entity.toMenuRespVO
 import cn.soybean.system.domain.repository.SystemMenuRepository
-import cn.soybean.system.interfaces.rest.vo.MenuRespVO
+import cn.soybean.system.interfaces.rest.vo.route.MenuRespVO
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 

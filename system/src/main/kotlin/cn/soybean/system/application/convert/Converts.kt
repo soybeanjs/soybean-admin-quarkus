@@ -1,8 +1,8 @@
 package cn.soybean.system.application.convert
 
 import cn.soybean.system.domain.entity.SystemMenuEntity
-import cn.soybean.system.interfaces.rest.vo.MenuRoute
-import cn.soybean.system.interfaces.rest.vo.RouteMeta
+import cn.soybean.system.interfaces.rest.vo.route.MenuRoute
+import cn.soybean.system.interfaces.rest.vo.route.RouteMeta
 
 fun SystemMenuEntity.convertToMenuRespVO(): MenuRoute = MenuRoute(
     parentId = this.parentId,

@@ -1,4 +1,4 @@
-package cn.soybean.system.interfaces.rest.dto.request
+package cn.soybean.system.interfaces.rest.dto.request.auth
 
 import jakarta.validation.constraints.NotBlank
 import org.eclipse.microprofile.openapi.annotations.media.Schema

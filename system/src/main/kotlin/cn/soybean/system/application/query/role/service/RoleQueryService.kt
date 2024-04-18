@@ -6,7 +6,7 @@ import cn.soybean.system.application.query.role.RoleById
 import cn.soybean.system.application.query.role.RoleByIdBuiltInQuery
 import cn.soybean.system.application.query.role.RoleExistsQuery
 import cn.soybean.system.domain.entity.SystemRoleEntity
-import cn.soybean.system.interfaces.rest.vo.RoleRespVO
+import cn.soybean.system.interfaces.rest.vo.role.RoleRespVO
 import io.smallrye.mutiny.Uni
 
 interface RoleQueryService {

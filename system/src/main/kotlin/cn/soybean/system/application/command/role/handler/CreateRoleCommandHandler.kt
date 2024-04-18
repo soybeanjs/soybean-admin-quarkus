@@ -5,7 +5,7 @@ import cn.soybean.shared.application.command.Command
 import cn.soybean.shared.application.command.CommandHandler
 import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.role.CreateRoleCommand
-import cn.soybean.system.application.command.role.toRoleCreatedOrUpdatedEventBase
+import cn.soybean.system.application.command.role.convert.convert2RoleCreatedOrUpdatedEventBase
 import cn.soybean.system.domain.aggregate.role.RoleAggregate
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.logging.Log
@@ -18,7 +18,7 @@ class CreateRoleCommandHandler(private val eventStoreDB: EventStoreDB, private v
     override fun handle(command: CreateRoleCommand): Uni<Boolean> {
         val aggregate = RoleAggregate(YitIdHelper.nextId().toString())
         aggregate.createRole(
-            command.toRoleCreatedOrUpdatedEventBase(
+            command.convert2RoleCreatedOrUpdatedEventBase(
                 aggregate.aggregateId,
                 loginHelper.getTenantId(),
                 loginHelper.getUserId(),

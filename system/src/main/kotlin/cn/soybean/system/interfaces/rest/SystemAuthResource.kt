@@ -3,14 +3,15 @@ package cn.soybean.system.interfaces.rest
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.service.AuthService
-import cn.soybean.system.interfaces.rest.dto.request.PwdLoginRequest
-import cn.soybean.system.interfaces.rest.vo.LoginRespVO
-import cn.soybean.system.interfaces.rest.vo.UserInfoVO
+import cn.soybean.system.interfaces.rest.dto.request.auth.PwdLoginRequest
+import cn.soybean.system.interfaces.rest.vo.auth.LoginRespVO
+import cn.soybean.system.interfaces.rest.vo.user.UserInfoVO
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.security.Authenticated
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.uni
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
@@ -31,7 +32,7 @@ class SystemAuthResource(private val authService: AuthService, private val login
     @POST
     @WithSession
     @Operation(summary = "账号密码登录", description = "PC端后台管理系统账号密码登录")
-    fun login(@RequestBody(description = "PC端后台管理系统登录请求体") @Valid req: PwdLoginRequest): Uni<ResponseEntity<LoginRespVO>> =
+    fun login(@RequestBody(description = "PC端后台管理系统登录请求体") @Valid @NotNull req: PwdLoginRequest): Uni<ResponseEntity<LoginRespVO>> =
         authService.pwdLogin(req).map { ResponseEntity.ok(it) }
 
     @Authenticated

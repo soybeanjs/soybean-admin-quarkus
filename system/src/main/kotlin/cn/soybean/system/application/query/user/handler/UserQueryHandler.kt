@@ -11,7 +11,7 @@ import cn.soybean.system.application.query.user.service.UserQueryService
 import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.domain.entity.toUserRespVO
 import cn.soybean.system.domain.repository.SystemUserRepository
-import cn.soybean.system.interfaces.rest.vo.UserRespVO
+import cn.soybean.system.interfaces.rest.vo.user.UserRespVO
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
