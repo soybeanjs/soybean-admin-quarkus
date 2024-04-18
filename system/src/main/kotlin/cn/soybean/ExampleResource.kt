@@ -1,13 +1,17 @@
 package cn.soybean
 
 import cn.soybean.infrastructure.config.consts.AppConstants
+import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.shared.infrastructure.annotations.ApiKeyRequest
 import cn.soybean.shared.infrastructure.annotations.ApiSignRequest
 import io.quarkus.logging.Log
 import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.uni
+import jakarta.validation.Valid
+import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
+import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.container.ContainerRequestContext
@@ -51,5 +55,18 @@ class ExampleResource {
         Log.info("Tenant ID from header: ${tenantId ?: "Not provided"}")
 
         return "apiKey request success"
+    }
+
+    @Path("/msgPack")
+    @POST
+    @Produces("application/x-msgpack")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(summary = "msgPack验证", description = "msgPack请求验证")
+    fun msgPack(@Valid dto: MsgTempData): Uni<ResponseEntity<MsgTempData>> =
+        uni { ResponseEntity.ok(dto) }
+
+    class MsgTempData {
+        val name: String? = null
+        val age: Int? = null
     }
 }

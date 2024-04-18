@@ -19,6 +19,7 @@ val idgeneratorVersion = "1.0.6"
 val jakartaPersistenceVersion = "3.2.0-M2"
 val jnrUnixsocketVersion = "0.38.22"
 val ip2regionVersion = "2.7.0"
+val msgpackVersion = "0.9.8"
 
 dependencies {
     implementation("jakarta.persistence:jakarta.persistence-api")
@@ -50,6 +51,8 @@ dependencies {
     implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-rest-jackson")
     implementation("org.lionsoul:ip2region:${ip2regionVersion}")
+
+    implementation("org.msgpack:jackson-dataformat-msgpack:${msgpackVersion}")
 
     implementation("io.quarkus:quarkus-cache")
     implementation("io.quarkus:quarkus-redis-client")

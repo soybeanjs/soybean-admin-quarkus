@@ -1,13 +1,14 @@
 package cn.soybean.interfaces.rest.response
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.quarkus.runtime.annotations.RegisterForReflection
 import java.io.Serializable
 
 @RegisterForReflection
 class ResponseEntity<T>(
-    val code: String,
-    val msg: String,
-    val data: T? = null
+    @JsonProperty("code") val code: String,
+    @JsonProperty("msg") val msg: String,
+    @JsonProperty("data") val data: T? = null
 ) : Serializable {
 
     companion object {
