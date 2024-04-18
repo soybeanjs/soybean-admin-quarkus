@@ -11,11 +11,11 @@ import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
 class SystemUserRepositoryImpl : SystemUserRepository, PanacheRepositoryBase<SystemUserEntity, String> {
-    override fun findByAccountNameOrEmailOrPhoneNumber(username: String, tenantId: String): Uni<SystemUserEntity> =
+    override fun findByAccountNameOrEmailOrPhoneNumber(accountName: String, tenantId: String): Uni<SystemUserEntity> =
         find(
             "tenantId = ?1 and (accountName = ?2 or email = ?2 or phoneNumber = ?2)",
             tenantId,
-            username
+            accountName
         ).singleResult()
 
     override fun getUserList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemUserEntity> =

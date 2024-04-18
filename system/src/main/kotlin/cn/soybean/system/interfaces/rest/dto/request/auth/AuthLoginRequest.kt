@@ -1,8 +1,11 @@
 package cn.soybean.system.interfaces.rest.dto.request.auth
 
+import cn.soybean.system.application.command.auth.PwdLoginCommand
+import io.mcarle.konvert.api.KonvertTo
 import jakarta.validation.constraints.NotBlank
 import org.eclipse.microprofile.openapi.annotations.media.Schema
 
+@KonvertTo(PwdLoginCommand::class)
 @Schema(description = "Login request payload")
 class PwdLoginRequest(
     @field:Schema(description = "Tenant Name", example = "exampleTenant", required = true)

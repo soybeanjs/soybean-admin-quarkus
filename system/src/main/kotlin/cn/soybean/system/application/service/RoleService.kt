@@ -5,8 +5,8 @@ import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.system.application.command.role.CreateRoleCommand
 import cn.soybean.system.application.command.role.DeleteRoleCommand
 import cn.soybean.system.application.command.role.UpdateRoleCommand
-import cn.soybean.system.application.query.role.RoleById
 import cn.soybean.system.application.query.role.RoleByIdBuiltInQuery
+import cn.soybean.system.application.query.role.RoleByIdQuery
 import cn.soybean.system.application.query.role.RoleExistsQuery
 import cn.soybean.system.application.query.role.service.RoleQueryService
 import io.smallrye.mutiny.Multi
@@ -87,7 +87,7 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
             DbConstants.SUPER_SYSTEM_ROLE_CODE, DbConstants.SUPER_TENANT_ROLE_CODE ->
                 Uni.createFrom().item(Pair(false, "Role code usage is not permitted."))
 
-            else -> roleQueryService.handle(RoleById(id, tenantId))
+            else -> roleQueryService.handle(RoleByIdQuery(id, tenantId))
                 .flatMap { role ->
                     when {
                         role.code != currentCode -> Uni.createFrom()

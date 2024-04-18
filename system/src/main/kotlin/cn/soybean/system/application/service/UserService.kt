@@ -6,11 +6,11 @@ import cn.soybean.application.exceptions.ServiceException
 import cn.soybean.system.application.command.user.CreateUserCommand
 import cn.soybean.system.application.command.user.DeleteUserCommand
 import cn.soybean.system.application.command.user.UpdateUserCommand
-import cn.soybean.system.application.query.user.UserByEmail
-import cn.soybean.system.application.query.user.UserById
+import cn.soybean.system.application.query.user.UserByEmailQuery
 import cn.soybean.system.application.query.user.UserByIdBuiltInQuery
-import cn.soybean.system.application.query.user.UserByPhoneNumber
-import cn.soybean.system.application.query.user.UserByaAccountName
+import cn.soybean.system.application.query.user.UserByIdQuery
+import cn.soybean.system.application.query.user.UserByPhoneNumberQuery
+import cn.soybean.system.application.query.user.UserByaAccountNameQuery
 import cn.soybean.system.application.query.user.service.UserQueryService
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
@@ -72,14 +72,14 @@ class UserService(private val userQueryService: UserQueryService, private val co
 
     private fun validateUserExists(id: String?, tenantId: String): Uni<Unit> = when (id) {
         null -> Uni.createFrom().item(Unit)
-        else -> userQueryService.handle(UserById(id, tenantId))
+        else -> userQueryService.handle(UserByIdQuery(id, tenantId))
             .onItem().ifNull().failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
             .replaceWithUnit()
     }
 
     private fun validateAccountNameUnique(id: String?, tenantId: String, accountName: String?): Uni<Unit> = when {
         accountName.isNullOrBlank() -> Uni.createFrom().item(Unit)
-        else -> userQueryService.handle(UserByaAccountName(accountName, tenantId))
+        else -> userQueryService.handle(UserByaAccountNameQuery(accountName, tenantId))
             .flatMap { user ->
                 when {
                     user != null && (id == null || user.id != id) -> Uni.createFrom()
@@ -92,7 +92,7 @@ class UserService(private val userQueryService: UserQueryService, private val co
 
     private fun validateEmailUnique(id: String?, tenantId: String, email: String?): Uni<Unit> = when {
         email.isNullOrBlank() -> Uni.createFrom().item(Unit)
-        else -> userQueryService.handle(UserByEmail(email, tenantId))
+        else -> userQueryService.handle(UserByEmailQuery(email, tenantId))
             .flatMap { user ->
                 when {
                     user != null && (id == null || user.id != id) -> Uni.createFrom()
@@ -105,7 +105,7 @@ class UserService(private val userQueryService: UserQueryService, private val co
 
     private fun validatePhoneNumberUnique(id: String?, tenantId: String, phoneNumber: String?): Uni<Unit> = when {
         phoneNumber.isNullOrBlank() -> Uni.createFrom().item(Unit)
-        else -> userQueryService.handle(UserByPhoneNumber(phoneNumber, tenantId))
+        else -> userQueryService.handle(UserByPhoneNumberQuery(phoneNumber, tenantId))
             .flatMap { user ->
                 when {
                     user != null && (id == null || user.id != id) -> Uni.createFrom()

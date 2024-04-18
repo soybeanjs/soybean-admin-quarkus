@@ -4,6 +4,7 @@ import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.service.AuthService
 import cn.soybean.system.interfaces.rest.dto.request.auth.PwdLoginRequest
+import cn.soybean.system.interfaces.rest.dto.request.auth.toPwdLoginCommand
 import cn.soybean.system.interfaces.rest.vo.auth.LoginRespVO
 import cn.soybean.system.interfaces.rest.vo.user.UserInfoVO
 import io.quarkus.hibernate.reactive.panache.common.WithSession
@@ -33,7 +34,7 @@ class SystemAuthResource(private val authService: AuthService, private val login
     @WithSession
     @Operation(summary = "账号密码登录", description = "PC端后台管理系统账号密码登录")
     fun login(@RequestBody(description = "PC端后台管理系统登录请求体") @Valid @NotNull req: PwdLoginRequest): Uni<ResponseEntity<LoginRespVO>> =
-        authService.pwdLogin(req).map { ResponseEntity.ok(it) }
+        authService.pwdLogin(req.toPwdLoginCommand()).map { ResponseEntity.ok(it) }
 
     @Authenticated
     @Path("/getUserInfo")

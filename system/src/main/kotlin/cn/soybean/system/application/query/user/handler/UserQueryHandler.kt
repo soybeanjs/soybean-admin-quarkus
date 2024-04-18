@@ -2,11 +2,12 @@ package cn.soybean.system.application.query.user.handler
 
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.application.query.user.PageUserQuery
-import cn.soybean.system.application.query.user.UserByEmail
-import cn.soybean.system.application.query.user.UserById
+import cn.soybean.system.application.query.user.UserByAccountQuery
+import cn.soybean.system.application.query.user.UserByEmailQuery
 import cn.soybean.system.application.query.user.UserByIdBuiltInQuery
-import cn.soybean.system.application.query.user.UserByPhoneNumber
-import cn.soybean.system.application.query.user.UserByaAccountName
+import cn.soybean.system.application.query.user.UserByIdQuery
+import cn.soybean.system.application.query.user.UserByPhoneNumberQuery
+import cn.soybean.system.application.query.user.UserByaAccountNameQuery
 import cn.soybean.system.application.query.user.service.UserQueryService
 import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.domain.entity.toUserRespVO
@@ -29,18 +30,21 @@ class UserQueryHandler(private val systemUserRepository: SystemUserRepository) :
         }
     }
 
-    override fun handle(query: UserById): Uni<SystemUserEntity?> =
+    override fun handle(query: UserByIdQuery): Uni<SystemUserEntity?> =
         systemUserRepository.getById(query.id, query.tenantId)
 
-    override fun handle(query: UserByaAccountName): Uni<SystemUserEntity?> =
+    override fun handle(query: UserByaAccountNameQuery): Uni<SystemUserEntity?> =
         systemUserRepository.getByAccountName(query.accountName, query.tenantId)
 
-    override fun handle(query: UserByPhoneNumber): Uni<SystemUserEntity?> =
+    override fun handle(query: UserByPhoneNumberQuery): Uni<SystemUserEntity?> =
         systemUserRepository.getByPhoneNumber(query.phoneNumber, query.tenantId)
 
-    override fun handle(query: UserByEmail): Uni<SystemUserEntity?> =
+    override fun handle(query: UserByEmailQuery): Uni<SystemUserEntity?> =
         systemUserRepository.getByEmail(query.email, query.tenantId)
 
     override fun handle(query: UserByIdBuiltInQuery): Uni<Boolean> =
         systemUserRepository.getById(query.id, query.tenantId).map { it?.builtin ?: true }
+
+    override fun handle(query: UserByAccountQuery): Uni<SystemUserEntity> =
+        systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(query.accountName, query.tenantId)
 }

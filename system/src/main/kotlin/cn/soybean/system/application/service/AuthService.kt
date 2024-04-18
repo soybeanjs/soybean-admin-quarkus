@@ -11,14 +11,17 @@ import cn.soybean.infrastructure.security.LoginHelper.Companion.USER_AVATAR
 import cn.soybean.infrastructure.security.LoginHelper.Companion.USER_KEY
 import cn.soybean.interfaces.rest.util.Ip2RegionUtil
 import cn.soybean.interfaces.rest.util.getClientIPAndPort
+import cn.soybean.system.application.command.auth.PwdLoginCommand
 import cn.soybean.system.application.event.UserPermActionEvent
+import cn.soybean.system.application.query.role.RoleCodeByUserIdQuery
+import cn.soybean.system.application.query.role.service.RoleQueryService
+import cn.soybean.system.application.query.tenant.TenantByNameQuery
+import cn.soybean.system.application.query.tenant.service.TenantQueryService
+import cn.soybean.system.application.query.user.UserByAccountQuery
+import cn.soybean.system.application.query.user.service.UserQueryService
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
 import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.domain.repository.SystemRoleRepository
-import cn.soybean.system.domain.repository.SystemTenantRepository
-import cn.soybean.system.domain.repository.SystemUserRepository
-import cn.soybean.system.interfaces.rest.dto.request.auth.PwdLoginRequest
 import cn.soybean.system.interfaces.rest.vo.auth.LoginRespVO
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.elytron.security.common.BcryptUtil
@@ -32,19 +35,19 @@ import java.time.LocalDateTime
 
 @ApplicationScoped
 class AuthService(
-    private val systemTenantRepository: SystemTenantRepository,
-    private val systemUserRepository: SystemUserRepository,
-    private val systemRoleRepository: SystemRoleRepository,
+    private val tenantQueryService: TenantQueryService,
+    private val userQueryService: UserQueryService,
+    private val roleQueryService: RoleQueryService,
     private val routingContext: RoutingContext,
     private val eventBus: Event<SystemLoginLogEntity>,
     private val eventPublisher: DomainEventPublisher
 ) {
 
-    fun pwdLogin(req: PwdLoginRequest): Uni<LoginRespVO> = findAndVerifyTenant(req.tenantName)
+    fun pwdLogin(command: PwdLoginCommand): Uni<LoginRespVO> = findAndVerifyTenant(command.tenantName)
         .flatMap { tenant ->
-            findAndVerifyUserCredentials(req.userName, req.password, tenant.id)
+            findAndVerifyUserCredentials(command.userName, command.password, tenant.id)
                 .flatMap { user ->
-                    systemRoleRepository.getRoleCodesByUserId(user.id)
+                    roleQueryService.handle(RoleCodeByUserIdQuery(user.id))
                         .map { roles -> Triple(tenant, user, roles) }
                 }
         }
@@ -54,9 +57,10 @@ class AuthService(
             }
         }
 
-    fun findAndVerifyTenant(tenantName: String): Uni<SystemTenantEntity> = systemTenantRepository.findByName(tenantName)
-        .onItem().ifNull().failWith(ServiceException(ErrorCode.TENANT_NOT_FOUND))
-        .flatMap { tenant -> verifyTenantStatus(tenant) }
+    fun findAndVerifyTenant(tenantName: String): Uni<SystemTenantEntity> =
+        tenantQueryService.handle(TenantByNameQuery(tenantName))
+            .onItem().ifNull().failWith(ServiceException(ErrorCode.TENANT_NOT_FOUND))
+            .flatMap { tenant -> verifyTenantStatus(tenant) }
 
     fun verifyTenantStatus(tenant: SystemTenantEntity): Uni<SystemTenantEntity> = when {
         tenant.status == DbEnums.Status.DISABLED -> Uni.createFrom()
@@ -68,8 +72,8 @@ class AuthService(
         else -> Uni.createFrom().item(tenant)
     }
 
-    fun findAndVerifyUserCredentials(username: String, password: String, tenantId: String): Uni<SystemUserEntity> =
-        systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(username, tenantId)
+    fun findAndVerifyUserCredentials(accountName: String, password: String, tenantId: String): Uni<SystemUserEntity> =
+        userQueryService.handle(UserByAccountQuery(accountName, tenantId))
             .onItem().ifNull().failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
             .flatMap { user -> verifyUserCredentials(user, password) }
 

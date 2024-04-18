@@ -4,8 +4,9 @@ import cn.soybean.application.exceptions.ErrorCode
 import cn.soybean.application.exceptions.ServiceException
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.application.query.role.PageRoleQuery
-import cn.soybean.system.application.query.role.RoleById
 import cn.soybean.system.application.query.role.RoleByIdBuiltInQuery
+import cn.soybean.system.application.query.role.RoleByIdQuery
+import cn.soybean.system.application.query.role.RoleCodeByUserIdQuery
 import cn.soybean.system.application.query.role.RoleExistsQuery
 import cn.soybean.system.application.query.role.service.RoleQueryService
 import cn.soybean.system.domain.entity.SystemRoleEntity
@@ -35,11 +36,14 @@ class RoleQueryHandler(private val systemRoleRepository: SystemRoleRepository) :
     override fun handle(query: RoleByIdBuiltInQuery): Uni<Boolean> =
         systemRoleRepository.getById(query.id, query.tenantId).map { it?.builtin ?: true }
 
-    override fun handle(query: RoleById): Uni<SystemRoleEntity> =
+    override fun handle(query: RoleByIdQuery): Uni<SystemRoleEntity> =
         systemRoleRepository.getById(query.id, query.tenantId).onItem().transformToUni { role ->
             when {
                 role != null -> Uni.createFrom().item(role)
                 else -> Uni.createFrom().failure(ServiceException(ErrorCode.ROLE_NOT_FOUND))
             }
         }
+
+    override fun handle(query: RoleCodeByUserIdQuery): Uni<Set<String>> =
+        systemRoleRepository.getRoleCodesByUserId(query.userId)
 }
