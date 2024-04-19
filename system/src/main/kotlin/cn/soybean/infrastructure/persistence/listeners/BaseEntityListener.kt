@@ -18,11 +18,10 @@ class BaseEntityListener {
     @PrePersist
     fun setCreatedInfo(obj: Any) {
         when (obj) {
-            is BaseEntity -> {
-                if (obj.createBy == null) loginHelper.getUserId().also { obj.createBy = it }
-                if (obj.createAccountName.isNullOrBlank()) loginHelper.getAccountName()
-                    .also { obj.createAccountName = it }
-                LocalDateTime.now().also { obj.createTime = it }
+            is BaseEntity -> obj.apply {
+                createBy = createBy ?: loginHelper.getUserId()
+                createAccountName = createAccountName.takeUnless { it.isNullOrBlank() } ?: loginHelper.getAccountName()
+                createTime = LocalDateTime.now()
             }
         }
     }
@@ -30,11 +29,10 @@ class BaseEntityListener {
     @PreUpdate
     fun setUpdatedInfo(obj: Any) {
         when (obj) {
-            is BaseEntity -> {
-                if (obj.updateBy == null) loginHelper.getUserId().also { obj.updateBy = it }
-                if (obj.updateAccountName.isNullOrBlank()) loginHelper.getAccountName()
-                    .also { obj.updateAccountName = it }
-                LocalDateTime.now().also { obj.updateTime = it }
+            is BaseEntity -> obj.apply {
+                updateBy = updateBy ?: loginHelper.getUserId()
+                updateAccountName = updateAccountName.takeUnless { it.isNullOrBlank() } ?: loginHelper.getAccountName()
+                updateTime = LocalDateTime.now()
             }
         }
     }

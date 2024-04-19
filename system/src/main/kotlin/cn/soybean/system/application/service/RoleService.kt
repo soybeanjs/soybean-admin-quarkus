@@ -47,7 +47,7 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
 
     fun deleteRole(command: DeleteRoleCommand, tenantId: String): Uni<Pair<Boolean, String>> =
         Multi.createFrom().iterable(command.ids)
-            .onItem().transformToUniAndConcatenate { id ->
+            .onItem().transformToUniAndMerge { id ->
                 roleQueryService.handle(RoleByIdBuiltInQuery(id, tenantId))
                     .flatMap { isBuiltIn ->
                         when {
@@ -61,10 +61,9 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
             .collect().asList()
             .flatMap { results ->
                 val errorResult = results.find { !it.first }
-                when {
-                    errorResult != null -> Uni.createFrom().item(errorResult)
-                    else -> commandInvoker.dispatch<DeleteRoleCommand, Boolean>(command).map { Pair(it, "") }
-                }
+                errorResult?.let { Uni.createFrom().item(it) } ?: commandInvoker.dispatch<DeleteRoleCommand, Boolean>(
+                    command
+                ).map { Pair(it, "") }
             }.onFailure().recoverWithItem { _ ->
                 Pair(false, "An error occurred during role delete.")
             }

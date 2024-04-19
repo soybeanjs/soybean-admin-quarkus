@@ -106,16 +106,13 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
         val snapshot = EventSourcingUtils.snapshotFromAggregate(aggregate)
         return SnapshotEntity.find("aggregateId", snapshot.aggregateId).firstResult()
             .flatMap { existingSnapshot ->
-                if (existingSnapshot != null) {
+                existingSnapshot?.let {
                     existingSnapshot.data = snapshot.data
                     existingSnapshot.metaData = snapshot.metaData
                     existingSnapshot.aggregateVersion = snapshot.aggregateVersion
                     existingSnapshot.timeStamp = snapshot.timeStamp
                     existingSnapshot.update<SnapshotEntity>().replaceWithUnit()
-                } else {
-                    val newSnapshot = snapshot.toSnapshotEntity()
-                    SnapshotEntity.persist(newSnapshot).replaceWithUnit()
-                }
+                } ?: SnapshotEntity.persist(snapshot.toSnapshotEntity()).replaceWithUnit()
             }
             .onFailure()
             .invoke { ex -> Log.errorf(ex, "[AggregateEventStore] (saveSnapshot) Error executing preparedQuery.") }

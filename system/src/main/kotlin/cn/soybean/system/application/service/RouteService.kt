@@ -34,7 +34,7 @@ class RouteService(private val routeQueryService: RouteQueryService, private val
 
     fun deleteRoute(command: DeleteRouteCommand): Uni<Pair<Boolean, String>> =
         Multi.createFrom().iterable(command.ids)
-            .onItem().transformToUniAndConcatenate { id ->
+            .onItem().transformToUniAndMerge { id ->
                 routeQueryService.handle(RouteByIdBuiltInQuery(id))
                     .flatMap { isBuiltIn ->
                         when {
@@ -48,10 +48,9 @@ class RouteService(private val routeQueryService: RouteQueryService, private val
             .collect().asList()
             .flatMap { results ->
                 val errorResult = results.find { !it.first }
-                when {
-                    errorResult != null -> Uni.createFrom().item(errorResult)
-                    else -> commandInvoker.dispatch<DeleteRouteCommand, Boolean>(command).map { Pair(it, "") }
-                }
+                errorResult?.let { Uni.createFrom().item(it) } ?: commandInvoker.dispatch<DeleteRouteCommand, Boolean>(
+                    command
+                ).map { Pair(it, "") }
             }.onFailure().recoverWithItem { _ ->
                 Pair(false, "An error occurred during route delete.")
             }

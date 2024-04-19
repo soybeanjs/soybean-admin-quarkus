@@ -37,7 +37,7 @@ class UserService(private val userQueryService: UserQueryService, private val co
 
     fun deleteUser(command: DeleteUserCommand, tenantId: String): Uni<Pair<Boolean, String>> =
         Multi.createFrom().iterable(command.ids)
-            .onItem().transformToUniAndConcatenate { id ->
+            .onItem().transformToUniAndMerge { id ->
                 userQueryService.handle(UserByIdBuiltInQuery(id, tenantId))
                     .flatMap { isBuiltIn ->
                         when {
@@ -51,10 +51,9 @@ class UserService(private val userQueryService: UserQueryService, private val co
             .collect().asList()
             .flatMap { results ->
                 val errorResult = results.find { !it.first }
-                when {
-                    errorResult != null -> Uni.createFrom().item(errorResult)
-                    else -> commandInvoker.dispatch<DeleteUserCommand, Boolean>(command).map { Pair(it, "") }
-                }
+                errorResult?.let { Uni.createFrom().item(it) } ?: commandInvoker.dispatch<DeleteUserCommand, Boolean>(
+                    command
+                ).map { Pair(it, "") }
             }.onFailure().recoverWithItem { _ ->
                 Pair(false, "An error occurred during user delete.")
             }
