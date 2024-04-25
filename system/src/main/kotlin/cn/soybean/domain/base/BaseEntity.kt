@@ -1,8 +1,8 @@
 package cn.soybean.domain.base
 
-import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.infrastructure.persistence.listeners.BaseEntityListener
 import cn.soybean.shared.domain.entity.EntityBase
+import cn.soybean.system.domain.config.DbConstants
 import jakarta.persistence.Column
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.MappedSuperclass

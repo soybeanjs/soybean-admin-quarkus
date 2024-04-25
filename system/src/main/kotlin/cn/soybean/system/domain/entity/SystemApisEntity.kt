@@ -1,6 +1,6 @@
 package cn.soybean.system.domain.entity
 
-import cn.soybean.infrastructure.config.consts.DbConstants
+import cn.soybean.system.domain.config.DbConstants
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import jakarta.persistence.Column

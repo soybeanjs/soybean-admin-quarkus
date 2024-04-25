@@ -22,7 +22,7 @@ import cn.soybean.system.application.query.user.service.UserQueryService
 import cn.soybean.system.domain.entity.SystemLoginLogEntity
 import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.interfaces.rest.vo.auth.LoginRespVO
+import cn.soybean.system.interfaces.rest.dto.response.auth.LoginResponse
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.elytron.security.common.BcryptUtil
 import io.smallrye.jwt.build.Jwt
@@ -43,7 +43,7 @@ class AuthService(
     private val eventPublisher: DomainEventPublisher
 ) {
 
-    fun pwdLogin(command: PwdLoginCommand): Uni<LoginRespVO> = findAndVerifyTenant(command.tenantName)
+    fun pwdLogin(command: PwdLoginCommand): Uni<LoginResponse> = findAndVerifyTenant(command.tenantName)
         .flatMap { tenant ->
             findAndVerifyUserCredentials(command.userName, command.password, tenant.id)
                 .flatMap { user ->
@@ -52,7 +52,7 @@ class AuthService(
                 }
         }
         .map { (tenant, user, roles) ->
-            createLoginRespVO(tenant, user, roles).also {
+            createLoginResponse(tenant, user, roles).also {
                 saveLoginLog(user, tenant.id)
             }
         }
@@ -87,11 +87,11 @@ class AuthService(
         else -> Uni.createFrom().item(user)
     }
 
-    private fun createLoginRespVO(
+    private fun createLoginResponse(
         tenantEntity: SystemTenantEntity,
         systemUserEntity: SystemUserEntity,
         roleCodes: Set<String>
-    ): LoginRespVO {
+    ): LoginResponse {
         val tokenValue = Jwt.upn(systemUserEntity.accountName)
             .subject(systemUserEntity.id)
             .groups(roleCodes + AppConstants.APP_COMMON_ROLE)
@@ -103,7 +103,7 @@ class AuthService(
             .claim(Claims.gender.name, systemUserEntity.gender ?: "")
             .sign()
         UserPermActionEvent(systemUserEntity.id).also { eventPublisher.publish(it) }
-        return LoginRespVO(tokenValue, "")
+        return LoginResponse(tokenValue, "")
     }
 
     private fun saveLoginLog(user: SystemUserEntity, tenantId: String) {

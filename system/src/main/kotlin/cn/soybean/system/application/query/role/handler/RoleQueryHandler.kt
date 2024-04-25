@@ -10,9 +10,9 @@ import cn.soybean.system.application.query.role.RoleCodeByUserIdQuery
 import cn.soybean.system.application.query.role.RoleExistsQuery
 import cn.soybean.system.application.query.role.service.RoleQueryService
 import cn.soybean.system.domain.entity.SystemRoleEntity
-import cn.soybean.system.domain.entity.toRoleRespVO
+import cn.soybean.system.domain.entity.toRoleResponse
 import cn.soybean.system.domain.repository.SystemRoleRepository
-import cn.soybean.system.interfaces.rest.vo.role.RoleRespVO
+import cn.soybean.system.interfaces.rest.dto.response.role.RoleResponse
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
@@ -20,12 +20,12 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class RoleQueryHandler(private val systemRoleRepository: SystemRoleRepository) : RoleQueryService {
 
-    override fun handle(query: PageRoleQuery): Uni<PageResult<RoleRespVO>> {
+    override fun handle(query: PageRoleQuery): Uni<PageResult<RoleResponse>> {
         val (q, params, page) = query
         val panacheQuery = systemRoleRepository.getRoleList(q, Sort.by("order"), params).page(page)
         return panacheQuery.list().flatMap { resultList ->
             panacheQuery.count().map { count ->
-                PageResult(resultList.map { it.toRoleRespVO() }, page.index + 1, page.size, count)
+                PageResult(resultList.map { it.toRoleResponse() }, page.index + 1, page.size, count)
             }
         }
     }

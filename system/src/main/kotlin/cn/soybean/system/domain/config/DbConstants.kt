@@ -1,4 +1,4 @@
-package cn.soybean.infrastructure.config.consts
+package cn.soybean.system.domain.config
 
 object DbConstants {
     const val LENGTH_5 = 5

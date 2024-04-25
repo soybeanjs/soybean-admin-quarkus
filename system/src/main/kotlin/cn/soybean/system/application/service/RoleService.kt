@@ -1,7 +1,6 @@
 package cn.soybean.system.application.service
 
 import cn.soybean.application.command.CommandInvoker
-import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.system.application.command.role.CreateRoleCommand
 import cn.soybean.system.application.command.role.DeleteRoleCommand
 import cn.soybean.system.application.command.role.UpdateRoleCommand
@@ -9,6 +8,7 @@ import cn.soybean.system.application.query.role.RoleByIdBuiltInQuery
 import cn.soybean.system.application.query.role.RoleByIdQuery
 import cn.soybean.system.application.query.role.RoleExistsQuery
 import cn.soybean.system.application.query.role.service.RoleQueryService
+import cn.soybean.system.domain.config.DbConstants
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped

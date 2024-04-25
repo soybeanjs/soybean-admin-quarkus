@@ -14,7 +14,7 @@ import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
 import cn.soybean.system.interfaces.rest.dto.request.user.UserRequest
 import cn.soybean.system.interfaces.rest.dto.request.user.toCreateUserCommand
 import cn.soybean.system.interfaces.rest.dto.request.user.toUpdateUserCommand
-import cn.soybean.system.interfaces.rest.vo.user.UserRespVO
+import cn.soybean.system.interfaces.rest.dto.response.user.UserResponse
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.PermissionsAllowed
@@ -51,7 +51,7 @@ class UserResource(
     @GET
     @WithSession
     @Operation(summary = "用户列表", description = "获取用户列表")
-    fun getUserList(@Parameter @BeanParam queryParam: UserQuery): Uni<ResponseEntity<PageResult<UserRespVO>>> {
+    fun getUserList(@Parameter @BeanParam queryParam: UserQuery): Uni<ResponseEntity<PageResult<UserResponse>>> {
         val queryBuilder = QueryBuilder(loginHelper.getTenantId())
         queryParam.accountName?.let { queryBuilder.addLikeCondition("accountName", it) }
         queryParam.gender?.let { queryBuilder.addCondition("gender", it) }

@@ -1,8 +1,8 @@
-package cn.soybean.system.interfaces.rest.vo.user
+package cn.soybean.system.interfaces.rest.dto.response.user
 
 import cn.soybean.domain.enums.DbEnums
 
-data class UserRespVO(
+data class UserResponse(
     var id: String? = null,
     var accountName: String? = null,
     var nickName: String? = null,

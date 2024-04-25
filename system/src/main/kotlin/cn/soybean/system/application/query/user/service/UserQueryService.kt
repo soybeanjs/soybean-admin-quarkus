@@ -9,11 +9,11 @@ import cn.soybean.system.application.query.user.UserByIdQuery
 import cn.soybean.system.application.query.user.UserByPhoneNumberQuery
 import cn.soybean.system.application.query.user.UserByaAccountNameQuery
 import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.interfaces.rest.vo.user.UserRespVO
+import cn.soybean.system.interfaces.rest.dto.response.user.UserResponse
 import io.smallrye.mutiny.Uni
 
 interface UserQueryService {
-    fun handle(query: PageUserQuery): Uni<PageResult<UserRespVO>>
+    fun handle(query: PageUserQuery): Uni<PageResult<UserResponse>>
     fun handle(query: UserByIdQuery): Uni<SystemUserEntity?>
     fun handle(query: UserByaAccountNameQuery): Uni<SystemUserEntity?>
     fun handle(query: UserByPhoneNumberQuery): Uni<SystemUserEntity?>

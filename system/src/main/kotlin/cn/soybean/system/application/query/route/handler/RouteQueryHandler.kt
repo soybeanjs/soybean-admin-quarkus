@@ -1,17 +1,17 @@
 package cn.soybean.system.application.query.route.handler
 
-import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.interfaces.rest.util.isSuperUser
-import cn.soybean.system.application.convert.convertToMenuRespVO
+import cn.soybean.system.application.convert.convertToMenuResponse
 import cn.soybean.system.application.query.route.GetRoutesByUserIdQuery
 import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdQuery
 import cn.soybean.system.application.query.route.RouteByIdBuiltInQuery
 import cn.soybean.system.application.query.route.RouteByIdQuery
 import cn.soybean.system.application.query.route.service.RouteQueryService
+import cn.soybean.system.domain.config.DbConstants
 import cn.soybean.system.domain.entity.SystemMenuEntity
-import cn.soybean.system.domain.entity.toMenuRespVO
+import cn.soybean.system.domain.entity.toMenuResponse
 import cn.soybean.system.domain.repository.SystemMenuRepository
-import cn.soybean.system.interfaces.rest.vo.route.MenuRespVO
+import cn.soybean.system.interfaces.rest.dto.response.route.MenuResponse
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
@@ -30,14 +30,14 @@ class RouteQueryHandler(private val systemMenuRepository: SystemMenuRepository) 
                 rootId = DbConstants.PARENT_ID_ROOT,
                 orderSelector = { it.order ?: 0 },
                 transform = { item, children ->
-                    item.convertToMenuRespVO().apply { this.children = children }
+                    item.convertToMenuResponse().apply { this.children = children }
                 }
             )
             mapOf("routes" to menuRoutes, "home" to "home")
         }
     }
 
-    override fun handle(query: ListTreeRoutesByUserIdQuery): Uni<List<MenuRespVO>> {
+    override fun handle(query: ListTreeRoutesByUserIdQuery): Uni<List<MenuResponse>> {
         val (userId) = query
         val menusUni: Uni<List<SystemMenuEntity>> = getRoutesByUserId(userId)
 
@@ -49,7 +49,7 @@ class RouteQueryHandler(private val systemMenuRepository: SystemMenuRepository) 
                 rootId = DbConstants.PARENT_ID_ROOT,
                 orderSelector = { it.order ?: 0 },
                 transform = { item, children ->
-                    item.toMenuRespVO().apply { this.children = children }
+                    item.toMenuResponse().apply { this.children = children }
                 }
             )
         }

@@ -2,8 +2,12 @@ package cn.soybean.system.domain.entity
 
 import cn.soybean.domain.base.BaseEntity
 import cn.soybean.domain.enums.DbEnums
-import cn.soybean.infrastructure.config.consts.DbConstants
+import cn.soybean.shared.infrastructure.persistence.converters.JsonStringSetTypeHandler
+import cn.soybean.system.domain.config.DbConstants
+import cn.soybean.system.interfaces.rest.dto.response.tenant.TenantResponse
+import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.Index
 import jakarta.persistence.Table
@@ -18,6 +22,7 @@ import java.time.LocalDateTime
         Index(columnList = "package_id")
     ]
 )
+@KonvertTo(TenantResponse::class)
 class SystemTenantEntity(
 
     /**
@@ -57,14 +62,16 @@ class SystemTenantEntity(
     val builtin: Boolean = false,
 
     /**
-     * 租户套餐ID
-     */
-    @Column(name = "package_id", nullable = false)
-    var packageId: String? = null,
-
-    /**
      * 租户过期时间
      */
     @Column(name = "expire_time", nullable = false)
-    var expireTime: LocalDateTime? = null
+    var expireTime: LocalDateTime? = null,
+
+    @Column(name = "menu_ids")
+    @Convert(converter = JsonStringSetTypeHandler::class)
+    var menuIds: Set<String>? = null,
+
+    @Column(name = "operation_ids")
+    @Convert(converter = JsonStringSetTypeHandler::class)
+    var operationIds: Set<String>? = null
 ) : BaseEntity()

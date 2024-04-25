@@ -14,7 +14,7 @@ import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
 import cn.soybean.system.interfaces.rest.dto.request.role.RoleRequest
 import cn.soybean.system.interfaces.rest.dto.request.role.toCreateRoleCommand
 import cn.soybean.system.interfaces.rest.dto.request.role.toUpdateRoleCommand
-import cn.soybean.system.interfaces.rest.vo.role.RoleRespVO
+import cn.soybean.system.interfaces.rest.dto.response.role.RoleResponse
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.PermissionsAllowed
@@ -51,7 +51,7 @@ class RoleResource(
     @GET
     @WithSession
     @Operation(summary = "角色列表", description = "获取角色列表")
-    fun getRoleList(@Parameter @BeanParam queryParam: RoleQuery): Uni<ResponseEntity<PageResult<RoleRespVO>>> {
+    fun getRoleList(@Parameter @BeanParam queryParam: RoleQuery): Uni<ResponseEntity<PageResult<RoleResponse>>> {
         val queryBuilder = QueryBuilder(loginHelper.getTenantId())
         queryParam.name?.let { queryBuilder.addLikeCondition("name", it) }
         queryParam.code?.let { queryBuilder.addLikeCondition("code", it) }

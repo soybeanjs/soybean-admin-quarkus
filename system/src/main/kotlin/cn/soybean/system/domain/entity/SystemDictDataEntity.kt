@@ -2,7 +2,7 @@ package cn.soybean.system.domain.entity
 
 import cn.soybean.domain.base.BaseEntity
 import cn.soybean.domain.enums.DbEnums
-import cn.soybean.infrastructure.config.consts.DbConstants
+import cn.soybean.system.domain.config.DbConstants
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Index

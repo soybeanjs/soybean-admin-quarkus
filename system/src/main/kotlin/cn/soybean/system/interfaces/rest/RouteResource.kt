@@ -12,9 +12,9 @@ import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
 import cn.soybean.system.interfaces.rest.dto.request.route.RouteRequest
 import cn.soybean.system.interfaces.rest.dto.request.route.toCreateRouteCommand
 import cn.soybean.system.interfaces.rest.dto.request.route.toUpdateRouteCommand
-import cn.soybean.system.interfaces.rest.vo.route.MenuRespVO
-import cn.soybean.system.interfaces.rest.vo.route.MenuRoute
-import cn.soybean.system.interfaces.rest.vo.route.RouteMeta
+import cn.soybean.system.interfaces.rest.dto.response.route.MenuResponse
+import cn.soybean.system.interfaces.rest.dto.response.route.MenuRoute
+import cn.soybean.system.interfaces.rest.dto.response.route.RouteMeta
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.Authenticated
@@ -59,7 +59,7 @@ class RouteResource(
     @GET
     @WithSession
     @Operation(summary = "路由列表", description = "获取路由列表")
-    fun getMenuList(): Uni<ResponseEntity<List<MenuRespVO>>> =
+    fun getMenuList(): Uni<ResponseEntity<List<MenuResponse>>> =
         routeQueryService.handle(ListTreeRoutesByUserIdQuery(loginHelper.getUserId())).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.create")

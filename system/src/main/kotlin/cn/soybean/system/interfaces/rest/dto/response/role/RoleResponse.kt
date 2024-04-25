@@ -1,8 +1,8 @@
-package cn.soybean.system.interfaces.rest.vo.role
+package cn.soybean.system.interfaces.rest.dto.response.role
 
 import cn.soybean.domain.enums.DbEnums
 
-data class RoleRespVO(
+data class RoleResponse(
     var id: String? = null,
     var name: String? = null,
     var code: String? = null,

@@ -2,9 +2,9 @@ package cn.soybean.system.domain.entity
 
 import cn.soybean.domain.base.BaseEntity
 import cn.soybean.domain.enums.DbEnums
-import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.shared.infrastructure.persistence.converters.JsonStringListConverter
-import cn.soybean.system.interfaces.rest.vo.route.MenuRespVO
+import cn.soybean.system.domain.config.DbConstants
+import cn.soybean.system.interfaces.rest.dto.response.route.MenuResponse
 import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
@@ -13,7 +13,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "sys_menu")
-@KonvertTo(MenuRespVO::class)
+@KonvertTo(MenuResponse::class)
 class SystemMenuEntity(
 
     /**

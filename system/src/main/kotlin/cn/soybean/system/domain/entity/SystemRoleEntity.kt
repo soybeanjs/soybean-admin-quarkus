@@ -2,9 +2,9 @@ package cn.soybean.system.domain.entity
 
 import cn.soybean.domain.base.BaseTenantEntity
 import cn.soybean.domain.enums.DbEnums
-import cn.soybean.infrastructure.config.consts.DbConstants
 import cn.soybean.shared.infrastructure.persistence.converters.JsonStringSetTypeHandler
-import cn.soybean.system.interfaces.rest.vo.role.RoleRespVO
+import cn.soybean.system.domain.config.DbConstants
+import cn.soybean.system.interfaces.rest.dto.response.role.RoleResponse
 import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
@@ -19,7 +19,7 @@ import jakarta.persistence.Table
         Index(columnList = "code")
     ]
 )
-@KonvertTo(RoleRespVO::class)
+@KonvertTo(RoleResponse::class)
 class SystemRoleEntity(
 
     /**

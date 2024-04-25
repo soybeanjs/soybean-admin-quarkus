@@ -5,8 +5,8 @@ import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.service.AuthService
 import cn.soybean.system.interfaces.rest.dto.request.auth.PwdLoginRequest
 import cn.soybean.system.interfaces.rest.dto.request.auth.toPwdLoginCommand
-import cn.soybean.system.interfaces.rest.vo.auth.LoginRespVO
-import cn.soybean.system.interfaces.rest.vo.user.UserInfoVO
+import cn.soybean.system.interfaces.rest.dto.response.auth.LoginResponse
+import cn.soybean.system.interfaces.rest.dto.response.user.UserInfoResponse
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.security.Authenticated
 import io.smallrye.mutiny.Uni
@@ -33,7 +33,7 @@ class SystemAuthResource(private val authService: AuthService, private val login
     @POST
     @WithSession
     @Operation(summary = "账号密码登录", description = "PC端后台管理系统账号密码登录")
-    fun login(@RequestBody(description = "PC端后台管理系统登录请求体") @Valid @NotNull req: PwdLoginRequest): Uni<ResponseEntity<LoginRespVO>> =
+    fun login(@RequestBody(description = "PC端后台管理系统登录请求体") @Valid @NotNull req: PwdLoginRequest): Uni<ResponseEntity<LoginResponse>> =
         authService.pwdLogin(req.toPwdLoginCommand()).map { ResponseEntity.ok(it) }
 
     @Authenticated
@@ -41,9 +41,9 @@ class SystemAuthResource(private val authService: AuthService, private val login
     @GET
     @WithSession
     @Operation(summary = "用户信息", description = "获取用户信息")
-    fun getUserInfo(): Uni<ResponseEntity<UserInfoVO>> = uni {
+    fun getUserInfo(): Uni<ResponseEntity<UserInfoResponse>> = uni {
         ResponseEntity.ok(
-            UserInfoVO(
+            UserInfoResponse(
                 userId = loginHelper.getUserId(),
                 userName = loginHelper.getAccountName(),
                 roles = loginHelper.getRoles()

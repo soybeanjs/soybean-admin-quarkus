@@ -10,9 +10,9 @@ import cn.soybean.system.application.query.user.UserByPhoneNumberQuery
 import cn.soybean.system.application.query.user.UserByaAccountNameQuery
 import cn.soybean.system.application.query.user.service.UserQueryService
 import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.domain.entity.toUserRespVO
+import cn.soybean.system.domain.entity.toUserResponse
 import cn.soybean.system.domain.repository.SystemUserRepository
-import cn.soybean.system.interfaces.rest.vo.user.UserRespVO
+import cn.soybean.system.interfaces.rest.dto.response.user.UserResponse
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
@@ -20,12 +20,12 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class UserQueryHandler(private val systemUserRepository: SystemUserRepository) : UserQueryService {
 
-    override fun handle(query: PageUserQuery): Uni<PageResult<UserRespVO>> {
+    override fun handle(query: PageUserQuery): Uni<PageResult<UserResponse>> {
         val (q, params, page) = query
         val panacheQuery = systemUserRepository.getUserList(q, Sort.by("id"), params).page(page)
         return panacheQuery.list().flatMap { resultList ->
             panacheQuery.count().map { count ->
-                PageResult(resultList.map { it.toUserRespVO() }, page.index + 1, page.size, count)
+                PageResult(resultList.map { it.toUserResponse() }, page.index + 1, page.size, count)
             }
         }
     }

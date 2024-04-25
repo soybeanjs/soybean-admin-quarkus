@@ -1,8 +1,8 @@
-package cn.soybean.system.interfaces.rest.vo.route
+package cn.soybean.system.interfaces.rest.dto.response.route
 
 import cn.soybean.domain.enums.DbEnums
 
-data class MenuRespVO(
+data class MenuResponse(
     var id: String? = null,
     var menuName: String? = null,
     var menuType: DbEnums.MenuItemType? = null,
@@ -22,5 +22,5 @@ data class MenuRespVO(
     var keepAlive: Boolean? = null,
     var constant: Boolean? = null,
     var href: String? = null,
-    var children: List<MenuRespVO>? = null
+    var children: List<MenuResponse>? = null
 )

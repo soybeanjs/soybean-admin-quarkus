@@ -2,8 +2,8 @@ package cn.soybean.system.domain.entity
 
 import cn.soybean.domain.base.BaseTenantEntity
 import cn.soybean.domain.enums.DbEnums
-import cn.soybean.infrastructure.config.consts.DbConstants
-import cn.soybean.system.interfaces.rest.vo.user.UserRespVO
+import cn.soybean.system.domain.config.DbConstants
+import cn.soybean.system.interfaces.rest.dto.response.user.UserResponse
 import io.mcarle.konvert.api.KonvertTo
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -19,7 +19,7 @@ import jakarta.persistence.Table
         Index(columnList = "phone_number")
     ]
 )
-@KonvertTo(UserRespVO::class)
+@KonvertTo(UserResponse::class)
 class SystemUserEntity(
 
     /**
