@@ -86,7 +86,7 @@ object SignUtil {
      * @return 签名
      */
     @Throws(NoSuchAlgorithmException::class)
-    fun createSign(paramsMapIn: MutableMap<String, *>, algorithm: String?): String {
+    fun createSign(paramsMapIn: Map<String, *>, algorithm: String?): String {
         // 如果调用者不小心传入了 sign 参数，则此处需要将 sign 参数排除在外
         var paramsMap = paramsMapIn
         if (paramsMap.containsKey(AppConstants.API_SIGNATURE)) {
@@ -112,7 +112,7 @@ object SignUtil {
     }
 
     @Throws(NoSuchAlgorithmException::class)
-    fun createSign(paramsMapIn: MutableMap<String, *>, algorithm: String?, secretKey: String): String {
+    fun createSign(paramsMapIn: Map<String, *>, algorithm: String?, secretKey: String): String {
         // 如果调用者不小心传入了 sign 参数，则此处需要将 sign 参数排除在外
         var paramsMap = paramsMapIn
         if (paramsMap.containsKey(AppConstants.API_SIGNATURE)) {
@@ -186,9 +186,7 @@ object SignUtil {
      * @param str 指定元素
      * @return 是否为null或者空字符串
      */
-    private fun isEmpty(str: Any?): Boolean {
-        return str == null || "" == str
-    }
+    private fun isEmpty(str: Any?): Boolean = str == null || "" == str
 
     /**
      * md5加密
