@@ -27,6 +27,7 @@ subprojects {
 
     dependencies {
         implementation(platform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+        implementation(platform("${quarkusPlatformGroupId}:quarkus-camel-bom:${quarkusPlatformVersion}"))
     }
 
     group = project.group

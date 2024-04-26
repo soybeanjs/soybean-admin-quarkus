@@ -73,6 +73,17 @@ dependencies {
     //tips 2024-04-17 此依赖解决mongo底层jnr native编译问题 此外有另一种方案未采用 自行搜索相关issue
     implementation("com.github.jnr:jnr-unixsocket:${jnrUnixsocketVersion}")
 
+    implementation("org.apache.camel.quarkus:camel-quarkus-reactive-executor")
+    implementation("org.apache.camel.quarkus:camel-quarkus-reactive-streams")
+    implementation("org.apache.camel.quarkus:camel-quarkus-direct")
+    implementation("org.apache.camel.quarkus:camel-quarkus-yaml-dsl")
+    implementation("org.apache.camel.quarkus:camel-quarkus-kotlin-dsl")
+    implementation("org.apache.camel.quarkus:camel-quarkus-bean")
+    implementation("org.apache.camel.quarkus:camel-quarkus-rest")
+    implementation("org.apache.camel.quarkus:camel-quarkus-platform-http")
+    implementation("org.apache.camel.quarkus:camel-quarkus-caffeine")
+    implementation("org.apache.camel.quarkus:camel-quarkus-disruptor")
+
     ksp("io.mcarle:konvert:$konvertVersion")
     ksp("io.mcarle:konvert-cdi-injector:$konvertVersion")
 

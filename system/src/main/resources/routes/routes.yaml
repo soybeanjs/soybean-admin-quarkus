@@ -1,0 +1,12 @@
+- rest:
+    get:
+      - path: "/greeting"
+        to: "direct:greet"
+
+- route:
+    id: "rest-route"
+    from:
+      uri: "direct:greet"
+      steps:
+        - setBody:
+            constant: "Hello YAML!"
