@@ -6,8 +6,8 @@ import cn.soybean.system.domain.event.route.RouteCreatedOrUpdatedEventBase
 fun CreateRouteCommand.convert2RouteCreatedOrUpdatedEventBase(
     id: String,
     tenantId: String,
-    userId: String,
-    accountName: String
+    createBy: String,
+    createAccountName: String
 ): RouteCreatedOrUpdatedEventBase =
     RouteCreatedOrUpdatedEventBase(
         aggregateId = id,
@@ -31,7 +31,6 @@ fun CreateRouteCommand.convert2RouteCreatedOrUpdatedEventBase(
         href = href
     ).also {
         it.tenantId = tenantId
-        it.createBy = userId
-        it.createAccountName = accountName
+        it.createBy = createBy
+        it.createAccountName = createAccountName
     }
-

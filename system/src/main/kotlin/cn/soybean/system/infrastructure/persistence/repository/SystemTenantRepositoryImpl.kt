@@ -13,4 +13,15 @@ class SystemTenantRepositoryImpl : SystemTenantRepository, PanacheRepositoryBase
     override fun findByName(name: String): Uni<SystemTenantEntity> = find("name", name).singleResult()
     override fun getTenantList(query: String, params: Parameters): PanacheQuery<SystemTenantEntity> =
         find(query, params)
+
+    override fun existsByName(name: String): Uni<Boolean> =
+        find("name", name).count().map {
+            when {
+                it > 0 -> true
+                else -> false
+            }
+        }
+
+    override fun getById(id: String): Uni<SystemTenantEntity> = findById(id)
+    override fun saveOrUpdate(entity: SystemTenantEntity): Uni<SystemTenantEntity> = persist(entity)
 } 

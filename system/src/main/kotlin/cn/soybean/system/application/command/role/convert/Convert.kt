@@ -6,8 +6,8 @@ import cn.soybean.system.domain.event.role.RoleCreatedOrUpdatedEventBase
 fun CreateRoleCommand.convert2RoleCreatedOrUpdatedEventBase(
     id: String,
     tenantId: String,
-    userId: String,
-    accountName: String
+    createBy: String,
+    createAccountName: String
 ): RoleCreatedOrUpdatedEventBase =
     RoleCreatedOrUpdatedEventBase(
         aggregateId = id,
@@ -20,7 +20,6 @@ fun CreateRoleCommand.convert2RoleCreatedOrUpdatedEventBase(
         remark = remark
     ).also {
         it.tenantId = tenantId
-        it.createBy = userId
-        it.createAccountName = accountName
+        it.createBy = createBy
+        it.createAccountName = createAccountName
     }
-

@@ -66,9 +66,9 @@ ON CONFLICT (id) DO NOTHING;
 -- sys_tenant
 INSERT INTO public.sys_tenant (id, create_account_name, create_by, create_time, update_account_name, update_by,
                                update_time, builtin, contact_account_name, contact_user_id, expire_time, name,
-                               package_id, status, website)
+                               status, website)
 VALUES ('1', 'builtin', '-1', '2024-01-01 00:00:00.000000', null, null, null, true, 'Soybean', 1,
-        '2099-12-31 00:00:00.000000', 'Soybean', '0', 0, 'https://soybean.pro')
+        '2099-12-31 00:00:00.000000', 'Soybean', 0, 'https://soybean.pro')
 ON CONFLICT (id) DO NOTHING;
 
 -- sys_role_user

@@ -6,3 +6,5 @@ import io.quarkus.panache.common.Parameters
 
 data class TenantByNameQuery(val name: String) : Query
 data class PageTenantQuery(val query: String, val params: Parameters, val page: Page) : Query
+data class TenantByNameExistsQuery(val name: String) : Query
+data class TenantByIdBuiltInQuery(val id: String) : Query

@@ -73,9 +73,9 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
             Uni.createFrom().item(Pair(false, "Role code usage is not permitted."))
 
         else -> roleQueryService.handle(RoleExistsQuery(code, tenantId))
-            .flatMap { codeExists ->
+            .flatMap { exist ->
                 when {
-                    codeExists -> Uni.createFrom().item(Pair(false, "Role code already exists."))
+                    exist -> Uni.createFrom().item(Pair(false, "Role code already exists."))
                     else -> Uni.createFrom().item(Pair(true, ""))
                 }
             }

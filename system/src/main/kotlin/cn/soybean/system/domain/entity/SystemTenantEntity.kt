@@ -17,9 +17,7 @@ import java.time.LocalDateTime
 @Table(
     name = "sys_tenant", indexes = [
         Index(columnList = "name"),
-        Index(columnList = "contact_user_id"),
-        Index(columnList = "website"),
-        Index(columnList = "package_id")
+        Index(columnList = "contact_user_id")
     ]
 )
 @KonvertTo(TenantResponse::class)

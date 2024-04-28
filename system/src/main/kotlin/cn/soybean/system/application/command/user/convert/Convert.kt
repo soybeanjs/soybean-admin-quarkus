@@ -1,12 +1,15 @@
 package cn.soybean.system.application.command.user.convert
 
+import cn.soybean.domain.enums.DbEnums
 import cn.soybean.system.application.command.user.CreateUserCommand
+import cn.soybean.system.application.command.user.TenantAssociatesUserCommand
 import cn.soybean.system.domain.event.user.UserCreatedOrUpdatedEventBase
+import cn.soybean.system.domain.vo.TenantContactPassword
 
 fun CreateUserCommand.convert2UserCreatedOrUpdatedEventBase(
     id: String,
     tenantId: String,
-    userId: String,
+    createBy: String,
     createAccountName: String
 ): UserCreatedOrUpdatedEventBase =
     UserCreatedOrUpdatedEventBase(
@@ -20,12 +23,33 @@ fun CreateUserCommand.convert2UserCreatedOrUpdatedEventBase(
         phoneCode = phoneCode,
         phoneNumber = phoneNumber,
         gender = gender,
-        avatar = phoneNumber,
+        avatar = avatar,
         deptId = deptId,
         status = status
     ).also {
         it.tenantId = tenantId
-        it.createBy = userId
+        it.createBy = createBy
         it.createAccountName = createAccountName
     }
 
+fun TenantAssociatesUserCommand.convert2UserCreatedOrUpdatedEventBase(
+    id: String,
+    tenantId: String,
+    contactAccountName: String,
+    createBy: String,
+    createAccountName: String
+): UserCreatedOrUpdatedEventBase =
+    UserCreatedOrUpdatedEventBase(
+        aggregateId = id,
+        accountName = contactAccountName,
+        accountPassword = TenantContactPassword.genPass(createAccountName),
+        nickName = contactAccountName,
+        personalProfile = "system generated",
+        countryCode = DbEnums.CountryInfo.CN.countryCode,
+        phoneCode = DbEnums.CountryInfo.CN.phoneCode,
+        status = DbEnums.Status.ENABLED
+    ).also {
+        it.tenantId = tenantId
+        it.createBy = createBy
+        it.createAccountName = createAccountName
+    }
