@@ -83,6 +83,7 @@ dependencies {
     implementation("org.apache.camel.quarkus:camel-quarkus-platform-http")
     implementation("org.apache.camel.quarkus:camel-quarkus-caffeine")
     implementation("org.apache.camel.quarkus:camel-quarkus-disruptor")
+    implementation("org.apache.camel.quarkus:camel-quarkus-timer")
 
     ksp("io.mcarle:konvert:$konvertVersion")
     ksp("io.mcarle:konvert-cdi-injector:$konvertVersion")
