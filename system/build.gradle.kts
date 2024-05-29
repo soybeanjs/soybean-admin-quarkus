@@ -13,7 +13,7 @@ val javaVersion = JavaVersion.VERSION_21
 
 val jacksonModuleKotlinVersion = "2.17.1"
 val redissonQuarkus30Version = "3.30.0"
-val konvertVersion = "3.2.0"
+val konvertVersion = "3.2.1"
 val mutinyReactorVersion = "2.6.0"
 val idgeneratorVersion = "1.0.6"
 val jakartaPersistenceVersion = "3.2.0-M2"
@@ -101,6 +101,15 @@ configurations.all {
 //        exclude(group = "javax.inject", module = "javax.inject")
     exclude(group = "javax.xml.bind", module = "jaxb-api")
 
+    resolutionStrategy {
+        force("jakarta.servlet:jakarta.servlet-api:6.1.0")
+
+        eachDependency {
+            if (requested.group == "jakarta.servlet" && requested.name.startsWith("jakarta.servlet-api")) {
+                useVersion("6.0.0")
+            }
+        }
+    }
     //tips 2024-04-17 quarkus3.9.*如果需要native image 需要强制升级以下依赖或者使用上方依赖降级方案
 //    resolutionStrategy {
 //        // 强制使用特定版本的依赖
