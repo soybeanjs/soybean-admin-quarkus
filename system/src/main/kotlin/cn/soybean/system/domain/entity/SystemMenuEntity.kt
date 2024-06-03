@@ -61,7 +61,7 @@ class SystemMenuEntity(
     /**
      * 路由地址
      */
-    @Column(name = "route_path", length = DbConstants.LENGTH_64)
+    @Column(name = "route_path", length = DbConstants.LENGTH_128)
     var routePath: String? = null,
 
     /**
@@ -74,13 +74,13 @@ class SystemMenuEntity(
     var i18nKey: String? = null,
 
     @Column(name = "multi_tab")
-    var multiTab: Boolean? = null,
+    var multiTab: Boolean = false,
 
     @Column(name = "active_menu", length = DbConstants.LENGTH_64)
     var activeMenu: String? = null,
 
     @Column(name = "hide_in_menu")
-    var hideInMenu: Boolean? = null,
+    var hideInMenu: Boolean = false,
 
     @Column(name = "status", nullable = false)
     var status: DbEnums.Status = DbEnums.Status.ENABLED,
@@ -89,10 +89,10 @@ class SystemMenuEntity(
     var roles: List<String>? = null,
 
     @Column(name = "keep_alive")
-    var keepAlive: Boolean? = null,
+    var keepAlive: Boolean = false,
 
     @Column(name = "constant")
-    var constant: Boolean? = null,
+    var constant: Boolean = false,
 
     @Column(name = "href", length = DbConstants.LENGTH_64)
     var href: String? = null,
@@ -100,6 +100,6 @@ class SystemMenuEntity(
     /**
      * 是否内置
      */
-    @Column(name = "builtin", nullable = false)
-    val builtin: Boolean = false
+    @Column(name = "built_in", nullable = false)
+    val builtIn: Boolean = false
 ) : BaseEntity()

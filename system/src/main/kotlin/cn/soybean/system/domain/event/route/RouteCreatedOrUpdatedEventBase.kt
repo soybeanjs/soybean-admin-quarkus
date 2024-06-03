@@ -16,13 +16,13 @@ data class RouteCreatedOrUpdatedEventBase(
     val routePath: String,
     val component: String,
     val i18nKey: String,
-    val multiTab: Boolean? = null,
+    val multiTab: Boolean = false,
     val activeMenu: String? = null,
-    val hideInMenu: Boolean? = null,
+    val hideInMenu: Boolean = false,
     val status: DbEnums.Status,
     val roles: List<String>? = null,
-    val keepAlive: Boolean? = null,
-    val constant: Boolean? = null,
+    val keepAlive: Boolean = false,
+    val constant: Boolean = false,
     val href: String? = null
 ) : AggregateEventBase(aggregateId), DomainEvent {
     companion object {

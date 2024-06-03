@@ -43,7 +43,7 @@ class UserQueryHandler(private val systemUserRepository: SystemUserRepository) :
         systemUserRepository.getByEmail(query.email, query.tenantId)
 
     override fun handle(query: UserByIdBuiltInQuery): Uni<Boolean> =
-        systemUserRepository.getById(query.id, query.tenantId).map { it?.builtin ?: true }
+        systemUserRepository.getById(query.id, query.tenantId).map { it?.builtIn ?: true }
 
     override fun handle(query: UserByAccountQuery): Uni<SystemUserEntity> =
         systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(query.accountName, query.tenantId)

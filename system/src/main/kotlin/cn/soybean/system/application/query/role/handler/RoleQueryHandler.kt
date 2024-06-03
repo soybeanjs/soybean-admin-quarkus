@@ -34,7 +34,7 @@ class RoleQueryHandler(private val systemRoleRepository: SystemRoleRepository) :
         systemRoleRepository.existsByCode(query.code, query.tenantId)
 
     override fun handle(query: RoleByIdBuiltInQuery): Uni<Boolean> =
-        systemRoleRepository.getById(query.id, query.tenantId).map { it?.builtin ?: true }
+        systemRoleRepository.getById(query.id, query.tenantId).map { it?.builtIn ?: true }
 
     override fun handle(query: RoleByIdQuery): Uni<SystemRoleEntity> =
         systemRoleRepository.getById(query.id, query.tenantId).onItem().transformToUni { role ->

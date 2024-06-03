@@ -30,9 +30,9 @@ class RoleService(private val roleQueryService: RoleQueryService, private val co
         command.id.isBlank() -> Uni.createFrom().item(Pair(false, "ID cannot be null or blank."))
         else -> checkRoleCodeForUpdate(command.code, tenantId, command.id).flatMap { (flag, msg) ->
             when {
-                flag -> roleQueryService.handle(RoleByIdBuiltInQuery(command.id, tenantId)).flatMap { builtin ->
+                flag -> roleQueryService.handle(RoleByIdBuiltInQuery(command.id, tenantId)).flatMap { builtIn ->
                     when {
-                        builtin -> Uni.createFrom().item(Pair(false, "Built-in roles cannot be modified."))
+                        builtIn -> Uni.createFrom().item(Pair(false, "Built-in roles cannot be modified."))
 
                         else -> commandInvoker.dispatch<UpdateRoleCommand, Boolean>(command).map { Pair(it, "") }
                     }

@@ -4,6 +4,7 @@ object DbConstants {
     const val LENGTH_5 = 5
     const val LENGTH_20 = 20
     const val LENGTH_64 = 64
+    const val LENGTH_128 = 128
 
     const val PARENT_ID_ROOT = "0"
     const val SUPER_TENANT = "1"

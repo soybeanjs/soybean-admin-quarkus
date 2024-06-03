@@ -25,4 +25,5 @@ class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<Sys
     override fun saveOrUpdate(entity: SystemMenuEntity): Uni<SystemMenuEntity> = persist(entity)
     override fun getById(id: String): Uni<SystemMenuEntity> = findById(id)
     override fun delById(id: String): Uni<Boolean> = deleteById(id)
-} 
+    override fun findAllByConstant(constant: Boolean): Uni<List<SystemMenuEntity>> = list("constant", constant)
+}

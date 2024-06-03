@@ -32,5 +32,5 @@ class TenantQueryHandler(private val systemTenantRepository: SystemTenantReposit
         systemTenantRepository.existsByName(query.name)
 
     override fun handle(query: TenantByIdBuiltInQuery): Uni<Boolean> =
-        systemTenantRepository.getById(query.id).map { it.builtin }
+        systemTenantRepository.getById(query.id).map { it.builtIn }
 }

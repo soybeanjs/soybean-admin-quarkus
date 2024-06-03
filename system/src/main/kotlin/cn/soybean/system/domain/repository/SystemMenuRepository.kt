@@ -9,4 +9,5 @@ interface SystemMenuRepository {
     fun saveOrUpdate(entity: SystemMenuEntity): Uni<SystemMenuEntity>
     fun getById(id: String): Uni<SystemMenuEntity>
     fun delById(id: String): Uni<Boolean>
+    fun findAllByConstant(constant: Boolean): Uni<List<SystemMenuEntity>>
 }

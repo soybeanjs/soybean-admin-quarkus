@@ -6,6 +6,7 @@ import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.command.route.DeleteRouteCommand
 import cn.soybean.system.application.query.route.GetRoutesByUserIdQuery
 import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdQuery
+import cn.soybean.system.application.query.route.RouteByConstantQuery
 import cn.soybean.system.application.query.route.service.RouteQueryService
 import cn.soybean.system.application.service.RouteService
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups
@@ -14,13 +15,11 @@ import cn.soybean.system.interfaces.rest.dto.request.route.toCreateRouteCommand
 import cn.soybean.system.interfaces.rest.dto.request.route.toUpdateRouteCommand
 import cn.soybean.system.interfaces.rest.dto.response.route.MenuResponse
 import cn.soybean.system.interfaces.rest.dto.response.route.MenuRoute
-import cn.soybean.system.interfaces.rest.dto.response.route.RouteMeta
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.Authenticated
 import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni
-import io.smallrye.mutiny.uni
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
@@ -90,65 +89,8 @@ class RouteResource(
 
     @Path("/getConstantRoutes")
     @GET
-    @Operation(summary = "常量路由", description = "固定路由列表,暂未从数据库获取,硬编码")
-    fun getConstantRoutes(): Uni<ResponseEntity<List<MenuRoute>>> = uni {
-        ResponseEntity.ok(
-            listOf(
-                MenuRoute(
-                    name = "403",
-                    path = "/403",
-                    component = "layout.blank\$view.403",
-                    meta = RouteMeta(
-                        constant = true,
-                        hideInMenu = true,
-                        i18nKey = "route.403",
-                        title = "403"
-                    )
-                ),
-                MenuRoute(
-                    name = "404",
-                    path = "/404",
-                    component = "layout.blank\$view.404",
-                    meta = RouteMeta(
-                        constant = true,
-                        hideInMenu = true,
-                        i18nKey = "route.404",
-                        title = "404"
-                    )
-                ),
-                MenuRoute(
-                    name = "500",
-                    path = "/500",
-                    component = "layout.blank\$view.500",
-                    meta = RouteMeta(
-                        constant = true,
-                        hideInMenu = true,
-                        i18nKey = "route.500",
-                        title = "500"
-                    )
-                ),
-                MenuRoute(
-                    name = "user-center",
-                    path = "/user-center",
-                    component = "layout.base\$view.user-center",
-                    meta = RouteMeta(
-                        hideInMenu = true,
-                        i18nKey = "route.user-center",
-                        title = "user-center"
-                    )
-                ),
-                MenuRoute(
-                    name = "login",
-                    path = "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
-                    component = "layout.blank\$view.login",
-                    meta = RouteMeta(
-                        constant = true,
-                        hideInMenu = true,
-                        i18nKey = "route.login",
-                        title = "login"
-                    )
-                )
-            )
-        )
-    }
+    @WithSession
+    @Operation(summary = "常量路由", description = "常量路由列表")
+    fun getConstantRoutes(): Uni<ResponseEntity<List<MenuRoute>>> =
+        routeQueryService.handle(RouteByConstantQuery()).map { ResponseEntity.ok(it) }
 }

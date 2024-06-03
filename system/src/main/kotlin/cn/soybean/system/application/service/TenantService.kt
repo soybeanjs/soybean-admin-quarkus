@@ -49,9 +49,9 @@ class TenantService(private val tenantQueryService: TenantQueryService, private 
         command.id.isBlank() -> Uni.createFrom().item(Pair(false, "ID cannot be null or blank."))
         else -> checkTenantName(command.name).flatMap { (flag, msg) ->
             when {
-                flag -> tenantQueryService.handle(TenantByIdBuiltInQuery(command.id)).flatMap { builtin ->
+                flag -> tenantQueryService.handle(TenantByIdBuiltInQuery(command.id)).flatMap { builtIn ->
                     when {
-                        builtin -> Uni.createFrom().item(Pair(false, "Built-in tenants cannot be modified."))
+                        builtIn -> Uni.createFrom().item(Pair(false, "Built-in tenants cannot be modified."))
 
                         else -> commandInvoker.dispatch<UpdateTenantCommand, Boolean>(command).map { Pair(it, "") }
                     }

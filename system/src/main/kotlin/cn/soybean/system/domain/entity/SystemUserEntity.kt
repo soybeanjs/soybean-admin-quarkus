@@ -91,8 +91,8 @@ class SystemUserEntity(
     /**
      * 是否内置
      */
-    @Column(name = "builtin", nullable = false)
-    val builtin: Boolean = false,
+    @Column(name = "built_in", nullable = false)
+    val builtIn: Boolean = false,
 
     /**
      * 用户账号状态
