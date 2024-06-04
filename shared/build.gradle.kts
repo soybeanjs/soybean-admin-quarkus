@@ -10,4 +10,5 @@ dependencies {
     implementation("io.smallrye.reactive:mutiny")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("jakarta.persistence:jakarta.persistence-api")
+    implementation("jakarta.interceptor:jakarta.interceptor-api")
 }

@@ -3,8 +3,8 @@
   "kind" : "Service",
   "metadata" : {
     "annotations" : {
-      "app.quarkus.io/quarkus-version" : "3.9.3",
-      "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-java.git"
+      "app.quarkus.io/quarkus-version" : "3.11.0",
+      "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-quarkus.git"
     },
     "labels" : {
       "app.kubernetes.io/name" : "system",
@@ -35,8 +35,8 @@
   "kind" : "Deployment",
   "metadata" : {
     "annotations" : {
-      "app.quarkus.io/quarkus-version" : "3.9.3",
-      "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-java.git"
+      "app.quarkus.io/quarkus-version" : "3.11.0",
+      "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-quarkus.git"
     },
     "labels" : {
       "app.kubernetes.io/name" : "system",
@@ -55,8 +55,8 @@
     "template" : {
       "metadata" : {
         "annotations" : {
-          "app.quarkus.io/quarkus-version" : "3.9.3",
-          "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-java.git"
+          "app.quarkus.io/quarkus-version" : "3.11.0",
+          "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-quarkus.git"
         },
         "labels" : {
           "app.kubernetes.io/managed-by" : "quarkus",
@@ -141,8 +141,8 @@
   "kind" : "Ingress",
   "metadata" : {
     "annotations" : {
-      "app.quarkus.io/quarkus-version" : "3.9.3",
-      "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-java.git",
+      "app.quarkus.io/quarkus-version" : "3.11.0",
+      "app.quarkus.io/vcs-uri" : "https://github.com/soybeanjs/soybean-admin-quarkus.git",
       "cert-manager.io/cluster-issuer" : "dnspod",
       "kubernetes.io/ingress.class" : "nginx",
       "nginx.ingress.kubernetes.io/force-ssl-redirect" : "true",

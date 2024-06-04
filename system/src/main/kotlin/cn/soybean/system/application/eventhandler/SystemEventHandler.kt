@@ -1,6 +1,7 @@
 package cn.soybean.system.application.eventhandler
 
 import cn.soybean.infrastructure.config.consts.AppConstants
+import cn.soybean.infrastructure.interceptor.dto.OperationLogDTO
 import cn.soybean.interfaces.rest.util.isSuperUser
 import cn.soybean.system.application.event.ApiEndpointEvent
 import cn.soybean.system.application.event.UserPermActionEvent
@@ -72,6 +73,16 @@ class SystemEventHandler(
             .subscribe().with(
                 { Log.trace("[SystemEventHandler] UserPermActionEvent event processed successfully. userId: ${userPermActionEvent.userId}") },
                 { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing UserPermActionEvent event") }
+            )
+    }
+
+    fun handleOperationLogEvent(@ObservesAsync operationLog: OperationLogDTO) {
+        sessionFactory.withStatelessSession { statelessSession ->
+            statelessSession.insert(operationLog.toOperateLogEntity())
+        }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
+            .subscribe().with(
+                { Log.trace("[SystemEventHandler] OperationLogDTO event processed successfully") },
+                { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing OperationLogDTO event") }
             )
     }
 
