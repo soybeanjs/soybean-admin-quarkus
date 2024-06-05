@@ -12,10 +12,14 @@ data class RoleCreatedOrUpdatedEventBase(
     val status: DbEnums.Status,
     val dataScope: DbEnums.DataPermission? = null,
     val dataScopeDeptIds: Set<String>? = null,
-    val remark: String? = null
+    val remark: String? = null,
+    val userId: String? = null,
+    val menuIds: Set<String>? = null,
+    val operationIds: Set<String>? = null
 ) : AggregateEventBase(aggregateId), DomainEvent {
     companion object {
         const val ROLE_CREATED_V1 = "ROLE_CREATED_V1"
+        const val ROLE_TENANT_ASSOCIATES_V1 = "ROLE_TENANT_ASSOCIATES_V1"
         const val ROLE_UPDATED_V1 = "ROLE_UPDATED_V1"
     }
 }

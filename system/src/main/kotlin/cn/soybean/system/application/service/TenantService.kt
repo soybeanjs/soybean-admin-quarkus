@@ -1,11 +1,9 @@
 package cn.soybean.system.application.service
 
 import cn.soybean.application.command.CommandInvoker
-import cn.soybean.system.application.command.role.TenantAssociatesRoleCommand
 import cn.soybean.system.application.command.tenant.CreateTenantCommand
 import cn.soybean.system.application.command.tenant.DeleteTenantCommand
 import cn.soybean.system.application.command.tenant.UpdateTenantCommand
-import cn.soybean.system.application.command.user.TenantAssociatesUserCommand
 import cn.soybean.system.application.query.tenant.TenantByIdBuiltInQuery
 import cn.soybean.system.application.query.tenant.TenantByNameExistsQuery
 import cn.soybean.system.application.query.tenant.service.TenantQueryService
@@ -13,7 +11,6 @@ import cn.soybean.system.domain.aggregate.tenant.TenantAggregate
 import cn.soybean.system.domain.config.DbConstants
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
-import io.smallrye.mutiny.uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
@@ -22,22 +19,7 @@ class TenantService(private val tenantQueryService: TenantQueryService, private 
     fun createTenant(command: CreateTenantCommand): Uni<Pair<Boolean, String>> =
         checkTenantName(command.name).flatMap { (flag, msg) ->
             when {
-                flag -> commandInvoker.dispatch<CreateTenantCommand, TenantAggregate>(command)
-                    .flatMap {
-                        it.contactUserId?.let { contactUserId ->
-                            commandInvoker.dispatch<TenantAssociatesUserCommand, Boolean>(
-                                TenantAssociatesUserCommand(
-                                    tenantId = it.aggregateId,
-                                    contactUserId = contactUserId,
-                                    contactAccountName = it.contactAccountName!!
-                                )
-                            )
-                        }?.replaceWith(it.aggregateId) ?: uni { it.aggregateId }
-                    }
-                    .flatMap {
-                        commandInvoker.dispatch<TenantAssociatesRoleCommand, Boolean>(TenantAssociatesRoleCommand(it))
-                    }
-                    .map { Pair(true, "") }
+                flag -> commandInvoker.dispatch<CreateTenantCommand, TenantAggregate>(command).map { Pair(true, "") }
 
                 else -> Uni.createFrom().item(Pair(false, msg))
             }

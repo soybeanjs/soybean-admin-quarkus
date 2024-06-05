@@ -276,10 +276,9 @@ VALUES ('1', 'built-in', '-1', '2024-01-01 00:00:00.000000', null, null, null, t
 ON CONFLICT (id) DO NOTHING;
 
 -- sys_role_user
-INSERT INTO sys_role_user (id, create_account_name, create_by, create_time, update_account_name, update_by,
-                           update_time, tenant_id, role_id, user_id)
-VALUES ('1', 'built-in', '-1', '2024-01-01 00:00:00.000000', null, null, null, '1', '1', '1')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_role_user (role_id, user_id, tenant_id)
+VALUES ('1', '1', '1')
+ON CONFLICT (role_id, user_id, tenant_id) DO NOTHING;
 
 -- sys_user
 INSERT INTO sys_user (id, create_account_name, create_by, create_time, update_account_name, update_by,

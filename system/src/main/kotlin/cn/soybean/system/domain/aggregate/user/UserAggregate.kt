@@ -59,8 +59,6 @@ class UserAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
         this.status = event.status
     }
 
-    private fun bcryptHashPassword(password: String) = BcryptUtil.bcryptHash(password)
-
     fun createUser(data: UserCreatedOrUpdatedEventBase) {
         data.accountPassword = bcryptHashPassword(data.accountPassword)
         val dataBytes = SerializerUtils.serializeToJsonBytes(data)
@@ -86,3 +84,4 @@ class UserAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
     }
 }
 
+fun bcryptHashPassword(password: String): String = BcryptUtil.bcryptHash(password)

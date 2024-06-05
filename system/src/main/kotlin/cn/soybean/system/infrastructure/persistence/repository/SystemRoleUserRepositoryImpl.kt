@@ -10,4 +10,6 @@ import jakarta.enterprise.context.ApplicationScoped
 class SystemRoleUserRepositoryImpl : SystemRoleUserRepository, PanacheRepositoryBase<SystemRoleUserEntity, String> {
     override fun delByRoleId(roleId: String, tenantId: String): Uni<Long> =
         delete("roleId = ?1 and tenantId = ?2", roleId, tenantId)
+
+    override fun saveOrUpdate(roleUser: SystemRoleUserEntity): Uni<SystemRoleUserEntity> = persist(roleUser)
 }
