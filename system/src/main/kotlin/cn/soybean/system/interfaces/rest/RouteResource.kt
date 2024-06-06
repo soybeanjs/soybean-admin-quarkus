@@ -54,7 +54,6 @@ class RouteResource(
         routeQueryService.handle(GetRoutesByUserIdQuery(loginHelper.getUserId())).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.list")
-    @Path("/getMenuList")
     @GET
     @WithSession
     @Operation(summary = "路由列表", description = "获取路由列表")

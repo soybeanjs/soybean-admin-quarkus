@@ -1,8 +1,10 @@
 package cn.soybean.system.domain.entity
 
+import cn.soybean.interfaces.rest.util.isSuperUser
 import cn.soybean.system.domain.config.DbConstants
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
+import io.smallrye.mutiny.Uni
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -49,5 +51,18 @@ class SystemApisEntity(
     @Column(name = "create_time", updatable = false)
     var createTime: LocalDateTime? = null
 ) : PanacheEntityBase {
-    companion object : PanacheCompanion<SystemApisEntity>
+    companion object : PanacheCompanion<SystemApisEntity> {
+        fun listApiByUserId(userId: String): Uni<List<SystemApisEntity>> = when {
+            isSuperUser(userId) -> listAll()
+            else -> list(
+                """
+                       SELECT a FROM SystemApisEntity a
+                       LEFT JOIN SystemRoleApiEntity ra ON ra.operationId = a.operationId
+                       LEFT JOIN SystemRoleUserEntity ru ON ru.roleId = ra.roleId
+                       WHERE ru.userId = ?1
+                """,
+                userId
+            )
+        }
+    }
 }

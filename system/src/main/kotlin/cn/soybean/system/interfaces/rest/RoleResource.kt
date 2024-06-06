@@ -47,7 +47,6 @@ class RoleResource(
 ) {
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}role.list")
-    @Path("/getRoleList")
     @GET
     @WithSession
     @Operation(summary = "角色列表", description = "获取角色列表")

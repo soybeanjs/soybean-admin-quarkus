@@ -47,7 +47,6 @@ class UserResource(
 ) {
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}user.list")
-    @Path("/getUserList")
     @GET
     @WithSession
     @Operation(summary = "用户列表", description = "获取用户列表")
