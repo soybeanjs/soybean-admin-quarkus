@@ -26,12 +26,11 @@ class ExampleResource {
 
     @PermissionsAllowed("${AppConstants.APP_PERM_NAME_PREFIX}hello")
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
     @Operation(
         summary = "@PermissionsAllowed注解权限验证",
         description = "默认使用[io.quarkus.security.StringPermission],也即默认按照冒号分割资源和权限,例user:read(user代表资源,read代表动作"
     )
-    fun hello(): Uni<String> = uni { "Hello from RESTEasy Reactive" }
+    fun hello(): Uni<ResponseEntity<String>> = uni { ResponseEntity.ok("Hello from RESTEasy Reactive") }
 
     @ApiSignRequest
     @Path("/sign")

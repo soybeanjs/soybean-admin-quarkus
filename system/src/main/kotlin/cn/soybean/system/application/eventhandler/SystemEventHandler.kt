@@ -67,7 +67,9 @@ class SystemEventHandler(
                     storeUserPermAction(apis, userPermActionEvent.userId)
                 }
 
-                else -> TODO()
+                else -> getApiPermActionByUserId(statelessSession, userPermActionEvent.userId).map { apis ->
+                    storeUserPermAction(apis, userPermActionEvent.userId)
+                }
             }
         }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
             .subscribe().with(
@@ -105,4 +107,19 @@ class SystemEventHandler(
             "FROM SystemApisEntity",
             SystemApisEntity::class.java
         ).resultList
+
+    private fun getApiPermActionByUserId(
+        statelessSession: Mutiny.StatelessSession,
+        userId: String
+    ): Uni<List<SystemApisEntity>> =
+        statelessSession.createQuery(
+            """
+                SELECT a
+                FROM SystemApisEntity a
+                     LEFT JOIN SystemRoleApiEntity ra ON ra.operationId = a.operationId
+                     LEFT JOIN SystemRoleUserEntity ru ON ru.roleId = ra.roleId
+                WHERE ru.userId = :userId
+            """,
+            SystemApisEntity::class.java
+        ).setParameter("userId", userId).resultList
 }

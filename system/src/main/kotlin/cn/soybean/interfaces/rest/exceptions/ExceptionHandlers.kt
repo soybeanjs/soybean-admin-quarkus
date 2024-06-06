@@ -2,6 +2,7 @@ package cn.soybean.interfaces.rest.exceptions
 
 import cn.soybean.application.exceptions.ServiceException
 import cn.soybean.interfaces.rest.response.ResponseEntity
+import io.quarkus.logging.Log
 import io.quarkus.security.ForbiddenException
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.uni
@@ -13,6 +14,14 @@ import org.jboss.resteasy.reactive.server.ServerExceptionMapper
 
 @Provider
 class ExceptionHandlers {
+
+    @ServerExceptionMapper
+    fun handleException(e: Exception): Uni<Response> = uni {
+        Log.error(e.printStackTrace())
+        Response.ok()
+            .entity(ResponseEntity.fail<Any>("Exception"))
+            .build()
+    }
 
     @ServerExceptionMapper
     fun handleNoResultException(e: NoResultException): Uni<Response> = uni {
@@ -30,7 +39,7 @@ class ExceptionHandlers {
 
     @ServerExceptionMapper
     fun handleForbiddenException(e: ForbiddenException): Uni<Response> = uni {
-        Response.ok()
+        Response.status(Status.FORBIDDEN)
             .entity(
                 ResponseEntity.error<Any>(
                     Status.FORBIDDEN.statusCode.toString(),

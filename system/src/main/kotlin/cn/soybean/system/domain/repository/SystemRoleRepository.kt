@@ -13,4 +13,5 @@ interface SystemRoleRepository {
     fun getById(id: String, tenantId: String): Uni<SystemRoleEntity?>
     fun existsByCode(code: String, tenantId: String): Uni<Boolean>
     fun delById(id: String, tenantId: String): Uni<Long>
+    fun getByCode(tenantId: String, code: String): Uni<SystemRoleEntity>
 }

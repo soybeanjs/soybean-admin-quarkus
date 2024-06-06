@@ -32,4 +32,7 @@ class SystemRoleRepositoryImpl : SystemRoleRepository, PanacheRepositoryBase<Sys
         }
 
     override fun delById(id: String, tenantId: String): Uni<Long> = delete("id = ?1 and tenantId = ?2", id, tenantId)
+
+    override fun getByCode(tenantId: String, code: String): Uni<SystemRoleEntity> =
+        find("tenantId = ?1 and code = ?2", tenantId, code).singleResult()
 }

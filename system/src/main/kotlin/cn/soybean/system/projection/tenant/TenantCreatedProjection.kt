@@ -6,12 +6,14 @@ import cn.soybean.shared.projection.Projection
 import cn.soybean.shared.util.SerializerUtils
 import cn.soybean.system.domain.aggregate.user.bcryptHashPassword
 import cn.soybean.system.domain.config.DbConstants
+import cn.soybean.system.domain.entity.SystemRoleApiEntity
 import cn.soybean.system.domain.entity.SystemRoleEntity
 import cn.soybean.system.domain.entity.SystemRoleMenuEntity
 import cn.soybean.system.domain.entity.SystemRoleUserEntity
 import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.domain.event.tenant.TenantCreatedEventBase
+import cn.soybean.system.domain.repository.SystemRoleApiRepository
 import cn.soybean.system.domain.repository.SystemRoleMenuRepository
 import cn.soybean.system.domain.repository.SystemRoleRepository
 import cn.soybean.system.domain.repository.SystemRoleUserRepository
@@ -30,7 +32,8 @@ class TenantCreatedProjection(
     private val userRepository: SystemUserRepository,
     private val roleRepository: SystemRoleRepository,
     private val roleUserRepository: SystemRoleUserRepository,
-    private val roleMenuRepository: SystemRoleMenuRepository
+    private val roleMenuRepository: SystemRoleMenuRepository,
+    private val roleApiRepository: SystemRoleApiRepository
 ) : Projection {
 
     @WithTransaction
@@ -54,7 +57,7 @@ class TenantCreatedProjection(
 
         val user = SystemUserEntity(
             accountName = event.contactAccountName,
-            accountPassword = event.createAccountName?.let { bcryptHashPassword(TenantContactPassword.genPass(it)) },
+            accountPassword = bcryptHashPassword(TenantContactPassword.genPass(event.contactAccountName)),
             nickName = event.contactAccountName,
             personalProfile = "system generated",
             countryCode = DbEnums.CountryInfo.CN.countryCode,
@@ -81,16 +84,13 @@ class TenantCreatedProjection(
         }
 
         return tenantRepository.saveOrUpdate(tenant).flatMap { userRepository.saveOrUpdate(user) }
-            .flatMap {
-                processAssociatesRole(roleEntity, event, event.menuIds)
-            }
+            .flatMap { processAssociatesRole(roleEntity, event) }
             .replaceWithUnit()
     }
 
     private fun processAssociatesRole(
         roleEntity: SystemRoleEntity,
         event: TenantCreatedEventBase,
-        menuIds: Set<String>?
     ): Uni<Unit> = roleRepository.saveOrUpdate(roleEntity)
         .flatMap { role ->
             val tenantId = role?.tenantId
@@ -108,18 +108,29 @@ class TenantCreatedProjection(
             when {
                 event.menuIds.isNullOrEmpty() -> Uni.createFrom().item(role)
 
-                else -> when {
-                    !menuIds.isNullOrEmpty() -> {
-                        val roleMenus =
-                            menuIds.map { menuId -> SystemRoleMenuEntity(role.id, menuId, event.aggregateId) }
+                else -> {
+                    val roleMenus =
+                        event.menuIds.map { menuId -> SystemRoleMenuEntity(role.id, menuId, event.aggregateId) }
 
-                        roleMenuRepository.delByRoleId(role.id, event.aggregateId)
-                            .flatMap { _ -> roleMenuRepository.saveOrUpdateAll(roleMenus) }
-                    }
+                    roleMenuRepository.saveOrUpdateAll(roleMenus).replaceWith(role)
+                }
+            }
+        }
+        .flatMap { role ->
+            when {
+                event.operationIds.isNullOrEmpty() -> Uni.createFrom().nullItem()
 
-                    else -> {
-                        Uni.createFrom().nullItem()
-                    }
+                else -> {
+                    val roleOperations =
+                        event.operationIds.map { operationId ->
+                            SystemRoleApiEntity(
+                                role.id,
+                                operationId,
+                                event.aggregateId
+                            )
+                        }
+
+                    roleApiRepository.saveOrUpdateAll(roleOperations).replaceWith(role)
                 }
             }
         }.replaceWithUnit()
