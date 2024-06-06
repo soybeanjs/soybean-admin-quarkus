@@ -21,4 +21,19 @@ class SystemRoleMenuRepositoryImpl : SystemRoleMenuRepository, PanacheRepository
     override fun saveOrUpdate(roleMenu: SystemRoleMenuEntity): Uni<SystemRoleMenuEntity> = persist(roleMenu)
     override fun saveOrUpdateAll(roleMenus: List<SystemRoleMenuEntity>): Uni<Unit> =
         persist(roleMenus).replaceWithUnit()
+
+    override fun findMenuIds(tenantId: String, roleCode: String): Uni<List<SystemRoleMenuEntity>> = list(
+        """
+                SELECT rm
+                FROM SystemRoleMenuEntity rm
+                LEFT JOIN SystemRoleEntity r ON r.id = rm.roleId
+                WHERE rm.tenantId = ?1
+                  AND r.code = ?2
+                """,
+        tenantId,
+        roleCode
+    )
+
+    override fun removeMenusByTenantId(tenantId: String, menuIds: Set<String>): Uni<Long> =
+        delete("tenantId = ?1 and menuId in ?2", tenantId, menuIds)
 }

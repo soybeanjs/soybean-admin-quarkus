@@ -9,4 +9,6 @@ interface SystemRoleMenuRepository {
     fun delByRoleId(roleId: String, tenantId: String): Uni<Long>
     fun saveOrUpdate(roleMenu: SystemRoleMenuEntity): Uni<SystemRoleMenuEntity>
     fun saveOrUpdateAll(roleMenus: List<SystemRoleMenuEntity>): Uni<Unit>
+    fun findMenuIds(tenantId: String, roleCode: String): Uni<List<SystemRoleMenuEntity>>
+    fun removeMenusByTenantId(tenantId: String, menuIds: Set<String>): Uni<Long>
 }

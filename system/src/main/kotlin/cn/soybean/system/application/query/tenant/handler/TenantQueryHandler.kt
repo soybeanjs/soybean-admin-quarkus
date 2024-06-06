@@ -3,6 +3,7 @@ package cn.soybean.system.application.query.tenant.handler
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.application.query.tenant.PageTenantQuery
 import cn.soybean.system.application.query.tenant.TenantByIdBuiltInQuery
+import cn.soybean.system.application.query.tenant.TenantByIdQuery
 import cn.soybean.system.application.query.tenant.TenantByNameExistsQuery
 import cn.soybean.system.application.query.tenant.TenantByNameQuery
 import cn.soybean.system.application.query.tenant.service.TenantQueryService
@@ -33,4 +34,6 @@ class TenantQueryHandler(private val systemTenantRepository: SystemTenantReposit
 
     override fun handle(query: TenantByIdBuiltInQuery): Uni<Boolean> =
         systemTenantRepository.getById(query.id).map { it.builtIn }
+
+    override fun handle(query: TenantByIdQuery): Uni<SystemTenantEntity> = systemTenantRepository.getById(query.id)
 }

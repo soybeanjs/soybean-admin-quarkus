@@ -5,6 +5,7 @@ import cn.soybean.system.application.command.tenant.CreateTenantCommand
 import cn.soybean.system.application.command.tenant.DeleteTenantCommand
 import cn.soybean.system.application.command.tenant.UpdateTenantCommand
 import cn.soybean.system.application.query.tenant.TenantByIdBuiltInQuery
+import cn.soybean.system.application.query.tenant.TenantByIdQuery
 import cn.soybean.system.application.query.tenant.TenantByNameExistsQuery
 import cn.soybean.system.application.query.tenant.service.TenantQueryService
 import cn.soybean.system.domain.aggregate.tenant.TenantAggregate
@@ -29,7 +30,7 @@ class TenantService(private val tenantQueryService: TenantQueryService, private 
 
     fun updateTenant(command: UpdateTenantCommand): Uni<Pair<Boolean, String>> = when {
         command.id.isBlank() -> Uni.createFrom().item(Pair(false, "ID cannot be null or blank."))
-        else -> checkTenantName(command.name).flatMap { (flag, msg) ->
+        else -> checkTenantNameForUpdate(command.name, command.id).flatMap { (flag, msg) ->
             when {
                 flag -> tenantQueryService.handle(TenantByIdBuiltInQuery(command.id)).flatMap { builtIn ->
                     when {
@@ -77,6 +78,19 @@ class TenantService(private val tenantQueryService: TenantQueryService, private 
             .flatMap { exist ->
                 when {
                     exist -> Uni.createFrom().item(Pair(false, "Tenant name already exists."))
+                    else -> Uni.createFrom().item(Pair(true, ""))
+                }
+            }
+    }
+
+    private fun checkTenantNameForUpdate(name: String, id: String): Uni<Pair<Boolean, String>> = when (name) {
+        DbConstants.SUPER_TENANT ->
+            Uni.createFrom().item(Pair(false, "Tenant code usage is not permitted."))
+
+        else -> tenantQueryService.handle(TenantByIdQuery(id))
+            .flatMap { tenant ->
+                when {
+                    tenant.name != name -> Uni.createFrom().item(Pair(false, "Tenant name already exists."))
                     else -> Uni.createFrom().item(Pair(true, ""))
                 }
             }

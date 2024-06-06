@@ -5,12 +5,20 @@ import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import cn.soybean.shared.projection.Projection
 import cn.soybean.shared.util.SerializerUtils
 import cn.soybean.system.domain.aggregate.user.bcryptHashPassword
+import cn.soybean.system.domain.config.DbConstants
+import cn.soybean.system.domain.entity.SystemRoleEntity
+import cn.soybean.system.domain.entity.SystemRoleMenuEntity
+import cn.soybean.system.domain.entity.SystemRoleUserEntity
 import cn.soybean.system.domain.entity.SystemTenantEntity
 import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.domain.event.tenant.TenantCreatedEventBase
+import cn.soybean.system.domain.repository.SystemRoleMenuRepository
+import cn.soybean.system.domain.repository.SystemRoleRepository
+import cn.soybean.system.domain.repository.SystemRoleUserRepository
 import cn.soybean.system.domain.repository.SystemTenantRepository
 import cn.soybean.system.domain.repository.SystemUserRepository
 import cn.soybean.system.domain.vo.TenantContactPassword
+import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.replaceWithUnit
@@ -19,7 +27,10 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class TenantCreatedProjection(
     private val tenantRepository: SystemTenantRepository,
-    private val userRepository: SystemUserRepository
+    private val userRepository: SystemUserRepository,
+    private val roleRepository: SystemRoleRepository,
+    private val roleUserRepository: SystemRoleUserRepository,
+    private val roleMenuRepository: SystemRoleMenuRepository
 ) : Projection {
 
     @WithTransaction
@@ -56,8 +67,62 @@ class TenantCreatedProjection(
             it.createAccountName = event.createAccountName
         }
 
-        return tenantRepository.saveOrUpdate(tenant).flatMap { userRepository.saveOrUpdate(user) }.replaceWithUnit()
+        val roleEntity = SystemRoleEntity(
+            name = DbConstants.SUPER_TENANT_ROLE_CODE,
+            code = DbConstants.SUPER_TENANT_ROLE_CODE,
+            order = 1,
+            status = DbEnums.Status.ENABLED,
+            remark = "system generated"
+        ).also {
+            it.id = YitIdHelper.nextId().toString()
+            it.tenantId = event.aggregateId
+            it.createBy = event.createBy
+            it.createAccountName = event.createAccountName
+        }
+
+        return tenantRepository.saveOrUpdate(tenant).flatMap { userRepository.saveOrUpdate(user) }
+            .flatMap {
+                processAssociatesRole(roleEntity, event, event.menuIds)
+            }
+            .replaceWithUnit()
     }
+
+    private fun processAssociatesRole(
+        roleEntity: SystemRoleEntity,
+        event: TenantCreatedEventBase,
+        menuIds: Set<String>?
+    ): Uni<Unit> = roleRepository.saveOrUpdate(roleEntity)
+        .flatMap { role ->
+            val tenantId = role?.tenantId
+            val userId = event.contactUserId
+            when {
+                tenantId != null -> {
+                    val roleUser = SystemRoleUserEntity(role.id, userId, tenantId)
+                    roleUserRepository.saveOrUpdate(roleUser).replaceWith(role)
+                }
+
+                else -> Uni.createFrom().item(role)
+            }
+        }
+        .flatMap { role ->
+            when {
+                event.menuIds.isNullOrEmpty() -> Uni.createFrom().item(role)
+
+                else -> when {
+                    !menuIds.isNullOrEmpty() -> {
+                        val roleMenus =
+                            menuIds.map { menuId -> SystemRoleMenuEntity(role.id, menuId, event.aggregateId) }
+
+                        roleMenuRepository.delByRoleId(role.id, event.aggregateId)
+                            .flatMap { _ -> roleMenuRepository.saveOrUpdateAll(roleMenus) }
+                    }
+
+                    else -> {
+                        Uni.createFrom().nullItem()
+                    }
+                }
+            }
+        }.replaceWithUnit()
 
     override fun supports(eventType: String): Boolean = eventType == TenantCreatedEventBase.TENANT_CREATED_V1
 }
