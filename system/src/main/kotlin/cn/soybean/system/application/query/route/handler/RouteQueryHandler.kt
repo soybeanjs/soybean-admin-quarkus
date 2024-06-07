@@ -7,18 +7,23 @@ import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdQuery
 import cn.soybean.system.application.query.route.RouteByConstantQuery
 import cn.soybean.system.application.query.route.RouteByIdBuiltInQuery
 import cn.soybean.system.application.query.route.RouteByIdQuery
+import cn.soybean.system.application.query.route.RouteByTenantIdQuery
 import cn.soybean.system.application.query.route.service.RouteQueryService
 import cn.soybean.system.domain.config.DbConstants
 import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.domain.entity.toMenuResponse
 import cn.soybean.system.domain.repository.SystemMenuRepository
+import cn.soybean.system.domain.repository.SystemTenantRepository
 import cn.soybean.system.interfaces.rest.dto.response.route.MenuResponse
 import cn.soybean.system.interfaces.rest.dto.response.route.MenuRoute
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class RouteQueryHandler(private val systemMenuRepository: SystemMenuRepository) : RouteQueryService {
+class RouteQueryHandler(
+    private val systemMenuRepository: SystemMenuRepository,
+    private val systemTenantRepository: SystemTenantRepository
+) : RouteQueryService {
 
     override fun handle(query: GetRoutesByUserIdQuery): Uni<Map<String, Any>> {
         val (userId) = query
@@ -64,6 +69,12 @@ class RouteQueryHandler(private val systemMenuRepository: SystemMenuRepository) 
     override fun handle(query: RouteByConstantQuery): Uni<List<MenuRoute>> =
         systemMenuRepository.findAllByConstant(query.constant)
             .map { menuList -> menuList.map { it.convertToMenuResponse() } }
+
+    override fun handle(query: RouteByTenantIdQuery): Uni<Set<String>> =
+        when (query.tenantId) {
+            DbConstants.SUPER_TENANT -> systemMenuRepository.all().map { menus -> menus.map { it.id }.toSet() }
+            else -> systemTenantRepository.getById(query.tenantId).map { it.menuIds }
+        }
 
     private fun getRoutesByUserId(userId: String): Uni<List<SystemMenuEntity>> = when {
         isSuperUser(userId) -> systemMenuRepository.all()

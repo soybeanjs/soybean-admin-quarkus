@@ -25,4 +25,7 @@ class SystemRoleApiRepositoryImpl : SystemRoleApiRepository, PanacheRepositoryBa
 
     override fun removeOperationsByTenantId(tenantId: String, operationIds: Set<String>): Uni<Long> =
         delete("tenantId = ?1 and operationId in ?2", tenantId, operationIds)
+
+    override fun delByRoleId(roleId: String, tenantId: String): Uni<Long> =
+        delete("roleId = ?1 and tenantId = ?2", roleId, tenantId)
 }
