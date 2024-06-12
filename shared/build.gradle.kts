@@ -1,5 +1,9 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin)
 }
 
 dependencies {
@@ -11,4 +15,15 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("jakarta.persistence:jakarta.persistence-api")
     implementation("jakarta.interceptor:jakarta.interceptor-api")
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        apiVersion = KotlinVersion.KOTLIN_1_9
+        languageVersion = KotlinVersion.KOTLIN_2_0
+
+        jvmTarget = JvmTarget.JVM_21
+        // w: Scripts are not yet supported with K2 in LightTree mode, consider using K1 or disable LightTree mode with -Xuse-fir-lt=false
+        freeCompilerArgs.add("-Xuse-fir-lt=false")
+    }
 }

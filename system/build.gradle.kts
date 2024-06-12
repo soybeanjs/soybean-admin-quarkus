@@ -1,10 +1,10 @@
-import org.jetbrains.kotlin.gradle.internal.KaptWithoutKotlincTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin)
     kotlin("plugin.allopen")
-    kotlin("kapt")
     id("io.quarkus")
     id("com.google.devtools.ksp")
 }
@@ -87,8 +87,6 @@ dependencies {
 
     ksp("io.mcarle:konvert:$konvertVersion")
     ksp("io.mcarle:konvert-cdi-injector:$konvertVersion")
-
-    kapt("jakarta.persistence:jakarta.persistence-api:${jakartaPersistenceVersion}")
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
@@ -176,12 +174,19 @@ tasks.withType<JavaCompile> {
     options.compilerArgs.add("-Xlint:unchecked")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = javaVersion.toString()
-    kotlinOptions.javaParameters = true
-}
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        /**
+         * IntelliJ IDEA 2024.2 EAP (Ultimate Edition)
+         * Build #IU-242.15523.18, built on June 6, 2024
+         * Kotlin: 242.15523.18-IJ
+         * 暂时降级处理
+         */
+        apiVersion = KotlinVersion.KOTLIN_1_9
+        languageVersion = KotlinVersion.KOTLIN_2_0
 
-tasks.withType<KaptWithoutKotlincTask>()
-    .configureEach {
-        kaptProcessJvmArgs.add("-Xmx512m")
+        jvmTarget = JvmTarget.JVM_21
+        // w: Scripts are not yet supported with K2 in LightTree mode, consider using K1 or disable LightTree mode with -Xuse-fir-lt=false
+        freeCompilerArgs.add("-Xuse-fir-lt=false")
     }
+}
