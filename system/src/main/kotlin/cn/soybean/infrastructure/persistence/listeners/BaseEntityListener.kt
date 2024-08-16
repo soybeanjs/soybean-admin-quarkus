@@ -8,6 +8,7 @@ import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import java.time.LocalDateTime
 
+// TODO 按ddd方法论domain应当自包含 但是一些注解 swagger又会侵入domain 难取舍 暂时废弃
 @RegisterForReflection
 class BaseEntityListener {
 

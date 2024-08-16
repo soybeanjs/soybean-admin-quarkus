@@ -1,7 +1,7 @@
 package cn.soybean.system.application.command.route.convert
 
+import cn.soybean.domain.system.event.route.RouteCreatedOrUpdatedEventBase
 import cn.soybean.system.application.command.route.CreateRouteCommand
-import cn.soybean.system.domain.event.route.RouteCreatedOrUpdatedEventBase
 
 fun CreateRouteCommand.convert2RouteCreatedOrUpdatedEventBase(
     id: String,

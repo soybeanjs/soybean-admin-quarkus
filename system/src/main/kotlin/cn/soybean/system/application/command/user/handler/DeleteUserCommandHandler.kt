@@ -1,12 +1,12 @@
 package cn.soybean.system.application.command.user.handler
 
+import cn.soybean.domain.system.aggregate.user.UserAggregate
+import cn.soybean.domain.system.event.user.UserDeletedEventBase
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.shared.application.command.Command
 import cn.soybean.shared.application.command.CommandHandler
 import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.user.DeleteUserCommand
-import cn.soybean.system.domain.aggregate.user.UserAggregate
-import cn.soybean.system.domain.event.user.UserDeletedEventBase
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni

@@ -1,5 +1,7 @@
 package cn.soybean.system.application.query.tenant.handler
 
+import cn.soybean.domain.system.entity.SystemTenantEntity
+import cn.soybean.domain.system.repository.SystemTenantRepository
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.application.query.tenant.PageTenantQuery
 import cn.soybean.system.application.query.tenant.TenantByIdBuiltInQuery
@@ -7,12 +9,20 @@ import cn.soybean.system.application.query.tenant.TenantByIdQuery
 import cn.soybean.system.application.query.tenant.TenantByNameExistsQuery
 import cn.soybean.system.application.query.tenant.TenantByNameQuery
 import cn.soybean.system.application.query.tenant.service.TenantQueryService
-import cn.soybean.system.domain.entity.SystemTenantEntity
-import cn.soybean.system.domain.entity.toTenantResponse
-import cn.soybean.system.domain.repository.SystemTenantRepository
 import cn.soybean.system.interfaces.rest.dto.response.tenant.TenantResponse
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
+
+// TODO 临时放置
+fun SystemTenantEntity.toTenantResponse(): TenantResponse = TenantResponse(
+    name = name,
+    contactAccountName = contactAccountName,
+    status = status,
+    website = website,
+    expireTime = expireTime,
+    menuIds = menuIds,
+    operationIds = operationIds
+)
 
 @ApplicationScoped
 class TenantQueryHandler(private val systemTenantRepository: SystemTenantRepository) : TenantQueryService {

@@ -1,5 +1,9 @@
 package cn.soybean.system.application.query.route.handler
 
+import cn.soybean.domain.system.config.DbConstants
+import cn.soybean.domain.system.entity.SystemMenuEntity
+import cn.soybean.domain.system.repository.SystemMenuRepository
+import cn.soybean.domain.system.repository.SystemTenantRepository
 import cn.soybean.interfaces.rest.util.isSuperUser
 import cn.soybean.system.application.convert.convertToMenuResponse
 import cn.soybean.system.application.query.route.GetRoutesByUserIdQuery
@@ -9,15 +13,33 @@ import cn.soybean.system.application.query.route.RouteByIdBuiltInQuery
 import cn.soybean.system.application.query.route.RouteByIdQuery
 import cn.soybean.system.application.query.route.RouteByTenantIdQuery
 import cn.soybean.system.application.query.route.service.RouteQueryService
-import cn.soybean.system.domain.config.DbConstants
-import cn.soybean.system.domain.entity.SystemMenuEntity
-import cn.soybean.system.domain.entity.toMenuResponse
-import cn.soybean.system.domain.repository.SystemMenuRepository
-import cn.soybean.system.domain.repository.SystemTenantRepository
 import cn.soybean.system.interfaces.rest.dto.response.route.MenuResponse
 import cn.soybean.system.interfaces.rest.dto.response.route.MenuRoute
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
+
+// TODO 临时放置
+fun SystemMenuEntity.toMenuResponse(): MenuResponse = MenuResponse(
+    id = id,
+    menuName = menuName,
+    menuType = menuType,
+    order = order,
+    parentId = parentId,
+    icon = icon,
+    iconType = iconType,
+    routeName = routeName,
+    routePath = routePath,
+    component = component,
+    i18nKey = i18nKey,
+    multiTab = multiTab,
+    activeMenu = activeMenu,
+    hideInMenu = hideInMenu,
+    status = status,
+    roles = roles,
+    keepAlive = keepAlive,
+    constant = constant,
+    href = href
+)
 
 @ApplicationScoped
 class RouteQueryHandler(
@@ -64,7 +86,7 @@ class RouteQueryHandler(
 
     override fun handle(query: RouteByIdQuery): Uni<SystemMenuEntity> = systemMenuRepository.getById(query.id)
     override fun handle(query: RouteByIdBuiltInQuery): Uni<Boolean> =
-        systemMenuRepository.getById(query.id).map { it?.builtIn ?: true }
+        systemMenuRepository.getById(query.id).map { it?.builtIn != false }
 
     override fun handle(query: RouteByConstantQuery): Uni<List<MenuRoute>> =
         systemMenuRepository.findAllByConstant(query.constant)

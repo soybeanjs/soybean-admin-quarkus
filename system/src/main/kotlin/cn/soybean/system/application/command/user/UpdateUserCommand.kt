@@ -1,8 +1,8 @@
 package cn.soybean.system.application.command.user
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
+import cn.soybean.domain.system.event.user.UserCreatedOrUpdatedEventBase
 import cn.soybean.shared.application.command.Command
-import cn.soybean.system.domain.event.user.UserCreatedOrUpdatedEventBase
 import io.mcarle.konvert.api.KonvertTo
 import io.mcarle.konvert.api.Mapping
 

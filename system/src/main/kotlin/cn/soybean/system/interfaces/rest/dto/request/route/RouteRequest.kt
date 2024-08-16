@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.rest.dto.request.route
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.system.application.command.route.CreateRouteCommand
 import cn.soybean.system.application.command.route.UpdateRouteCommand
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups

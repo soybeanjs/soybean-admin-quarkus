@@ -3,14 +3,14 @@ package cn.soybean.system.application.service
 import cn.soybean.application.command.CommandInvoker
 import cn.soybean.application.exceptions.ErrorCode
 import cn.soybean.application.exceptions.ServiceException
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.config.DbConstants
+import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.system.application.command.route.CreateRouteCommand
 import cn.soybean.system.application.command.route.DeleteRouteCommand
 import cn.soybean.system.application.command.route.UpdateRouteCommand
 import cn.soybean.system.application.query.route.RouteByIdBuiltInQuery
 import cn.soybean.system.application.query.route.RouteByIdQuery
 import cn.soybean.system.application.query.route.service.RouteQueryService
-import cn.soybean.system.domain.config.DbConstants
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped

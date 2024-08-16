@@ -1,6 +1,8 @@
 package cn.soybean.system.application.service
 
 import cn.soybean.application.command.CommandInvoker
+import cn.soybean.domain.system.aggregate.tenant.TenantAggregate
+import cn.soybean.domain.system.config.DbConstants
 import cn.soybean.system.application.command.tenant.CreateTenantCommand
 import cn.soybean.system.application.command.tenant.DeleteTenantCommand
 import cn.soybean.system.application.command.tenant.UpdateTenantCommand
@@ -8,8 +10,6 @@ import cn.soybean.system.application.query.tenant.TenantByIdBuiltInQuery
 import cn.soybean.system.application.query.tenant.TenantByIdQuery
 import cn.soybean.system.application.query.tenant.TenantByNameExistsQuery
 import cn.soybean.system.application.query.tenant.service.TenantQueryService
-import cn.soybean.system.domain.aggregate.tenant.TenantAggregate
-import cn.soybean.system.domain.config.DbConstants
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped

@@ -1,5 +1,7 @@
 package cn.soybean.system.application.query.user.handler
 
+import cn.soybean.domain.system.entity.SystemUserEntity
+import cn.soybean.domain.system.repository.SystemUserRepository
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.application.query.user.PageUserQuery
 import cn.soybean.system.application.query.user.UserByAccountQuery
@@ -9,13 +11,26 @@ import cn.soybean.system.application.query.user.UserByIdQuery
 import cn.soybean.system.application.query.user.UserByPhoneNumberQuery
 import cn.soybean.system.application.query.user.UserByaAccountNameQuery
 import cn.soybean.system.application.query.user.service.UserQueryService
-import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.domain.entity.toUserResponse
-import cn.soybean.system.domain.repository.SystemUserRepository
 import cn.soybean.system.interfaces.rest.dto.response.user.UserResponse
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
+
+// TODO 临时放置
+fun SystemUserEntity.toUserResponse(): UserResponse = UserResponse(
+    id = id,
+    accountName = accountName,
+    nickName = nickName,
+    personalProfile = personalProfile,
+    email = email,
+    countryCode = countryCode,
+    phoneCode = phoneCode,
+    phoneNumber = phoneNumber,
+    gender = gender,
+    avatar = avatar,
+    deptId = deptId,
+    status = status
+)
 
 @ApplicationScoped
 class UserQueryHandler(private val systemUserRepository: SystemUserRepository) : UserQueryService {
@@ -43,7 +58,7 @@ class UserQueryHandler(private val systemUserRepository: SystemUserRepository) :
         systemUserRepository.getByEmail(query.email, query.tenantId)
 
     override fun handle(query: UserByIdBuiltInQuery): Uni<Boolean> =
-        systemUserRepository.getById(query.id, query.tenantId).map { it?.builtIn ?: true }
+        systemUserRepository.getById(query.id, query.tenantId).map { it?.builtIn != false }
 
     override fun handle(query: UserByAccountQuery): Uni<SystemUserEntity> =
         systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(query.accountName, query.tenantId)

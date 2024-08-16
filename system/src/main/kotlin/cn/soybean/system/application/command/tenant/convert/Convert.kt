@@ -1,7 +1,7 @@
 package cn.soybean.system.application.command.tenant.convert
 
+import cn.soybean.domain.system.event.tenant.TenantCreatedEventBase
 import cn.soybean.system.application.command.tenant.CreateTenantCommand
-import cn.soybean.system.domain.event.tenant.TenantCreatedEventBase
 
 fun CreateTenantCommand.convert2TenantCreatedOrUpdatedEventBase(
     id: String,

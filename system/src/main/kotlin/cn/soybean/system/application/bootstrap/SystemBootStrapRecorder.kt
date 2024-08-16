@@ -1,9 +1,9 @@
 package cn.soybean.system.application.bootstrap
 
 import cn.soybean.domain.event.DomainEventPublisher
+import cn.soybean.domain.system.entity.SystemApiKeyEntity
 import cn.soybean.interfaces.rest.util.Ip2RegionUtil
 import cn.soybean.system.application.event.ApiEndpointEvent
-import cn.soybean.system.domain.entity.SystemApiKeyEntity
 import cn.soybean.system.infrastructure.security.ApiKeyCache
 import cn.soybean.system.infrastructure.web.ApiEndpointDynamicFeature.Companion.apiEndpoints
 import com.github.yitter.contract.IdGeneratorOptions

@@ -1,12 +1,12 @@
 package cn.soybean.system.application.command.user.handler
 
+import cn.soybean.domain.system.aggregate.user.UserAggregate
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.shared.application.command.Command
 import cn.soybean.shared.application.command.CommandHandler
 import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.user.UpdateUserCommand
 import cn.soybean.system.application.command.user.toUserCreatedOrUpdatedEventBase
-import cn.soybean.system.domain.aggregate.user.UserAggregate
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped

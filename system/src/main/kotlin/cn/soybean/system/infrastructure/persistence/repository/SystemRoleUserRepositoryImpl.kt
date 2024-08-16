@@ -1,7 +1,7 @@
 package cn.soybean.system.infrastructure.persistence.repository
 
-import cn.soybean.system.domain.entity.SystemRoleUserEntity
-import cn.soybean.system.domain.repository.SystemRoleUserRepository
+import cn.soybean.domain.system.entity.SystemRoleUserEntity
+import cn.soybean.domain.system.repository.SystemRoleUserRepository
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped

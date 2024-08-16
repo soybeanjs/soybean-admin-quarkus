@@ -1,6 +1,6 @@
 package cn.soybean.interfaces.rest.util
 
-import cn.soybean.system.domain.config.DbConstants
+import cn.soybean.domain.system.config.DbConstants
 import io.vertx.core.http.HttpServerRequest
 
 fun getClientIPAndPort(request: HttpServerRequest): Pair<String, Int?> = Pair(

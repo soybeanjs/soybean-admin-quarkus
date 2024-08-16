@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.rest.dto.request.user
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.system.application.command.user.CreateUserCommand
 import cn.soybean.system.application.command.user.UpdateUserCommand
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups

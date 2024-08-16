@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.rest.dto.response.role
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 
 data class RoleResponse(
     var id: String? = null,

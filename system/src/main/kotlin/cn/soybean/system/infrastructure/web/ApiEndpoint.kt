@@ -1,6 +1,6 @@
 package cn.soybean.system.infrastructure.web
 
-import cn.soybean.system.domain.entity.SystemApisEntity
+import cn.soybean.domain.system.entity.SystemApisEntity
 import io.mcarle.konvert.api.KonvertTo
 import java.time.LocalDateTime
 

@@ -61,6 +61,7 @@ dependencies {
     implementation("org.redisson:redisson-quarkus-30:${redissonQuarkus30Version}")
 
     implementation(project(":shared"))
+    implementation(project(":domain"))
 
     //tips 2024-04-17 quarkus3.9.*如果需要native image 需要移除这两个依赖或者降级到2.5.8或者开启下方resolutionStrategy
     //tips 另外除非需要一些响应式类库的互转比如reactor的flux和mono等或者kt协程等一般不需要smallrye转换类库

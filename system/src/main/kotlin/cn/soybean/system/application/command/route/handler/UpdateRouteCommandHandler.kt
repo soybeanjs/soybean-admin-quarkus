@@ -1,12 +1,12 @@
 package cn.soybean.system.application.command.route.handler
 
+import cn.soybean.domain.system.aggregate.route.RouteAggregate
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.shared.application.command.Command
 import cn.soybean.shared.application.command.CommandHandler
 import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.route.UpdateRouteCommand
 import cn.soybean.system.application.command.route.toRouteCreatedOrUpdatedEventBase
-import cn.soybean.system.domain.aggregate.route.RouteAggregate
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped

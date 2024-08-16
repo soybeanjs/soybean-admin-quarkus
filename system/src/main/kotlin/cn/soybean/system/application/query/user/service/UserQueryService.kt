@@ -1,5 +1,6 @@
 package cn.soybean.system.application.query.user.service
 
+import cn.soybean.domain.system.entity.SystemUserEntity
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.application.query.user.PageUserQuery
 import cn.soybean.system.application.query.user.UserByAccountQuery
@@ -8,7 +9,6 @@ import cn.soybean.system.application.query.user.UserByIdBuiltInQuery
 import cn.soybean.system.application.query.user.UserByIdQuery
 import cn.soybean.system.application.query.user.UserByPhoneNumberQuery
 import cn.soybean.system.application.query.user.UserByaAccountNameQuery
-import cn.soybean.system.domain.entity.SystemUserEntity
 import cn.soybean.system.interfaces.rest.dto.response.user.UserResponse
 import io.smallrye.mutiny.Uni
 

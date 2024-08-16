@@ -1,8 +1,8 @@
 package cn.soybean.system.projection.tenant
 
+import cn.soybean.domain.system.event.tenant.TenantDeletedEventBase
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import cn.soybean.shared.projection.Projection
-import cn.soybean.system.domain.event.tenant.TenantDeletedEventBase
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped

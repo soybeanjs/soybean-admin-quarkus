@@ -1,12 +1,12 @@
 package cn.soybean.system.application.command.user.handler
 
+import cn.soybean.domain.system.aggregate.user.UserAggregate
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.shared.application.command.Command
 import cn.soybean.shared.application.command.CommandHandler
 import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.user.CreateUserCommand
 import cn.soybean.system.application.command.user.convert.convert2UserCreatedOrUpdatedEventBase
-import cn.soybean.system.domain.aggregate.user.UserAggregate
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Uni

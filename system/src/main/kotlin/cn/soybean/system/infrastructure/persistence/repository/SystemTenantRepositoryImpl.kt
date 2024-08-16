@@ -1,7 +1,7 @@
 package cn.soybean.system.infrastructure.persistence.repository
 
-import cn.soybean.system.domain.entity.SystemTenantEntity
-import cn.soybean.system.domain.repository.SystemTenantRepository
+import cn.soybean.domain.system.entity.SystemTenantEntity
+import cn.soybean.domain.system.repository.SystemTenantRepository
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheQuery
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.quarkus.panache.common.Parameters
@@ -24,4 +24,4 @@ class SystemTenantRepositoryImpl : SystemTenantRepository, PanacheRepositoryBase
 
     override fun getById(id: String): Uni<SystemTenantEntity> = findById(id)
     override fun saveOrUpdate(entity: SystemTenantEntity): Uni<SystemTenantEntity> = persist(entity)
-} 
+}

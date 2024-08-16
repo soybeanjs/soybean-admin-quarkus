@@ -2,6 +2,13 @@ package cn.soybean.system.application.service
 
 import cn.soybean.application.exceptions.ErrorCode
 import cn.soybean.application.exceptions.ServiceException
+import cn.soybean.domain.system.config.DbConstants
+import cn.soybean.domain.system.config.DbConstants.SUPER_TENANT_ROLE_CODE
+import cn.soybean.domain.system.entity.SystemApisEntity
+import cn.soybean.domain.system.entity.SystemRoleApiEntity
+import cn.soybean.domain.system.entity.SystemRoleMenuEntity
+import cn.soybean.domain.system.repository.SystemRoleApiRepository
+import cn.soybean.domain.system.repository.SystemRoleMenuRepository
 import cn.soybean.interfaces.rest.util.isSuperUser
 import cn.soybean.system.application.command.permission.AuthorizeRoleMenuCommand
 import cn.soybean.system.application.command.permission.AuthorizeRoleOperationCommand
@@ -12,13 +19,6 @@ import cn.soybean.system.application.query.route.RouteByTenantIdQuery
 import cn.soybean.system.application.query.route.service.RouteQueryService
 import cn.soybean.system.application.query.user.UserByIdQuery
 import cn.soybean.system.application.query.user.service.UserQueryService
-import cn.soybean.system.domain.config.DbConstants
-import cn.soybean.system.domain.config.DbConstants.SUPER_TENANT_ROLE_CODE
-import cn.soybean.system.domain.entity.SystemApisEntity
-import cn.soybean.system.domain.entity.SystemRoleApiEntity
-import cn.soybean.system.domain.entity.SystemRoleMenuEntity
-import cn.soybean.system.domain.repository.SystemRoleApiRepository
-import cn.soybean.system.domain.repository.SystemRoleMenuRepository
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 

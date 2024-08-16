@@ -1,7 +1,7 @@
 package cn.soybean.system.application.command.role.convert
 
+import cn.soybean.domain.system.event.role.RoleCreatedOrUpdatedEventBase
 import cn.soybean.system.application.command.role.CreateRoleCommand
-import cn.soybean.system.domain.event.role.RoleCreatedOrUpdatedEventBase
 
 fun CreateRoleCommand.convert2RoleCreatedOrUpdatedEventBase(
     id: String,

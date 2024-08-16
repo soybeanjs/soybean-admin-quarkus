@@ -1,8 +1,8 @@
 package cn.soybean.system.application.command.tenant
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
+import cn.soybean.domain.system.event.tenant.TenantUpdatedEventBase
 import cn.soybean.shared.application.command.Command
-import cn.soybean.system.domain.event.tenant.TenantUpdatedEventBase
 import io.mcarle.konvert.api.KonvertTo
 import io.mcarle.konvert.api.Mapping
 import java.time.LocalDateTime

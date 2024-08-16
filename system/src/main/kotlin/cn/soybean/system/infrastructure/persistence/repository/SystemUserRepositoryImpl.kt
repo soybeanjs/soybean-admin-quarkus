@@ -1,7 +1,7 @@
 package cn.soybean.system.infrastructure.persistence.repository
 
-import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.domain.repository.SystemUserRepository
+import cn.soybean.domain.system.entity.SystemUserEntity
+import cn.soybean.domain.system.repository.SystemUserRepository
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheQuery
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.quarkus.panache.common.Parameters

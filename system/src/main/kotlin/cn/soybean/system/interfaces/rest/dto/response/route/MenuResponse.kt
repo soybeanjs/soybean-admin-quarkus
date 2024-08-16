@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.rest.dto.response.route
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 
 data class MenuResponse(
     var id: String? = null,

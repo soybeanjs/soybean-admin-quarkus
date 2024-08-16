@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.rest.dto.query.tenant
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.interfaces.rest.dto.request.BasePageParam
 import jakarta.ws.rs.QueryParam
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter

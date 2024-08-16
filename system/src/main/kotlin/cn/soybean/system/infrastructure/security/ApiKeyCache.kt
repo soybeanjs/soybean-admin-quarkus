@@ -1,6 +1,6 @@
 package cn.soybean.system.infrastructure.security
 
-import cn.soybean.system.domain.entity.SystemApiKeyEntity
+import cn.soybean.domain.system.entity.SystemApiKeyEntity
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import jakarta.enterprise.context.ApplicationScoped

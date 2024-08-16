@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.rest.dto.response.tenant
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 import java.time.LocalDateTime
 
 data class TenantResponse(

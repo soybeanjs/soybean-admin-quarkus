@@ -1,9 +1,9 @@
 package cn.soybean.system.interfaces.rest
 
+import cn.soybean.domain.system.entity.SystemApisEntity
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.response.ResponseEntity
-import cn.soybean.system.domain.entity.SystemApisEntity
 import io.quarkus.hibernate.reactive.panache.common.WithSession
 import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni

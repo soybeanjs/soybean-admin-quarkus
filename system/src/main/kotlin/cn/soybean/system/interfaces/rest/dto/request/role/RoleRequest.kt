@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.rest.dto.request.role
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.system.application.command.role.CreateRoleCommand
 import cn.soybean.system.application.command.role.UpdateRoleCommand
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups

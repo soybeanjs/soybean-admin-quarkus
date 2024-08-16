@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.rest.dto.response.user
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 
 data class UserResponse(
     var id: String? = null,

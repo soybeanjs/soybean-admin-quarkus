@@ -2,6 +2,8 @@ package cn.soybean.system.application.query.role.handler
 
 import cn.soybean.application.exceptions.ErrorCode
 import cn.soybean.application.exceptions.ServiceException
+import cn.soybean.domain.system.entity.SystemRoleEntity
+import cn.soybean.domain.system.repository.SystemRoleRepository
 import cn.soybean.interfaces.rest.dto.response.PageResult
 import cn.soybean.system.application.query.role.PageRoleQuery
 import cn.soybean.system.application.query.role.RoleByIdBuiltInQuery
@@ -9,13 +11,23 @@ import cn.soybean.system.application.query.role.RoleByIdQuery
 import cn.soybean.system.application.query.role.RoleCodeByUserIdQuery
 import cn.soybean.system.application.query.role.RoleExistsQuery
 import cn.soybean.system.application.query.role.service.RoleQueryService
-import cn.soybean.system.domain.entity.SystemRoleEntity
-import cn.soybean.system.domain.entity.toRoleResponse
-import cn.soybean.system.domain.repository.SystemRoleRepository
 import cn.soybean.system.interfaces.rest.dto.response.role.RoleResponse
 import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
+
+// TODO 临时放置
+fun SystemRoleEntity.toRoleResponse(): RoleResponse = RoleResponse(
+    id = this.id,
+    name = this.name,
+    code = this.code,
+    order = this.order,
+    status = this.status,
+    builtIn = this.builtIn,
+    dataScope = this.dataScope,
+    dataScopeDeptIds = this.dataScopeDeptIds,
+    remark = this.remark
+)
 
 @ApplicationScoped
 class RoleQueryHandler(private val systemRoleRepository: SystemRoleRepository) : RoleQueryService {
@@ -34,7 +46,7 @@ class RoleQueryHandler(private val systemRoleRepository: SystemRoleRepository) :
         systemRoleRepository.existsByCode(query.code, query.tenantId)
 
     override fun handle(query: RoleByIdBuiltInQuery): Uni<Boolean> =
-        systemRoleRepository.getById(query.id, query.tenantId).map { it?.builtIn ?: true }
+        systemRoleRepository.getById(query.id, query.tenantId).map { it?.builtIn != false }
 
     override fun handle(query: RoleByIdQuery): Uni<SystemRoleEntity> =
         systemRoleRepository.getById(query.id, query.tenantId).onItem().transformToUni { role ->

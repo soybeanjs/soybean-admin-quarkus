@@ -1,16 +1,16 @@
 package cn.soybean.system.projection.tenant
 
+import cn.soybean.domain.system.config.DbConstants.SUPER_TENANT_ROLE_CODE
+import cn.soybean.domain.system.entity.SystemRoleApiEntity
+import cn.soybean.domain.system.entity.SystemRoleMenuEntity
+import cn.soybean.domain.system.event.tenant.TenantUpdatedEventBase
+import cn.soybean.domain.system.repository.SystemRoleApiRepository
+import cn.soybean.domain.system.repository.SystemRoleMenuRepository
+import cn.soybean.domain.system.repository.SystemRoleRepository
+import cn.soybean.domain.system.repository.SystemTenantRepository
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import cn.soybean.shared.projection.Projection
 import cn.soybean.shared.util.SerializerUtils
-import cn.soybean.system.domain.config.DbConstants.SUPER_TENANT_ROLE_CODE
-import cn.soybean.system.domain.entity.SystemRoleApiEntity
-import cn.soybean.system.domain.entity.SystemRoleMenuEntity
-import cn.soybean.system.domain.event.tenant.TenantUpdatedEventBase
-import cn.soybean.system.domain.repository.SystemRoleApiRepository
-import cn.soybean.system.domain.repository.SystemRoleMenuRepository
-import cn.soybean.system.domain.repository.SystemRoleRepository
-import cn.soybean.system.domain.repository.SystemTenantRepository
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.replaceWithUnit
@@ -43,14 +43,16 @@ class TenantUpdatedProjection(
                 tenantRepository.saveOrUpdate(tenant)
             }
             .flatMap { tenant ->
+                val menuIds = event.menuIds
                 when {
-                    event.menuIds.isNullOrEmpty() -> Uni.createFrom().item(tenant)
-                    else -> processMenuUpdate(tenant.id, event.menuIds).replaceWith(tenant)
+                    menuIds.isNullOrEmpty() -> Uni.createFrom().item(tenant)
+                    else -> processMenuUpdate(tenant.id, menuIds).replaceWith(tenant)
                 }
             }.flatMap { tenant ->
+                val operationIds = event.operationIds
                 when {
-                    event.operationIds.isNullOrEmpty() -> Uni.createFrom().nullItem()
-                    else -> processOperationUpdate(tenant.id, event.operationIds)
+                    operationIds.isNullOrEmpty() -> Uni.createFrom().nullItem()
+                    else -> processOperationUpdate(tenant.id, operationIds)
                 }
             }.replaceWithUnit()
     }

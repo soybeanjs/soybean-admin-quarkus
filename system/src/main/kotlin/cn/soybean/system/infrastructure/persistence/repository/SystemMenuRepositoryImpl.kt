@@ -1,8 +1,8 @@
 package cn.soybean.system.infrastructure.persistence.repository
 
-import cn.soybean.domain.enums.DbEnums
-import cn.soybean.system.domain.entity.SystemMenuEntity
-import cn.soybean.system.domain.repository.SystemMenuRepository
+import cn.soybean.domain.system.entity.SystemMenuEntity
+import cn.soybean.domain.system.enums.DbEnums
+import cn.soybean.domain.system.repository.SystemMenuRepository
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped

@@ -1,12 +1,12 @@
 package cn.soybean.system.application.query.route.service
 
+import cn.soybean.domain.system.entity.SystemMenuEntity
 import cn.soybean.system.application.query.route.GetRoutesByUserIdQuery
 import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdQuery
 import cn.soybean.system.application.query.route.RouteByConstantQuery
 import cn.soybean.system.application.query.route.RouteByIdBuiltInQuery
 import cn.soybean.system.application.query.route.RouteByIdQuery
 import cn.soybean.system.application.query.route.RouteByTenantIdQuery
-import cn.soybean.system.domain.entity.SystemMenuEntity
 import cn.soybean.system.interfaces.rest.dto.response.route.MenuResponse
 import cn.soybean.system.interfaces.rest.dto.response.route.MenuRoute
 import io.smallrye.mutiny.Uni

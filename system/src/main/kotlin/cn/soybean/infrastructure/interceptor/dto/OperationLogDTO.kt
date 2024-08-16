@@ -1,6 +1,6 @@
 package cn.soybean.infrastructure.interceptor.dto
 
-import cn.soybean.system.domain.entity.SystemOperationLogEntity
+import cn.soybean.domain.system.entity.SystemOperationLogEntity
 import java.time.LocalDateTime
 
 data class OperationLogDTO(

@@ -1,6 +1,6 @@
 package cn.soybean.system.application.command.tenant
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.shared.application.command.Command
 import java.time.LocalDateTime
 

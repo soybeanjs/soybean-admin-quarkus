@@ -1,6 +1,6 @@
 package cn.soybean.system.application.command.user
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.shared.application.command.Command
 
 data class CreateUserCommand(

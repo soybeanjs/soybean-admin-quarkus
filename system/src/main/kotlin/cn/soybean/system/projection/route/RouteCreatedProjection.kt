@@ -1,11 +1,11 @@
 package cn.soybean.system.projection.route
 
+import cn.soybean.domain.system.entity.SystemMenuEntity
+import cn.soybean.domain.system.event.route.RouteCreatedOrUpdatedEventBase
+import cn.soybean.domain.system.repository.SystemMenuRepository
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import cn.soybean.shared.projection.Projection
 import cn.soybean.shared.util.SerializerUtils
-import cn.soybean.system.domain.entity.SystemMenuEntity
-import cn.soybean.system.domain.event.route.RouteCreatedOrUpdatedEventBase
-import cn.soybean.system.domain.repository.SystemMenuRepository
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.replaceWithUnit

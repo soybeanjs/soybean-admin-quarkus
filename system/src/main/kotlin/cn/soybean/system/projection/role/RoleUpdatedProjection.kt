@@ -1,10 +1,10 @@
 package cn.soybean.system.projection.role
 
+import cn.soybean.domain.system.event.role.RoleCreatedOrUpdatedEventBase
+import cn.soybean.domain.system.repository.SystemRoleRepository
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import cn.soybean.shared.projection.Projection
 import cn.soybean.shared.util.SerializerUtils
-import cn.soybean.system.domain.event.role.RoleCreatedOrUpdatedEventBase
-import cn.soybean.system.domain.repository.SystemRoleRepository
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.replaceWithUnit

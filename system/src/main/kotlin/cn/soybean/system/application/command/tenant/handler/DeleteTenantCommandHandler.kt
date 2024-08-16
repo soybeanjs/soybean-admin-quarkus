@@ -1,12 +1,12 @@
 package cn.soybean.system.application.command.tenant.handler
 
+import cn.soybean.domain.system.aggregate.tenant.TenantAggregate
+import cn.soybean.domain.system.event.tenant.TenantDeletedEventBase
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.shared.application.command.Command
 import cn.soybean.shared.application.command.CommandHandler
 import cn.soybean.shared.eventsourcing.EventStoreDB
 import cn.soybean.system.application.command.tenant.DeleteTenantCommand
-import cn.soybean.system.domain.aggregate.tenant.TenantAggregate
-import cn.soybean.system.domain.event.tenant.TenantDeletedEventBase
 import io.quarkus.logging.Log
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni

@@ -1,11 +1,11 @@
 package cn.soybean.system.projection.user
 
+import cn.soybean.domain.system.entity.SystemUserEntity
+import cn.soybean.domain.system.event.user.UserCreatedOrUpdatedEventBase
+import cn.soybean.domain.system.repository.SystemUserRepository
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import cn.soybean.shared.projection.Projection
 import cn.soybean.shared.util.SerializerUtils
-import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.domain.event.user.UserCreatedOrUpdatedEventBase
-import cn.soybean.system.domain.repository.SystemUserRepository
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.replaceWithUnit

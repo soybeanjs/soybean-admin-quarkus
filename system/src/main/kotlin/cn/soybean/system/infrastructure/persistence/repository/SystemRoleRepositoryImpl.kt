@@ -1,7 +1,7 @@
 package cn.soybean.system.infrastructure.persistence.repository
 
-import cn.soybean.system.domain.entity.SystemRoleEntity
-import cn.soybean.system.domain.repository.SystemRoleRepository
+import cn.soybean.domain.system.entity.SystemRoleEntity
+import cn.soybean.domain.system.repository.SystemRoleRepository
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheQuery
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.quarkus.panache.common.Parameters

@@ -1,7 +1,7 @@
 package cn.soybean.system.infrastructure.persistence.repository
 
-import cn.soybean.system.domain.entity.SystemRoleMenuEntity
-import cn.soybean.system.domain.repository.SystemRoleMenuRepository
+import cn.soybean.domain.system.entity.SystemRoleMenuEntity
+import cn.soybean.domain.system.repository.SystemRoleMenuRepository
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.replaceWithUnit

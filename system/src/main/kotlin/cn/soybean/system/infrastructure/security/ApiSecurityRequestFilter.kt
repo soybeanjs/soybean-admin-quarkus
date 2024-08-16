@@ -1,6 +1,6 @@
 package cn.soybean.system.infrastructure.security
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.shared.infrastructure.annotations.ApiKeyRequest

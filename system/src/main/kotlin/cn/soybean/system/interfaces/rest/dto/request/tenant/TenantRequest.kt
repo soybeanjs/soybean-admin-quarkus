@@ -1,6 +1,6 @@
 package cn.soybean.system.interfaces.rest.dto.request.tenant
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.system.application.command.tenant.CreateTenantCommand
 import cn.soybean.system.application.command.tenant.UpdateTenantCommand
 import cn.soybean.system.interfaces.rest.dto.request.ValidationGroups

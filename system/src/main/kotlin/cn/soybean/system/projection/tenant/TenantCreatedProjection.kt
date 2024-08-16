@@ -1,25 +1,25 @@
 package cn.soybean.system.projection.tenant
 
-import cn.soybean.domain.enums.DbEnums
+import cn.soybean.domain.system.aggregate.user.bcryptHashPassword
+import cn.soybean.domain.system.config.DbConstants
+import cn.soybean.domain.system.entity.SystemRoleApiEntity
+import cn.soybean.domain.system.entity.SystemRoleEntity
+import cn.soybean.domain.system.entity.SystemRoleMenuEntity
+import cn.soybean.domain.system.entity.SystemRoleUserEntity
+import cn.soybean.domain.system.entity.SystemTenantEntity
+import cn.soybean.domain.system.entity.SystemUserEntity
+import cn.soybean.domain.system.enums.DbEnums
+import cn.soybean.domain.system.event.tenant.TenantCreatedEventBase
+import cn.soybean.domain.system.repository.SystemRoleApiRepository
+import cn.soybean.domain.system.repository.SystemRoleMenuRepository
+import cn.soybean.domain.system.repository.SystemRoleRepository
+import cn.soybean.domain.system.repository.SystemRoleUserRepository
+import cn.soybean.domain.system.repository.SystemTenantRepository
+import cn.soybean.domain.system.repository.SystemUserRepository
+import cn.soybean.domain.system.vo.TenantContactPassword
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
 import cn.soybean.shared.projection.Projection
 import cn.soybean.shared.util.SerializerUtils
-import cn.soybean.system.domain.aggregate.user.bcryptHashPassword
-import cn.soybean.system.domain.config.DbConstants
-import cn.soybean.system.domain.entity.SystemRoleApiEntity
-import cn.soybean.system.domain.entity.SystemRoleEntity
-import cn.soybean.system.domain.entity.SystemRoleMenuEntity
-import cn.soybean.system.domain.entity.SystemRoleUserEntity
-import cn.soybean.system.domain.entity.SystemTenantEntity
-import cn.soybean.system.domain.entity.SystemUserEntity
-import cn.soybean.system.domain.event.tenant.TenantCreatedEventBase
-import cn.soybean.system.domain.repository.SystemRoleApiRepository
-import cn.soybean.system.domain.repository.SystemRoleMenuRepository
-import cn.soybean.system.domain.repository.SystemRoleRepository
-import cn.soybean.system.domain.repository.SystemRoleUserRepository
-import cn.soybean.system.domain.repository.SystemTenantRepository
-import cn.soybean.system.domain.repository.SystemUserRepository
-import cn.soybean.system.domain.vo.TenantContactPassword
 import com.github.yitter.idgen.YitIdHelper
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.smallrye.mutiny.Uni
@@ -105,24 +105,26 @@ class TenantCreatedProjection(
             }
         }
         .flatMap { role ->
+            val menuIds = event.menuIds
             when {
-                event.menuIds.isNullOrEmpty() -> Uni.createFrom().item(role)
+                menuIds.isNullOrEmpty() -> Uni.createFrom().item(role)
 
                 else -> {
                     val roleMenus =
-                        event.menuIds.map { menuId -> SystemRoleMenuEntity(role.id, menuId, event.aggregateId) }
+                        menuIds.map { menuId -> SystemRoleMenuEntity(role.id, menuId, event.aggregateId) }
 
                     roleMenuRepository.saveOrUpdateAll(roleMenus).replaceWith(role)
                 }
             }
         }
         .flatMap { role ->
+            val operationIds = event.operationIds
             when {
-                event.operationIds.isNullOrEmpty() -> Uni.createFrom().nullItem()
+                operationIds.isNullOrEmpty() -> Uni.createFrom().nullItem()
 
                 else -> {
                     val roleOperations =
-                        event.operationIds.map { operationId ->
+                        operationIds.map { operationId ->
                             SystemRoleApiEntity(
                                 role.id,
                                 operationId,
