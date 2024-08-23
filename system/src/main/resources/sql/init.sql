@@ -59,7 +59,6 @@ VALUES ('54', 'built-in', '-1', '2024-01-01 00:00:00.000000', null, null, null, 
         null, 'route.manage', 'carbon:cloud-service-management', '1', false, 'manage', 0, false, 1, '0', null, 'manage',
         '/manage', 0)
 ON CONFLICT (id) DO NOTHING;
-ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_menu (id, create_account_name, create_by, create_time, update_account_name, update_by,
                       update_time, active_menu, built_in, component, constant, hide_in_menu, href, i18n_key,
                       icon,
