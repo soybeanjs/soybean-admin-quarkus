@@ -11,3 +11,4 @@ data class UserByPhoneNumberQuery(val phoneNumber: String, val tenantId: String)
 data class UserByEmailQuery(val email: String, val tenantId: String) : Query
 data class UserByIdBuiltInQuery(val id: String, val tenantId: String) : Query
 data class UserByAccountQuery(val accountName: String, val tenantId: String) : Query
+data class UserByTenantIdQuery(val tenantId: String) : Query

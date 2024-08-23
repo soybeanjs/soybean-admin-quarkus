@@ -9,6 +9,7 @@ import cn.soybean.system.application.query.user.UserByEmailQuery
 import cn.soybean.system.application.query.user.UserByIdBuiltInQuery
 import cn.soybean.system.application.query.user.UserByIdQuery
 import cn.soybean.system.application.query.user.UserByPhoneNumberQuery
+import cn.soybean.system.application.query.user.UserByTenantIdQuery
 import cn.soybean.system.application.query.user.UserByaAccountNameQuery
 import cn.soybean.system.application.query.user.service.UserQueryService
 import cn.soybean.system.interfaces.rest.dto.response.user.UserResponse
@@ -62,4 +63,8 @@ class UserQueryHandler(private val systemUserRepository: SystemUserRepository) :
 
     override fun handle(query: UserByAccountQuery): Uni<SystemUserEntity> =
         systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(query.accountName, query.tenantId)
+
+    override fun handle(query: UserByTenantIdQuery): Uni<Set<String>> =
+        systemUserRepository.findByTenantId(query.tenantId)
+            .map { users -> users.map { it.id }.toSet() }
 }

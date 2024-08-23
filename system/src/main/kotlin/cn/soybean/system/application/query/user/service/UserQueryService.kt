@@ -8,6 +8,7 @@ import cn.soybean.system.application.query.user.UserByEmailQuery
 import cn.soybean.system.application.query.user.UserByIdBuiltInQuery
 import cn.soybean.system.application.query.user.UserByIdQuery
 import cn.soybean.system.application.query.user.UserByPhoneNumberQuery
+import cn.soybean.system.application.query.user.UserByTenantIdQuery
 import cn.soybean.system.application.query.user.UserByaAccountNameQuery
 import cn.soybean.system.interfaces.rest.dto.response.user.UserResponse
 import io.smallrye.mutiny.Uni
@@ -20,4 +21,5 @@ interface UserQueryService {
     fun handle(query: UserByEmailQuery): Uni<SystemUserEntity?>
     fun handle(query: UserByIdBuiltInQuery): Uni<Boolean>
     fun handle(query: UserByAccountQuery): Uni<SystemUserEntity>
+    fun handle(query: UserByTenantIdQuery): Uni<Set<String>>
 }

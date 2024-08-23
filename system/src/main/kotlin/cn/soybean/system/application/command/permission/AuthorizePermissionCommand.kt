@@ -7,9 +7,9 @@ data class AuthorizeRoleMenuCommand(
     val menuIds: Set<String>
 ) : Command
 
-data class AuthorizeUserRoleCommand(
-    val userId: String,
-    val roleIds: Set<String>
+data class AuthorizeRoleUserCommand(
+    val roleId: String,
+    val userIds: Set<String>
 ) : Command
 
 data class AuthorizeRoleOperationCommand(

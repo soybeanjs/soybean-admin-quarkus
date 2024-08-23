@@ -18,6 +18,9 @@ class SystemUserRepositoryImpl : SystemUserRepository, PanacheRepositoryBase<Sys
             accountName
         ).singleResult()
 
+    override fun findByTenantId(tenantId: String): Uni<List<SystemUserEntity>> =
+        find("tenantId", tenantId).list()
+
     override fun getUserList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemUserEntity> =
         find(query, sort, params)
 

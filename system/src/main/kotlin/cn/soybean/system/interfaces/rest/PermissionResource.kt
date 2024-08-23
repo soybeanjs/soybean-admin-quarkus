@@ -9,7 +9,7 @@ import cn.soybean.system.interfaces.rest.dto.request.permission.AuthorizeRoleOpe
 import cn.soybean.system.interfaces.rest.dto.request.permission.AuthorizeUserRoleRequest
 import cn.soybean.system.interfaces.rest.dto.request.permission.toAuthorizeRoleMenuCommand
 import cn.soybean.system.interfaces.rest.dto.request.permission.toAuthorizeRoleOperationCommand
-import cn.soybean.system.interfaces.rest.dto.request.permission.toAuthorizeUserRoleCommand
+import cn.soybean.system.interfaces.rest.dto.request.permission.toAuthorizeRoleUserCommand
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction
 import io.quarkus.security.PermissionsAllowed
 import io.smallrye.mutiny.Uni
@@ -49,7 +49,7 @@ class PermissionResource(private val permissionService: PermissionService, priva
     @WithTransaction
     @Operation(summary = "用户授权角色", description = "用户授权角色资源")
     fun authorizeUserRoles(@Valid @NotNull req: AuthorizeUserRoleRequest): Uni<ResponseEntity<Boolean>> =
-        permissionService.authorizeUserRoles(req.toAuthorizeUserRoleCommand(), loginHelper.getTenantId())
+        permissionService.authorizeUserRoles(req.toAuthorizeRoleUserCommand(), loginHelper.getTenantId())
             .map { (isSuccess, message) ->
                 when {
                     isSuccess -> ResponseEntity.ok(true)

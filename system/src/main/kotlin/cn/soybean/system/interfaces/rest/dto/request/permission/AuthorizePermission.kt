@@ -2,7 +2,7 @@ package cn.soybean.system.interfaces.rest.dto.request.permission
 
 import cn.soybean.system.application.command.permission.AuthorizeRoleMenuCommand
 import cn.soybean.system.application.command.permission.AuthorizeRoleOperationCommand
-import cn.soybean.system.application.command.permission.AuthorizeUserRoleCommand
+import cn.soybean.system.application.command.permission.AuthorizeRoleUserCommand
 import io.mcarle.konvert.api.Konfig
 import io.mcarle.konvert.api.KonvertTo
 import jakarta.validation.constraints.NotBlank
@@ -24,17 +24,17 @@ data class AuthorizeRoleMenuRequest(
 )
 
 @KonvertTo(
-    AuthorizeUserRoleCommand::class, options = [
+    AuthorizeRoleUserCommand::class, options = [
         Konfig(key = "konvert.enforce-not-null", value = "true")
     ]
 )
 data class AuthorizeUserRoleRequest(
     @field:NotBlank
-    var userId: String? = null,
+    var roleId: String? = null,
 
     @field:NotNull
     @field:NotEmpty
-    var roleIds: Set<String>? = null
+    var userIds: Set<String>? = null
 )
 
 @KonvertTo(

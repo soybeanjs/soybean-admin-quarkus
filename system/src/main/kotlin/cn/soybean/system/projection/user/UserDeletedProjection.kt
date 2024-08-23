@@ -22,7 +22,7 @@ class UserDeletedProjection(
         val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, UserDeletedEventBase::class.java)
         return event.tenantId?.let { tenantId ->
             userRepository.delById(event.aggregateId, tenantId)
-                .flatMap { roleUserRepository.delByRoleId(event.aggregateId, tenantId) }
+                .flatMap { roleUserRepository.delByUserId(event.aggregateId, tenantId) }
                 .replaceWithUnit()
         } ?: Uni.createFrom().item(Unit)
     }

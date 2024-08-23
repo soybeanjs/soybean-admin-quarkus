@@ -7,17 +7,20 @@ import cn.soybean.domain.system.config.DbConstants.SUPER_TENANT_ROLE_CODE
 import cn.soybean.domain.system.entity.SystemApisEntity
 import cn.soybean.domain.system.entity.SystemRoleApiEntity
 import cn.soybean.domain.system.entity.SystemRoleMenuEntity
+import cn.soybean.domain.system.entity.SystemRoleUserEntity
 import cn.soybean.domain.system.repository.SystemRoleApiRepository
 import cn.soybean.domain.system.repository.SystemRoleMenuRepository
+import cn.soybean.domain.system.repository.SystemRoleUserRepository
 import cn.soybean.interfaces.rest.util.isSuperUser
 import cn.soybean.system.application.command.permission.AuthorizeRoleMenuCommand
 import cn.soybean.system.application.command.permission.AuthorizeRoleOperationCommand
-import cn.soybean.system.application.command.permission.AuthorizeUserRoleCommand
+import cn.soybean.system.application.command.permission.AuthorizeRoleUserCommand
 import cn.soybean.system.application.query.role.RoleByIdQuery
 import cn.soybean.system.application.query.role.service.RoleQueryService
 import cn.soybean.system.application.query.route.RouteByTenantIdQuery
 import cn.soybean.system.application.query.route.service.RouteQueryService
 import cn.soybean.system.application.query.user.UserByIdQuery
+import cn.soybean.system.application.query.user.UserByTenantIdQuery
 import cn.soybean.system.application.query.user.service.UserQueryService
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
@@ -29,6 +32,7 @@ class PermissionService(
     private val routeQueryService: RouteQueryService,
     private val roleMenuRepository: SystemRoleMenuRepository,
     private val roleApiRepository: SystemRoleApiRepository,
+    private val roleUserRepository: SystemRoleUserRepository,
 ) {
 
     fun authorizeRoleMenus(command: AuthorizeRoleMenuCommand, tenantId: String): Uni<Pair<Boolean, String>> =
@@ -67,15 +71,47 @@ class PermissionService(
             .onFailure().recoverWithItem { _ -> Pair(false, "Failed to assign menus to role.") }
     }
 
-    fun authorizeUserRoles(command: AuthorizeUserRoleCommand, tenantId: String): Uni<Pair<Boolean, String>> {
-        TODO()
+    private fun addNewRoleUsers(
+        roleId: String,
+        userIds: Set<String>,
+        tenantId: String
+    ): Uni<Pair<Boolean, String>> {
+        val roleUsers = userIds.map { userId ->
+            SystemRoleUserEntity(roleId = roleId, userId = userId, tenantId = tenantId)
+        }
+        return roleUserRepository.saveOrUpdateAll(roleUsers)
+            .map { Pair(true, "User IDs successfully assigned to role.") }
+            .onFailure().recoverWithItem { _ -> Pair(false, "Failed to assign users to role.") }
     }
+
+    fun authorizeUserRoles(command: AuthorizeRoleUserCommand, tenantId: String): Uni<Pair<Boolean, String>> =
+        checkRole(command.roleId, tenantId).flatMap { (flag, msg) ->
+            when {
+                flag -> processAuthorizeRoleUsers(command.roleId, command.userIds, tenantId)
+                else -> Uni.createFrom().item(Pair(false, msg))
+            }
+        }
 
     fun authorizeRoleOperations(command: AuthorizeRoleOperationCommand, tenantId: String): Uni<Pair<Boolean, String>> =
         checkRole(command.roleId, tenantId).flatMap { (flag, msg) ->
             when {
                 flag -> processAuthorizeRoleOperations(command.roleId, command.operationIds, tenantId)
                 else -> Uni.createFrom().item(Pair(false, msg))
+            }
+        }
+
+    private fun processAuthorizeRoleUsers(
+        roleId: String,
+        userIds: Set<String>,
+        tenantId: String
+    ): Uni<Pair<Boolean, String>> =
+        userQueryService.handle(UserByTenantIdQuery(tenantId)).flatMap { availableUserIds ->
+            val validUserIds = userIds.intersect(availableUserIds)
+            if (validUserIds.isEmpty()) {
+                Uni.createFrom().item(Pair(false, "No valid user IDs to assign."))
+            } else {
+                roleUserRepository.delByRoleId(roleId, tenantId)
+                    .flatMap { addNewRoleUsers(roleId, validUserIds, tenantId) }
             }
         }
 

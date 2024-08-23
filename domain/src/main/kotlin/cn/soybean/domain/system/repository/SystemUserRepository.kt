@@ -15,4 +15,5 @@ interface SystemUserRepository {
     fun getByEmail(email: String, tenantId: String): Uni<SystemUserEntity?>
     fun saveOrUpdate(entity: SystemUserEntity): Uni<SystemUserEntity>
     fun delById(id: String, tenantId: String): Uni<Long>
+    fun findByTenantId(tenantId: String): Uni<List<SystemUserEntity>>
 }
