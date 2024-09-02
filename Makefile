@@ -5,6 +5,9 @@ IMAGE_TAG = $(DATE)-1.0.0-SNAPSHOT
 clean:
 	./gradlew clean
 
+dev-run: clean
+	./gradlew :system:quarkusDev
+
 build: clean
 	./gradlew build
 

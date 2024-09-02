@@ -2,8 +2,8 @@
 # libraries
 
 # plugins
-kotlin = "2.0.0"
-gradleIntelliJPlugin = "1.17.3"
+kotlin = "2.0.20"
+gradleIntelliJPlugin = "1.17.4"
 
 [libraries]
 
