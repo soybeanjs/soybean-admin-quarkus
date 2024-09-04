@@ -1,5 +1,6 @@
 package cn.soybean.system.interfaces.rest
 
+import cn.soybean.domain.system.entity.SystemMenuEntity
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.response.ResponseEntity
@@ -30,6 +31,7 @@ import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.PUT
 import jakarta.ws.rs.Path
+import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.openapi.annotations.Operation
@@ -58,7 +60,8 @@ class RouteResource(
     @WithSession
     @Operation(summary = "路由列表", description = "获取路由列表")
     fun getMenuList(): Uni<ResponseEntity<List<MenuResponse>>> =
-        routeQueryService.handle(ListTreeRoutesByUserIdQuery(loginHelper.getUserId())).map { ResponseEntity.ok(it) }
+        routeQueryService.handle(ListTreeRoutesByUserIdQuery(loginHelper.getUserId(), loginHelper.getTenantId()))
+            .map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.create")
     @POST
@@ -92,4 +95,13 @@ class RouteResource(
     @Operation(summary = "常量路由", description = "常量路由列表")
     fun getConstantRoutes(): Uni<ResponseEntity<List<MenuRoute>>> =
         routeQueryService.handle(RouteByConstantQuery()).map { ResponseEntity.ok(it) }
+
+    @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}api.list_menu_id_by_role_id")
+    @GET
+    @Path("/listMenuIdByRoleId/{roleId}")
+    @WithSession
+    @Operation(summary = "根据角色获取已授权路由资源", description = "根据角色获取已授权路由资源")
+    fun listMenuIdByRoleId(@PathParam("roleId") roleId: String): Uni<ResponseEntity<List<String>>> =
+        SystemMenuEntity.listMenuIdByRoleId(roleId, loginHelper.getUserId(), loginHelper.getTenantId())
+            .map { ResponseEntity.ok(it) }
 }

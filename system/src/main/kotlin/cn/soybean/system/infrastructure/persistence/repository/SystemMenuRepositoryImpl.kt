@@ -1,6 +1,7 @@
 package cn.soybean.system.infrastructure.persistence.repository
 
 import cn.soybean.domain.system.entity.SystemMenuEntity
+import cn.soybean.domain.system.entity.SystemTenantEntity
 import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.domain.system.repository.SystemMenuRepository
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
@@ -21,6 +22,15 @@ class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<Sys
         userId,
         DbEnums.Status.ENABLED
     )
+
+    override fun allByTenantId(tenantId: String): Uni<List<SystemMenuEntity>> =
+        SystemTenantEntity.getTenantMenuIds(tenantId).flatMap { menuIds ->
+            if (menuIds.isEmpty()) {
+                Uni.createFrom().item(emptyList())
+            } else {
+                list("SELECT m FROM SystemMenuEntity m WHERE m.id IN ?1", menuIds)
+            }
+        }
 
     override fun saveOrUpdate(entity: SystemMenuEntity): Uni<SystemMenuEntity> = persist(entity)
     override fun getById(id: String): Uni<SystemMenuEntity> = findById(id)

@@ -67,8 +67,8 @@ class RouteQueryHandler(
     }
 
     override fun handle(query: ListTreeRoutesByUserIdQuery): Uni<List<MenuResponse>> {
-        val (userId) = query
-        val menusUni: Uni<List<SystemMenuEntity>> = getRoutesByUserId(userId)
+        val (userId, tenantId) = query
+        val menusUni: Uni<List<SystemMenuEntity>> = listRoute(userId, tenantId)
 
         return menusUni.map { menuItems ->
             buildTree(
@@ -101,6 +101,11 @@ class RouteQueryHandler(
     private fun getRoutesByUserId(userId: String): Uni<List<SystemMenuEntity>> = when {
         isSuperUser(userId) -> systemMenuRepository.all()
         else -> systemMenuRepository.allByUserId(userId)
+    }
+
+    private fun listRoute(userId: String, tenantId: String): Uni<List<SystemMenuEntity>> = when {
+        isSuperUser(userId) -> systemMenuRepository.all()
+        else -> systemMenuRepository.allByTenantId(tenantId)
     }
 
     private fun <T, R> buildTree(

@@ -1,9 +1,13 @@
 package cn.soybean.domain.system.entity
 
 import cn.soybean.domain.base.BaseEntity
+import cn.soybean.domain.isSuperUser
 import cn.soybean.domain.system.config.DbConstants
 import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.shared.infrastructure.persistence.converters.JsonStringListConverter
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
+import io.smallrye.mutiny.Uni
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -99,4 +103,18 @@ open class SystemMenuEntity(
      */
     @Column(name = "built_in", nullable = false)
     val builtIn: Boolean = false
-) : BaseEntity()
+) : BaseEntity(), PanacheEntityBase {
+    companion object : PanacheCompanion<SystemMenuEntity> {
+        fun listMenuIdByRoleId(roleId: String, userId: String, tenantId: String): Uni<List<String>> = when {
+            isSuperUser(userId) -> listAll().map { menus -> menus.map { it.id } }
+
+            else -> list(
+                """
+                       SELECT m FROM SystemMenuEntity m
+                       LEFT JOIN SystemRoleMenuEntity rm ON rm.menuId = m.id
+                       WHERE rm.roleId = ?1 AND rm.tenantId = ?2
+                """, roleId, tenantId
+            ).map { menus -> menus.map { it.id } }
+        }
+    }
+}

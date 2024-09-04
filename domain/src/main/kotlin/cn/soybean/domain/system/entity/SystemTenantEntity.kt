@@ -4,6 +4,9 @@ import cn.soybean.domain.base.BaseEntity
 import cn.soybean.domain.system.config.DbConstants
 import cn.soybean.domain.system.enums.DbEnums
 import cn.soybean.shared.infrastructure.persistence.converters.JsonStringSetTypeHandler
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanionBase
+import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
+import io.smallrye.mutiny.Uni
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -69,4 +72,14 @@ open class SystemTenantEntity(
     @Column(name = "operation_ids")
     @Convert(converter = JsonStringSetTypeHandler::class)
     var operationIds: Set<String>? = null
-) : BaseEntity()
+) : BaseEntity(), PanacheEntityBase {
+    companion object : PanacheCompanionBase<SystemTenantEntity, String> {
+        fun getTenantOperationIds(tenantId: String): Uni<Set<String>> = findById(tenantId).map { tenant ->
+            tenant?.operationIds ?: emptySet()
+        }
+
+        fun getTenantMenuIds(tenantId: String): Uni<Set<String>> = findById(tenantId).map { tenant ->
+            tenant?.menuIds ?: emptySet()
+        }
+    }
+}
