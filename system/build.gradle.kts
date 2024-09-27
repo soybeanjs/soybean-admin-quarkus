@@ -11,10 +11,10 @@ plugins {
 
 val javaVersion = JavaVersion.VERSION_21
 
-val jacksonModuleKotlinVersion = "2.17.2"
-val redissonQuarkus30Version = "3.35.0"
+val jacksonModuleKotlinVersion = "2.18.0"
+val redissonQuarkus30Version = "3.36.0"
 val konvertVersion = "3.2.2"
-val mutinyReactorVersion = "2.6.0"
+val mutinyReactorVersion = "2.6.2"
 val idgeneratorVersion = "1.0.6"
 val jakartaPersistenceVersion = "3.2.0"
 val jnrUnixsocketVersion = "0.38.22"
