@@ -1,6 +1,6 @@
 IMAGE_NAME = soybean-admin-backend
 DATE = $(shell date +%y%m%d)
-IMAGE_TAG = $(DATE)-1.0.0-SNAPSHOT
+IMAGE_TAG = $(DATE)-1.0.0
 
 clean:
 	./gradlew clean
