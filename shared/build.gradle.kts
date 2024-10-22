@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.kotlin)
 }
 
+val javaVersion = JavaVersion.VERSION_21
+
 dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.module:jackson-module-parameter-names")
@@ -15,6 +17,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("jakarta.persistence:jakarta.persistence-api")
     implementation("jakarta.interceptor:jakarta.interceptor-api")
+}
+
+java {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
 }
 
 tasks.withType<KotlinCompile>().configureEach {

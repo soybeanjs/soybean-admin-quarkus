@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.kotlin)
 }
 
+val javaVersion = JavaVersion.VERSION_21
+
 dependencies {
     implementation(project(":shared"))
 
@@ -16,6 +18,11 @@ dependencies {
 
     implementation("io.quarkus:quarkus-elytron-security-common")
     implementation("org.eclipse.microprofile.openapi:microprofile-openapi-api")
+}
+
+java {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
 }
 
 tasks.withType<KotlinCompile>().configureEach {

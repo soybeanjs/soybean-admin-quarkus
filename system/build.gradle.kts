@@ -12,7 +12,7 @@ plugins {
 val javaVersion = JavaVersion.VERSION_21
 
 val jacksonModuleKotlinVersion = "2.18.0"
-val redissonQuarkus30Version = "3.36.0"
+val redissonQuarkus30Version = "3.37.0"
 val konvertVersion = "3.2.2"
 val mutinyReactorVersion = "2.6.2"
 val idgeneratorVersion = "1.0.6"
@@ -58,7 +58,9 @@ dependencies {
     implementation("io.quarkus:quarkus-redis-client")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonModuleKotlinVersion}")
-    implementation("org.redisson:redisson-quarkus-30:${redissonQuarkus30Version}")
+//    Error: Could not find target method: io.quarkus.netty.runtime.graal.Target_io_netty_handler_ssl_JdkSslClientContext(java.security.Provider,java.security.cert.X509Certificate[],javax.net.ssl.TrustManagerFactory,java.security.cert.X509Certificate[],java.security.PrivateKey,java.lang.String,javax.net.ssl.KeyManagerFactory,java.lang.Iterable,io.netty.handler.ssl.CipherSuiteFilter,io.netty.handler.ssl.ApplicationProtocolConfig,java.lang.String[],long,long,java.security.SecureRandom,java.lang.String) throws javax.net.ssl.SSLException
+//Internal exception: com.oracle.svm.core.util.UserError$UserException: Could not find target method: io.quarkus.netty.runtime.graal.Target_io_netty_handler_ssl_JdkSslClientContext(java.security.Provider,java.security.cert.X509Certificate[],javax.net.ssl.TrustManagerFactory,java.security.cert.X509Certificate[],java.security.PrivateKey,java.lang.String,javax.net.ssl.KeyManagerFactory,java.lang.Iterable,io.netty.handler.ssl.CipherSuiteFilter,io.netty.handler.ssl.ApplicationProtocolConfig,java.lang.String[],long,long,java.security.SecureRandom,java.lang.String) throws javax.net.ssl.SSLException
+//    implementation("org.redisson:redisson-quarkus-30:${redissonQuarkus30Version}")
 
     implementation(project(":shared"))
     implementation(project(":domain"))

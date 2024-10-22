@@ -10,6 +10,9 @@ import cn.soybean.system.application.event.UserPermActionEvent
 import cn.soybean.system.infrastructure.web.toSystemApisEntity
 import io.quarkus.hibernate.reactive.panache.Panache
 import io.quarkus.logging.Log
+import io.quarkus.redis.client.RedisClientName
+import io.quarkus.redis.datasource.ReactiveRedisDataSource
+import io.quarkus.redis.datasource.set.ReactiveSetCommands
 import io.quarkus.vertx.VertxContextSupport
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.Uni
@@ -20,7 +23,6 @@ import jakarta.enterprise.event.ObservesAsync
 import jakarta.inject.Inject
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hibernate.reactive.mutiny.Mutiny
-import org.redisson.api.RedissonClient
 import java.time.Duration
 import java.util.*
 
@@ -28,7 +30,7 @@ import java.util.*
 class SystemEventHandler(
     private val sessionFactory: Mutiny.SessionFactory,
     private val vertx: Vertx,
-    private val redissonClient: RedissonClient
+    @RedisClientName("sign-redis") private val reactiveRedisDataSource: ReactiveRedisDataSource
 ) {
 
     @Inject
@@ -88,19 +90,34 @@ class SystemEventHandler(
             )
     }
 
-    private fun storeUserPermAction(apis: List<SystemApisEntity>, userId: String) {
-        val permAction = apis.asSequence()
+    fun storeUserPermAction(apis: List<SystemApisEntity>, userId: String) {
+        val permissionsKey = "${AppConstants.APP_PERM_ACTION_CACHE_PREFIX}:$userId"
+        val permAction = extractPermissions(apis)
+
+        when {
+            permAction.isEmpty() -> return
+            else -> {
+                val commands: ReactiveSetCommands<String, String> =
+                    reactiveRedisDataSource.set(String::class.java, String::class.java)
+
+                reactiveRedisDataSource.key().del(permissionsKey)
+                    .flatMap { commands.sadd(permissionsKey, *permAction.toTypedArray()) }
+                    .flatMap {
+                        reactiveRedisDataSource.key()
+                            .expire(permissionsKey, Duration.ofSeconds(mpJwtVerifyTokenAge.get()))
+                    }.subscribe().with { _ ->
+                        Log.info("[SystemEventHandler] storeUserPermAction processed successfully, Permissions updated for userId $userId")
+                    }
+            }
+        }
+    }
+
+    private fun extractPermissions(apis: List<SystemApisEntity>): Set<String> =
+        apis.asSequence()
             .mapNotNull { it.permissions }
             .flatMap { it.split(",").asSequence().map(String::trim) }
             .filterNot { it.isBlank() }
             .toSet()
-        val permissionsKey = "${AppConstants.APP_PERM_ACTION_CACHE_PREFIX}:$userId"
-        val permissions = redissonClient.getSet<String>(permissionsKey)
-
-        permissions.deleteAsync()
-            .thenComposeAsync { permissions.addAllAsync(permAction) }
-            .thenAcceptAsync { permissions.expire(Duration.ofSeconds(mpJwtVerifyTokenAge.get())) }
-    }
 
     private fun getApiPermAction(statelessSession: Mutiny.StatelessSession): Uni<List<SystemApisEntity>> =
         statelessSession.createQuery(

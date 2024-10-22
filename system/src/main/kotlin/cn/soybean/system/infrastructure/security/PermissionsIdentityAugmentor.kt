@@ -1,6 +1,8 @@
 package cn.soybean.system.infrastructure.security
 
 import cn.soybean.infrastructure.config.consts.AppConstants
+import io.quarkus.redis.client.RedisClientName
+import io.quarkus.redis.datasource.ReactiveRedisDataSource
 import io.quarkus.security.identity.AuthenticationRequestContext
 import io.quarkus.security.identity.SecurityIdentity
 import io.quarkus.security.identity.SecurityIdentityAugmentor
@@ -8,11 +10,10 @@ import io.quarkus.security.runtime.QuarkusSecurityIdentity
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.jwt.JsonWebToken
-import org.redisson.api.RedissonClient
-import java.security.Permission
 
 @ApplicationScoped
-class PermissionsIdentityAugmentor(private val redissonClient: RedissonClient) : SecurityIdentityAugmentor {
+class PermissionsIdentityAugmentor(@RedisClientName("sign-redis") private val reactiveRedisDataSource: ReactiveRedisDataSource) :
+    SecurityIdentityAugmentor {
 
     override fun augment(identity: SecurityIdentity, context: AuthenticationRequestContext): Uni<SecurityIdentity> =
         when {
@@ -20,7 +21,7 @@ class PermissionsIdentityAugmentor(private val redissonClient: RedissonClient) :
 
             isNotSystemUser(identity) -> Uni.createFrom().item(identity)
 
-            else -> Uni.createFrom().item(build(identity))
+            else -> augmentIdentity(identity)
         }
 
     private fun isAnonymous(identity: SecurityIdentity): Boolean = identity.isAnonymous
@@ -34,37 +35,40 @@ class PermissionsIdentityAugmentor(private val redissonClient: RedissonClient) :
     private fun isNotSystemUser(identity: SecurityIdentity): Boolean =
         !identity.roles.contains(AppConstants.APP_COMMON_ROLE)
 
-    private fun build(identity: SecurityIdentity): SecurityIdentity = when (val principal = identity.principal) {
-        is JsonWebToken -> {
-            val userId = principal.subject.toLong()
-            val permissionsKey = "${AppConstants.APP_PERM_ACTION_CACHE_PREFIX}:$userId"
+    private fun augmentIdentity(identity: SecurityIdentity): Uni<SecurityIdentity> =
+        when (identity.principal) {
+            is JsonWebToken -> {
+                val principal = identity.principal as JsonWebToken
+                val userId = principal.subject.toLong()
+                val permissionsKey = "${AppConstants.APP_PERM_ACTION_CACHE_PREFIX}:$userId"
+                val commands = reactiveRedisDataSource.set(String::class.java)
 
-            val permissions = redissonClient.getSet<String>(permissionsKey)
-            when {
-                permissions.isNullOrEmpty() -> identity
-                else ->
-                    // 创建一个新的SecurityIdentity，增加权限检查器
-                    QuarkusSecurityIdentity.builder(identity)
-                        .addPermissionChecker { requiredPermission: Permission ->
-                            // 检查所需权限是否在用户权限列表中
-                            val requiredPermName = requiredPermission.name
-                            val actionsList = requiredPermission.actions?.split(",")
-                                ?.filterNot { it.isBlank() }
-                                ?: emptyList()
-                            val accessGranted = if (actionsList.isEmpty()) {
-                                // 如果没有指定任何动作，只需检查权限名即可
-                                permissions.contains(requiredPermName)
-                            } else {
-                                // 检查是否至少有一个指定的动作存在于userPerms中
-                                actionsList.any { action ->
-                                    permissions.contains("$requiredPermName:$action")
-                                }
-                            }
-                            Uni.createFrom().item(accessGranted)
-                        }.build()
+                commands.smembers(permissionsKey)
+                    .flatMap { permissions ->
+                        when {
+                            permissions.isNullOrEmpty() -> Uni.createFrom().item(identity)
+                            else -> buildSecurityIdentity(identity, permissions)
+                        }
+                    }
             }
+
+            else -> Uni.createFrom().item(identity)
         }
 
-        else -> identity
+    private fun buildSecurityIdentity(identity: SecurityIdentity, permissions: Set<String>): Uni<SecurityIdentity> {
+        val identityBuilder = QuarkusSecurityIdentity.builder(identity)
+        identityBuilder.addPermissionChecker { requiredPermission ->
+            val requiredPermName = requiredPermission.name
+            val actionsList = requiredPermission.actions?.split(",")?.filterNot(String::isBlank) ?: emptyList()
+            val accessGranted =
+                when {
+                    actionsList.isEmpty() -> permissions.contains(requiredPermName)
+                    else -> actionsList.any { action ->
+                        permissions.contains("$requiredPermName:$action")
+                    }
+                }
+            Uni.createFrom().item(accessGranted)
+        }
+        return Uni.createFrom().item(identityBuilder.build())
     }
 }

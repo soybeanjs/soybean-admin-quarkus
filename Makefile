@@ -12,10 +12,12 @@ build: clean
 	./gradlew build
 
 build-native-linux: clean
-	./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
+	./gradlew build -Dquarkus.native.enabled=true -Dquarkus.native.container-build=true
 
+#Could not determine the dependencies of task ':quarkusBuild'.
+#https://github.com/quarkusio/quarkus/discussions/40679
 build-native-mac: clean
-	./gradlew build -Dquarkus.package.type=native
+	./gradlew build -Dquarkus.native.enabled=true -Dquarkus.package.jar.enabled=false -x test
 
 build-image-jvm: build
 	docker build -f src/main/docker/Dockerfile.jvm -t $(IMAGE_NAME):$(IMAGE_TAG) .

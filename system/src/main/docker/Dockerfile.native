@@ -3,7 +3,7 @@
 #
 # Before building the container image run:
 #
-# ./gradlew build -Dquarkus.package.type=native
+# ./gradlew build -Dquarkus.native.enabled=true
 #
 # Then, build the image with:
 #
