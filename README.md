@@ -17,6 +17,7 @@
 
 <p align="center">
   <a href="#简介">简介</a> •
+  <a href="#前端项目">前端项目</a> •
   <a href="#特性">特性</a> •
   <a href="#项目结构">项目结构</a> •
   <a href="#快速开始">快速开始</a> •
@@ -33,6 +34,12 @@ SoybeanAdmin Quarkus 是一个基于 Kotlin 和 Quarkus 的现代化后台管理
 
 无论您是开发小型管理后台，还是构建 CMS 等企业应用，SoybeanAdmin Quarkus 都能为您提供坚实的基础和高效的开发体验。本项目提供了灵活可扩展的架构，您可以根据具体需求和偏好进行定制和扩展。
 
+## 前端项目
+
+本项目的前端部分基于 [SoybeanAdmin](https://github.com/soybeanjs/soybean-admin) 进行二次开发。SoybeanAdmin 是一个现代化的前端管理系统模板，提供了丰富的UI组件和功能模块，与本后端项目完美配合，共同构建完整的全栈管理系统解决方案。
+
+前端项目地址：[https://github.com/ByteByteBrew/soybean-admin](https://github.com/ByteByteBrew/soybean-admin)
+
 ## 特性
 
 - **Kotlin 语言**：利用 Kotlin 的简洁性和表现力，提供安全、简洁的代码。
@@ -47,6 +54,7 @@ SoybeanAdmin Quarkus 是一个基于 Kotlin 和 Quarkus 的现代化后台管理
 - **JWT 认证**：实现安全可靠的用户认证和授权机制。
 - **API 文档**：自动生成 Swagger API 文档，便于接口管理和测试。
 - **环境配置**：支持多环境配置，满足不同部署场景的需求。
+- **前后端分离**：采用前后端分离架构，提高开发效率和系统可维护性。
 
 ## 项目结构
 
