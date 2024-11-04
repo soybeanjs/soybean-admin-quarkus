@@ -18,7 +18,6 @@ import cn.soybean.system.interfaces.rest.dto.response.route.MenuRoute
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
-// TODO 临时放置
 fun SystemMenuEntity.toMenuResponse(): MenuResponse = MenuResponse(
     id = id,
     menuName = menuName,

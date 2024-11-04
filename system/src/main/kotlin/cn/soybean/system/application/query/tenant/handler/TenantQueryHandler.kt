@@ -13,7 +13,6 @@ import cn.soybean.system.interfaces.rest.dto.response.tenant.TenantResponse
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
-// TODO 临时放置
 fun SystemTenantEntity.toTenantResponse(): TenantResponse = TenantResponse(
     name = name,
     contactAccountName = contactAccountName,

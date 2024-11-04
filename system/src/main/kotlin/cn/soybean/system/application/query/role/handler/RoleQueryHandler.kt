@@ -16,7 +16,6 @@ import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
-// TODO 临时放置
 fun SystemRoleEntity.toRoleResponse(): RoleResponse = RoleResponse(
     id = this.id,
     name = this.name,

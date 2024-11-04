@@ -17,7 +17,6 @@ import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
-// TODO 临时放置
 fun SystemUserEntity.toUserResponse(): UserResponse = UserResponse(
     id = id,
     accountName = accountName,
