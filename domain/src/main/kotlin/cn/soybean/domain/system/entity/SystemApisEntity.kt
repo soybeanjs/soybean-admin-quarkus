@@ -53,18 +53,23 @@ open class SystemApisEntity(
 ) : PanacheEntityBase {
     companion object : PanacheCompanion<SystemApisEntity> {
         fun listApi(userId: String, tenantId: String): Uni<List<SystemApisEntity>> = when {
-            isSuperUser(userId) -> listAll()
+            isSuperUser(userId) -> listAll().map { list -> list.filter { !it.permissions.isNullOrEmpty() } }
+
             else -> SystemTenantEntity.getTenantOperationIds(tenantId).flatMap { operationIds ->
                 if (operationIds.isEmpty()) {
                     Uni.createFrom().item(emptyList())
                 } else {
-                    list("SELECT a FROM SystemApisEntity a WHERE a.operationId IN ?1", operationIds)
+                    list(
+                        "SELECT a FROM SystemApisEntity a WHERE a.operationId IN ?1 AND a.permissions IS NOT NULL",
+                        operationIds
+                    )
                 }
             }
         }
 
         fun listApiOperationIdByRoleId(roleId: String, userId: String, tenantId: String): Uni<List<String>> = when {
-            isSuperUser(userId) -> listAll().map { apis -> apis.mapNotNull { it.operationId } }
+            //TODO magic number
+            isSuperUser(userId) && roleId == "1" -> listAll().map { apis -> apis.mapNotNull { it.operationId } }
 
             else -> list(
                 """
