@@ -6,6 +6,7 @@ import cn.soybean.infrastructure.security.LoginHelper
 import cn.soybean.interfaces.rest.response.ResponseEntity
 import cn.soybean.system.application.command.route.DeleteRouteCommand
 import cn.soybean.system.application.query.route.GetRoutesByUserIdQuery
+import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdAndConstantQuery
 import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdQuery
 import cn.soybean.system.application.query.route.RouteByConstantQuery
 import cn.soybean.system.application.query.route.service.RouteQueryService
@@ -103,5 +104,19 @@ class RouteResource(
     @Operation(summary = "根据角色获取已授权路由资源", description = "根据角色获取已授权路由资源")
     fun listMenuIdByRoleId(@PathParam("roleId") roleId: String): Uni<ResponseEntity<List<String>>> =
         SystemMenuEntity.listMenuIdByRoleId(roleId, loginHelper.getUserId(), loginHelper.getTenantId())
+            .map { ResponseEntity.ok(it) }
+
+    @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.tree")
+    @GET
+    @Path("/tree")
+    @WithSession
+    @Operation(summary = "路由🌲结构", description = "获取路由🌲")
+    fun getMenuTree(): Uni<ResponseEntity<List<MenuResponse>>> =
+        routeQueryService.handle(
+            ListTreeRoutesByUserIdAndConstantQuery(
+                loginHelper.getUserId(),
+                loginHelper.getTenantId()
+            )
+        )
             .map { ResponseEntity.ok(it) }
 }

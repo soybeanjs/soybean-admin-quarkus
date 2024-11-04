@@ -7,6 +7,7 @@ import cn.soybean.domain.system.repository.SystemTenantRepository
 import cn.soybean.interfaces.rest.util.isSuperUser
 import cn.soybean.system.application.convert.convertToMenuResponse
 import cn.soybean.system.application.query.route.GetRoutesByUserIdQuery
+import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdAndConstantQuery
 import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdQuery
 import cn.soybean.system.application.query.route.RouteByConstantQuery
 import cn.soybean.system.application.query.route.RouteByIdBuiltInQuery
@@ -97,6 +98,24 @@ class RouteQueryHandler(
             else -> systemTenantRepository.getById(query.tenantId).map { it.menuIds }
         }
 
+    override fun handle(query: ListTreeRoutesByUserIdAndConstantQuery): Uni<List<MenuResponse>> {
+        val (userId, tenantId, constant) = query
+        val menusUni: Uni<List<SystemMenuEntity>> = listRouteByConstant(userId, tenantId, constant)
+
+        return menusUni.map { menuItems ->
+            buildTree(
+                items = menuItems,
+                idSelector = { it.id },
+                parentIdSelector = { it.parentId ?: DbConstants.PARENT_ID_ROOT },
+                rootId = DbConstants.PARENT_ID_ROOT,
+                orderSelector = { it.order ?: 0 },
+                transform = { item, children ->
+                    item.toMenuResponse().apply { this.children = children }
+                }
+            )
+        }
+    }
+
     private fun getRoutesByUserId(userId: String): Uni<List<SystemMenuEntity>> = when {
         isSuperUser(userId) -> systemMenuRepository.all()
         else -> systemMenuRepository.allByUserId(userId)
@@ -106,6 +125,12 @@ class RouteQueryHandler(
         isSuperUser(userId) -> systemMenuRepository.all()
         else -> systemMenuRepository.allByTenantId(tenantId)
     }
+
+    private fun listRouteByConstant(userId: String, tenantId: String, constant: Boolean): Uni<List<SystemMenuEntity>> =
+        when {
+            isSuperUser(userId) -> systemMenuRepository.findAllByConstant(constant)
+            else -> systemMenuRepository.allByTenantIdAndConstant(tenantId, constant)
+        }
 
     private fun <T, R> buildTree(
         items: List<T>,

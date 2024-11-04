@@ -65,11 +65,11 @@ open class SystemTenantEntity(
     @Column(name = "expire_time", nullable = false)
     var expireTime: LocalDateTime? = null,
 
-    @Column(name = "menu_ids")
+    @Column(name = "menu_ids", length = DbConstants.LENGTH_2048)
     @Convert(converter = JsonStringSetTypeHandler::class)
     var menuIds: Set<String>? = null,
 
-    @Column(name = "operation_ids")
+    @Column(name = "operation_ids", length = DbConstants.LENGTH_2048)
     @Convert(converter = JsonStringSetTypeHandler::class)
     var operationIds: Set<String>? = null
 ) : BaseEntity(), PanacheEntityBase {

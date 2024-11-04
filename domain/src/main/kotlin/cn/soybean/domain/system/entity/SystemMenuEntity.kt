@@ -106,7 +106,8 @@ open class SystemMenuEntity(
 ) : BaseEntity(), PanacheEntityBase {
     companion object : PanacheCompanion<SystemMenuEntity> {
         fun listMenuIdByRoleId(roleId: String, userId: String, tenantId: String): Uni<List<String>> = when {
-            isSuperUser(userId) -> listAll().map { menus -> menus.map { it.id } }
+            //TODO magic number
+            isSuperUser(userId) && roleId == "1" -> listAll().map { menus -> menus.map { it.id } }
 
             else -> list(
                 """

@@ -11,4 +11,5 @@ interface SystemMenuRepository {
     fun getById(id: String): Uni<SystemMenuEntity>
     fun delById(id: String): Uni<Boolean>
     fun findAllByConstant(constant: Boolean): Uni<List<SystemMenuEntity>>
+    fun allByTenantIdAndConstant(tenantId: String, constant: Boolean): Uni<List<SystemMenuEntity>>
 }

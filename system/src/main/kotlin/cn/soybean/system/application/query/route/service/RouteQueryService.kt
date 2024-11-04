@@ -2,6 +2,7 @@ package cn.soybean.system.application.query.route.service
 
 import cn.soybean.domain.system.entity.SystemMenuEntity
 import cn.soybean.system.application.query.route.GetRoutesByUserIdQuery
+import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdAndConstantQuery
 import cn.soybean.system.application.query.route.ListTreeRoutesByUserIdQuery
 import cn.soybean.system.application.query.route.RouteByConstantQuery
 import cn.soybean.system.application.query.route.RouteByIdBuiltInQuery
@@ -18,4 +19,5 @@ interface RouteQueryService {
     fun handle(query: RouteByIdBuiltInQuery): Uni<Boolean>
     fun handle(query: RouteByConstantQuery): Uni<List<MenuRoute>>
     fun handle(query: RouteByTenantIdQuery): Uni<Set<String>>
+    fun handle(query: ListTreeRoutesByUserIdAndConstantQuery): Uni<List<MenuResponse>>
 }

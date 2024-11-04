@@ -8,3 +8,8 @@ data class RouteByIdQuery(val id: String) : Query
 data class RouteByIdBuiltInQuery(val id: String) : Query
 data class RouteByConstantQuery(val constant: Boolean = true) : Query
 data class RouteByTenantIdQuery(val tenantId: String) : Query
+data class ListTreeRoutesByUserIdAndConstantQuery(
+    val userId: String,
+    val tenantId: String,
+    val constant: Boolean = false
+) : Query

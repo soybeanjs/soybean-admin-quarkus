@@ -36,4 +36,12 @@ class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<Sys
     override fun getById(id: String): Uni<SystemMenuEntity> = findById(id)
     override fun delById(id: String): Uni<Boolean> = deleteById(id)
     override fun findAllByConstant(constant: Boolean): Uni<List<SystemMenuEntity>> = list("constant", constant)
+    override fun allByTenantIdAndConstant(tenantId: String, constant: Boolean): Uni<List<SystemMenuEntity>> =
+        SystemTenantEntity.getTenantMenuIds(tenantId).flatMap { menuIds ->
+            if (menuIds.isEmpty()) {
+                Uni.createFrom().item(emptyList())
+            } else {
+                list("SELECT m FROM SystemMenuEntity m WHERE m.constant = ?1 AND m.id IN ?2", constant, menuIds)
+            }
+        }
 }
