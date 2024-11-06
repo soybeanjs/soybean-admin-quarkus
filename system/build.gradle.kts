@@ -11,13 +11,12 @@ plugins {
 
 val javaVersion = JavaVersion.VERSION_21
 
-val jacksonModuleKotlinVersion = "2.18.0"
-val redissonQuarkus30Version = "3.37.0"
-val konvertVersion = "3.2.2"
+val jacksonModuleKotlinVersion = "2.18.1"
+val redissonQuarkus30Version = "3.38.1"
+val konvertVersion = "3.2.3"
 val mutinyReactorVersion = "2.6.2"
 val idgeneratorVersion = "1.0.6"
-val jakartaPersistenceVersion = "3.2.0"
-val jnrUnixsocketVersion = "0.38.22"
+val jnrUnixsocketVersion = "0.38.23"
 val ip2regionVersion = "2.7.0"
 val msgpackVersion = "0.9.8"
 
@@ -60,6 +59,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonModuleKotlinVersion}")
 //    Error: Could not find target method: io.quarkus.netty.runtime.graal.Target_io_netty_handler_ssl_JdkSslClientContext(java.security.Provider,java.security.cert.X509Certificate[],javax.net.ssl.TrustManagerFactory,java.security.cert.X509Certificate[],java.security.PrivateKey,java.lang.String,javax.net.ssl.KeyManagerFactory,java.lang.Iterable,io.netty.handler.ssl.CipherSuiteFilter,io.netty.handler.ssl.ApplicationProtocolConfig,java.lang.String[],long,long,java.security.SecureRandom,java.lang.String) throws javax.net.ssl.SSLException
 //Internal exception: com.oracle.svm.core.util.UserError$UserException: Could not find target method: io.quarkus.netty.runtime.graal.Target_io_netty_handler_ssl_JdkSslClientContext(java.security.Provider,java.security.cert.X509Certificate[],javax.net.ssl.TrustManagerFactory,java.security.cert.X509Certificate[],java.security.PrivateKey,java.lang.String,javax.net.ssl.KeyManagerFactory,java.lang.Iterable,io.netty.handler.ssl.CipherSuiteFilter,io.netty.handler.ssl.ApplicationProtocolConfig,java.lang.String[],long,long,java.security.SecureRandom,java.lang.String) throws javax.net.ssl.SSLException
+// Tips 2024-11-06 新版本3.18.1依赖依然没有解决netty ssl问题,此库只会影响native image,不影响jvm,此库比quarkus-redis-client功能强大的多 非native image 可以正常使用
 //    implementation("org.redisson:redisson-quarkus-30:${redissonQuarkus30Version}")
 
     implementation(project(":shared"))
