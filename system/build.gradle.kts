@@ -12,9 +12,9 @@ plugins {
 val javaVersion = JavaVersion.VERSION_21
 
 val jacksonModuleKotlinVersion = "2.18.1"
-val redissonQuarkus30Version = "3.38.1"
-val konvertVersion = "3.2.3"
-val mutinyReactorVersion = "2.6.2"
+val redissonQuarkus30Version = "3.39.0"
+val konvertVersion = "4.0.1"
+val mutinyReactorVersion = "2.7.0-RC3"
 val idgeneratorVersion = "1.0.6"
 val jnrUnixsocketVersion = "0.38.23"
 val ip2regionVersion = "2.7.0"
