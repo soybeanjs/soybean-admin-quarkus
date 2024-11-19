@@ -8,6 +8,9 @@ clean:
 dev-run: clean
 	./gradlew :system:quarkusDev
 
+docker-profile-run: clean
+	./gradlew :system:quarkusRun -Dquarkus.profile=docker
+
 build: clean
 	./gradlew build
 

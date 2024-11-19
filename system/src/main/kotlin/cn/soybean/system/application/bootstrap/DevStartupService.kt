@@ -7,7 +7,7 @@ import io.vertx.mutiny.pgclient.PgPool
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 
-@IfBuildProfile("dev")
+@IfBuildProfile(anyOf = ["dev", "docker"])
 @ApplicationScoped
 class DevStartupService(private val pgPool: PgPool) {
 
