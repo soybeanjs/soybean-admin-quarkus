@@ -12,7 +12,7 @@ dependencies {
     implementation(project(":shared"))
 
     implementation("io.smallrye.reactive:mutiny")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
     implementation("io.quarkus:quarkus-panache-common")
     implementation("io.quarkus:quarkus-hibernate-reactive-panache-kotlin")
 

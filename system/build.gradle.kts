@@ -11,7 +11,7 @@ plugins {
 
 val javaVersion = JavaVersion.VERSION_21
 
-val jacksonModuleKotlinVersion = "2.18.1"
+val jacksonModuleKotlinVersion = "2.18.2"
 val redissonQuarkus30Version = "3.39.0"
 val konvertVersion = "4.0.1"
 val mutinyReactorVersion = "2.7.0-RC3"
