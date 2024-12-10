@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin)
+    id("com.diffplug.spotless")
 }
 
 repositories {
@@ -24,14 +25,48 @@ subprojects {
     }
 
     apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "com.diffplug.spotless")
 
     dependencies {
-        implementation(platform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
-        implementation(platform("${quarkusPlatformGroupId}:quarkus-camel-bom:${quarkusPlatformVersion}"))
+        implementation(platform("$quarkusPlatformGroupId:$quarkusPlatformArtifactId:$quarkusPlatformVersion"))
+        implementation(platform("$quarkusPlatformGroupId:quarkus-camel-bom:$quarkusPlatformVersion"))
     }
 
     group = project.group
     version = projectVersion
+
+    spotless {
+        kotlin {
+            // Target all Kotlin files in the project
+            target("**/*.kt", "**/*.kts")
+            // Exclude generated files
+            targetExclude("**/build/**/*.kt", "**/build/**/*.kts", "**/generated/**")
+
+            // Use ktlint for code formatting
+            ktlint("1.0.1")
+                .setEditorConfigPath("${rootProject.projectDir.resolve(".editorconfig").absolutePath}")
+                .editorConfigOverride(mapOf(
+                    "max_line_length" to "140",
+                    "ktlint_standard_filename" to "disabled",  // 暂时禁用文件命名规则
+                ))
+
+            // Apply additional formatting rules
+            trimTrailingWhitespace()
+            indentWithSpaces(4)
+            endWithNewline()
+
+            // License header configuration
+            licenseHeader(
+                """
+                /*
+                 * Copyright 2024 Soybean Admin Backend
+                 * Licensed under the Apache License, Version 2.0 (the "License");
+                 * you may not use this file except in compliance with the License.
+                 */
+                """.trimIndent(),
+            )
+        }
+    }
 
     plugins.withId(quarkusPluginId) {
         val kubernetesDir = layout.buildDirectory.dir("kubernetes")

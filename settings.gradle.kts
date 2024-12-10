@@ -3,6 +3,7 @@ pluginManagement {
     val quarkusPluginId: String by settings
     val kotlinVersion: String by settings
     val kspVersion: String by settings
+    val spotlessVersion: String by settings
     repositories {
         mavenCentral()
         gradlePluginPortal()
@@ -17,6 +18,7 @@ pluginManagement {
                 "org.jetbrains.kotlin.jvm" -> useVersion(kotlinVersion)
                 "org.jetbrains.kotlin.plugin.allopen" -> useVersion(kotlinVersion)
                 "com.google.devtools.ksp" -> useVersion(kspVersion)
+                "com.diffplug.spotless" -> useVersion(spotlessVersion)
             }
         }
     }

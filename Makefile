@@ -36,3 +36,13 @@ build-image-jvm: build
 
 build-image-native: build-native-linux
 	docker build -f src/main/docker/Dockerfile.native-micro -t $(IMAGE_NAME):$(IMAGE_TAG) .
+
+# Format all kotlin code in the project
+format-check:
+	$(GRADLEW) spotlessCheck
+
+format:
+	$(GRADLEW) spotlessApply
+
+# Format and build
+build-with-format: format build
