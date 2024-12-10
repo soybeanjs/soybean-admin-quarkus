@@ -10,6 +10,7 @@ object DbConstants {
     const val PARENT_ID_ROOT = "0"
     const val SUPER_TENANT = "1"
     const val SUPER_USER = "1"
+    const val SUPER_SYSTEM_ROLE_ID = "1"
     const val SUPER_SYSTEM_ROLE_CODE = "ROLE_SYSTEM_ADMIN"
     const val SUPER_TENANT_ROLE_CODE = "ROLE_TENANT_ADMIN"
 }

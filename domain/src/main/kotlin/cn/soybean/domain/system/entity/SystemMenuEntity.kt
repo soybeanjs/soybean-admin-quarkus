@@ -4,6 +4,7 @@ import cn.soybean.domain.base.BaseEntity
 import cn.soybean.domain.isSuperUser
 import cn.soybean.domain.system.config.DbConstants
 import cn.soybean.domain.system.enums.DbEnums
+import cn.soybean.domain.isSuperRole
 import cn.soybean.shared.infrastructure.persistence.converters.JsonStringListConverter
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
@@ -106,8 +107,7 @@ open class SystemMenuEntity(
 ) : BaseEntity(), PanacheEntityBase {
     companion object : PanacheCompanion<SystemMenuEntity> {
         fun listMenuIdByRoleId(roleId: String, userId: String, tenantId: String): Uni<List<String>> = when {
-            //TODO magic number
-            isSuperUser(userId) && roleId == "1" -> listAll().map { menus -> menus.map { it.id } }
+            isSuperUser(userId) && isSuperRole(roleId) -> listAll().map { menus -> menus.map { it.id } }
 
             else -> list(
                 """

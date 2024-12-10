@@ -2,6 +2,7 @@ package cn.soybean.domain.system.entity
 
 import cn.soybean.domain.isSuperUser
 import cn.soybean.domain.system.config.DbConstants
+import cn.soybean.domain.isSuperRole
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheCompanion
 import io.quarkus.hibernate.reactive.panache.kotlin.PanacheEntityBase
 import io.smallrye.mutiny.Uni
@@ -68,8 +69,7 @@ open class SystemApisEntity(
         }
 
         fun listApiOperationIdByRoleId(roleId: String, userId: String, tenantId: String): Uni<List<String>> = when {
-            //TODO magic number
-            isSuperUser(userId) && roleId == "1" -> listAll().map { apis -> apis.mapNotNull { it.operationId } }
+            isSuperUser(userId) && isSuperRole(roleId) -> listAll().map { apis -> apis.mapNotNull { it.operationId } }
 
             else -> list(
                 """
