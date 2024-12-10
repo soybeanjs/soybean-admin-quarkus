@@ -17,7 +17,9 @@ import io.smallrye.mutiny.replaceWithUnit
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class RouteCreatedProjection(private val menuRepository: SystemMenuRepository) : Projection {
+class RouteCreatedProjection(
+    private val menuRepository: SystemMenuRepository,
+) : Projection {
     @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =

@@ -23,7 +23,8 @@ data class UserCreatedOrUpdatedEventBase(
     val avatar: String? = null,
     val deptId: String? = null,
     val status: DbEnums.Status,
-) : AggregateEventBase(aggregateId), DomainEvent {
+) : AggregateEventBase(aggregateId),
+    DomainEvent {
     companion object {
         const val USER_CREATED_V1 = "USER_CREATED_V1"
         const val USER_UPDATED_V1 = "USER_UPDATED_V1"

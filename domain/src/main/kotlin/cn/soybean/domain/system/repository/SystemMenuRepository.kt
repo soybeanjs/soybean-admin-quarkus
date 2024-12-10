@@ -23,5 +23,8 @@ interface SystemMenuRepository {
 
     fun findAllByConstant(constant: Boolean): Uni<List<SystemMenuEntity>>
 
-    fun allByTenantIdAndConstant(tenantId: String, constant: Boolean): Uni<List<SystemMenuEntity>>
+    fun allByTenantIdAndConstant(
+        tenantId: String,
+        constant: Boolean,
+    ): Uni<List<SystemMenuEntity>>
 }

@@ -32,14 +32,20 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Permissions", description = "Operations related to permissions")
-class PermissionResource(private val permissionService: PermissionService, private val loginHelper: LoginHelper) {
+class PermissionResource(
+    private val permissionService: PermissionService,
+    private val loginHelper: LoginHelper,
+) {
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}permission.auth_role_menu")
     @Path("/authRoleMenu")
     @POST
     @WithTransaction
     @Operation(summary = "角色授权菜单", description = "角色授权菜单资源")
-    fun authorizeRoleMenus(@Valid @NotNull req: AuthorizeRoleMenuRequest): Uni<ResponseEntity<Boolean>> =
-        permissionService.authorizeRoleMenus(req.toAuthorizeRoleMenuCommand(), loginHelper.getTenantId())
+    fun authorizeRoleMenus(
+        @Valid @NotNull req: AuthorizeRoleMenuRequest,
+    ): Uni<ResponseEntity<Boolean>> =
+        permissionService
+            .authorizeRoleMenus(req.toAuthorizeRoleMenuCommand(), loginHelper.getTenantId())
             .map { (isSuccess, message) ->
                 when {
                     isSuccess -> ResponseEntity.ok(true)
@@ -52,8 +58,11 @@ class PermissionResource(private val permissionService: PermissionService, priva
     @POST
     @WithTransaction
     @Operation(summary = "用户授权角色", description = "用户授权角色资源")
-    fun authorizeUserRoles(@Valid @NotNull req: AuthorizeUserRoleRequest): Uni<ResponseEntity<Boolean>> =
-        permissionService.authorizeUserRoles(req.toAuthorizeRoleUserCommand(), loginHelper.getTenantId())
+    fun authorizeUserRoles(
+        @Valid @NotNull req: AuthorizeUserRoleRequest,
+    ): Uni<ResponseEntity<Boolean>> =
+        permissionService
+            .authorizeUserRoles(req.toAuthorizeRoleUserCommand(), loginHelper.getTenantId())
             .map { (isSuccess, message) ->
                 when {
                     isSuccess -> ResponseEntity.ok(true)
@@ -66,8 +75,11 @@ class PermissionResource(private val permissionService: PermissionService, priva
     @POST
     @WithTransaction
     @Operation(summary = "角色授权API", description = "角色授权API资源")
-    fun authorizeRoleOperations(@Valid @NotNull req: AuthorizeRoleOperationRequest): Uni<ResponseEntity<Boolean>> =
-        permissionService.authorizeRoleOperations(req.toAuthorizeRoleOperationCommand(), loginHelper.getTenantId())
+    fun authorizeRoleOperations(
+        @Valid @NotNull req: AuthorizeRoleOperationRequest,
+    ): Uni<ResponseEntity<Boolean>> =
+        permissionService
+            .authorizeRoleOperations(req.toAuthorizeRoleOperationCommand(), loginHelper.getTenantId())
             .map { (isSuccess, message) ->
                 when {
                     isSuccess -> ResponseEntity.ok(true)

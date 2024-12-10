@@ -9,13 +9,15 @@ import cn.soybean.domain.system.config.DbConstants
 import cn.soybean.shared.domain.entity.EntityBase
 import jakarta.persistence.Column
 import jakarta.persistence.MappedSuperclass
-import java.io.Serializable
-import java.time.LocalDateTime
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import java.io.Serializable
+import java.time.LocalDateTime
 
 @MappedSuperclass
-abstract class BaseEntity : EntityBase<String>(), Serializable {
+abstract class BaseEntity :
+    EntityBase<String>(),
+    Serializable {
     /**
      * 创建时间
      */

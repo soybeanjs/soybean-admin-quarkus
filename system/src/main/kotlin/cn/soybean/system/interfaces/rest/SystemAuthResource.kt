@@ -32,26 +32,31 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Auth", description = "Operations related to auths")
-class SystemAuthResource(private val authService: AuthService, private val loginHelper: LoginHelper) {
+class SystemAuthResource(
+    private val authService: AuthService,
+    private val loginHelper: LoginHelper,
+) {
     @Path("/login")
     @POST
     @WithSession
     @Operation(summary = "账号密码登录", description = "PC端后台管理系统账号密码登录")
-    fun login(@RequestBody(description = "PC端后台管理系统登录请求体") @Valid @NotNull req: PwdLoginRequest): Uni<ResponseEntity<LoginResponse>> =
-        authService.pwdLogin(req.toPwdLoginCommand()).map { ResponseEntity.ok(it) }
+    fun login(
+        @RequestBody(description = "PC端后台管理系统登录请求体") @Valid @NotNull req: PwdLoginRequest,
+    ): Uni<ResponseEntity<LoginResponse>> = authService.pwdLogin(req.toPwdLoginCommand()).map { ResponseEntity.ok(it) }
 
     @Authenticated
     @Path("/getUserInfo")
     @GET
     @WithSession
     @Operation(summary = "用户信息", description = "获取用户信息")
-    fun getUserInfo(): Uni<ResponseEntity<UserInfoResponse>> = uni {
-        ResponseEntity.ok(
-            UserInfoResponse(
-                userId = loginHelper.getUserId(),
-                userName = loginHelper.getAccountName(),
-                roles = loginHelper.getRoles(),
-            ),
-        )
-    }
+    fun getUserInfo(): Uni<ResponseEntity<UserInfoResponse>> =
+        uni {
+            ResponseEntity.ok(
+                UserInfoResponse(
+                    userId = loginHelper.getUserId(),
+                    userName = loginHelper.getAccountName(),
+                    roles = loginHelper.getRoles(),
+                ),
+            )
+        }
 }

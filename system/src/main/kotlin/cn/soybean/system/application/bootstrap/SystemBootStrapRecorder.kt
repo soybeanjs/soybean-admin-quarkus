@@ -25,7 +25,9 @@ class SystemBootStrapRecorder(
     private val eventPublisher: DomainEventPublisher,
     private val apiKeyCache: ApiKeyCache,
 ) {
-    fun onStart(@Observes ev: StartupEvent) {
+    fun onStart(
+        @Observes ev: StartupEvent,
+    ) {
         initApiEndpoints()
 
         initApiKeyCache()

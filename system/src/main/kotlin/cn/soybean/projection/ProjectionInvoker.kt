@@ -19,7 +19,9 @@ import org.eclipse.microprofile.reactive.messaging.Incoming
 import org.eclipse.microprofile.reactive.messaging.Message
 
 @ApplicationScoped
-class ProjectionInvoker(private val handlers: Instance<Projection>) {
+class ProjectionInvoker(
+    private val handlers: Instance<Projection>,
+) {
     private fun distributionProcess(eventEntity: AggregateEventEntity): Uni<Unit> {
         val supportedHandlers = handlers.filter { it.supports(eventEntity.eventType) }
 
@@ -32,14 +34,17 @@ class ProjectionInvoker(private val handlers: Instance<Projection>) {
             else -> {
                 val processingUnis =
                     supportedHandlers.map { handler ->
-                        handler.process(eventEntity)
-                            .onItem().invoke { _ ->
+                        handler
+                            .process(eventEntity)
+                            .onItem()
+                            .invoke { _ ->
                                 Log.debugf(
                                     "[ProjectionInvoker] Processed event %s by %s",
                                     eventEntity.eventType,
                                     handler::class.java.simpleName,
                                 )
-                            }.onFailure().invoke { ex ->
+                            }.onFailure()
+                            .invoke { ex ->
                                 Log.errorf(
                                     ex,
                                     "[ProjectionInvoker] Error processing event %s by %s",
@@ -48,7 +53,12 @@ class ProjectionInvoker(private val handlers: Instance<Projection>) {
                                 )
                             }
                     }
-                Uni.combine().all().unis<Unit>(processingUnis).discardItems().replaceWithUnit()
+                Uni
+                    .combine()
+                    .all()
+                    .unis<Unit>(processingUnis)
+                    .discardItems()
+                    .replaceWithUnit()
             }
         }
     }
@@ -61,15 +71,26 @@ class ProjectionInvoker(private val handlers: Instance<Projection>) {
 
         return when {
             events.isEmpty() ->
-                Uni.createFrom().item(Unit)
-                    .onItem().invoke { _ -> Log.warn("[ProjectionInvoker] empty events list") }
-                    .onItem().invoke { _ -> message.ack() }
-                    .onFailure().invoke { ex -> Log.errorf(ex, "[ProjectionInvoker] (process) msg ack exception") }
+                Uni
+                    .createFrom()
+                    .item(Unit)
+                    .onItem()
+                    .invoke { _ -> Log.warn("[ProjectionInvoker] empty events list") }
+                    .onItem()
+                    .invoke { _ -> message.ack() }
+                    .onFailure()
+                    .invoke { ex -> Log.errorf(ex, "[ProjectionInvoker] (process) msg ack exception") }
 
             else ->
-                Multi.createFrom().iterable(events.toList())
-                    .onItem().call { event -> distributionProcess(event) }.toUni().replaceWithUnit()
-                    .onItem().invoke { _ -> message.ack() }
+                Multi
+                    .createFrom()
+                    .iterable(events.toList())
+                    .onItem()
+                    .call { event -> distributionProcess(event) }
+                    .toUni()
+                    .replaceWithUnit()
+                    .onItem()
+                    .invoke { _ -> message.ack() }
                     .onFailure()
                     .invoke { ex ->
                         Log.errorf(

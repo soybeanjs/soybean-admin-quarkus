@@ -22,23 +22,26 @@ import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
-fun SystemUserEntity.toUserResponse(): UserResponse = UserResponse(
-    id = id,
-    accountName = accountName,
-    nickName = nickName,
-    personalProfile = personalProfile,
-    email = email,
-    countryCode = countryCode,
-    phoneCode = phoneCode,
-    phoneNumber = phoneNumber,
-    gender = gender,
-    avatar = avatar,
-    deptId = deptId,
-    status = status,
-)
+fun SystemUserEntity.toUserResponse(): UserResponse =
+    UserResponse(
+        id = id,
+        accountName = accountName,
+        nickName = nickName,
+        personalProfile = personalProfile,
+        email = email,
+        countryCode = countryCode,
+        phoneCode = phoneCode,
+        phoneNumber = phoneNumber,
+        gender = gender,
+        avatar = avatar,
+        deptId = deptId,
+        status = status,
+    )
 
 @ApplicationScoped
-class UserQueryHandler(private val systemUserRepository: SystemUserRepository) : UserQueryService {
+class UserQueryHandler(
+    private val systemUserRepository: SystemUserRepository,
+) : UserQueryService {
     override fun handle(query: PageUserQuery): Uni<PageResult<UserResponse>> {
         val (q, params, page) = query
         val panacheQuery = systemUserRepository.getUserList(q, Sort.by("id"), params).page(page)
@@ -65,6 +68,8 @@ class UserQueryHandler(private val systemUserRepository: SystemUserRepository) :
     override fun handle(query: UserByAccountQuery): Uni<SystemUserEntity> =
         systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(query.accountName, query.tenantId)
 
-    override fun handle(query: UserByTenantIdQuery): Uni<Set<String>> = systemUserRepository.findByTenantId(query.tenantId)
-        .map { users -> users.map { it.id }.toSet() }
+    override fun handle(query: UserByTenantIdQuery): Uni<Set<String>> =
+        systemUserRepository
+            .findByTenantId(query.tenantId)
+            .map { users -> users.map { it.id }.toSet() }
 }

@@ -19,15 +19,18 @@ import org.eclipse.microprofile.jwt.JsonWebToken
 @ApplicationScoped
 class PermissionsIdentityAugmentor(
     @RedisClientName("sign-redis") private val reactiveRedisDataSource: ReactiveRedisDataSource,
-) :
-    SecurityIdentityAugmentor {
-    override fun augment(identity: SecurityIdentity, context: AuthenticationRequestContext): Uni<SecurityIdentity> = when {
-        isAnonymous(identity) -> Uni.createFrom().item(identity)
+) : SecurityIdentityAugmentor {
+    override fun augment(
+        identity: SecurityIdentity,
+        context: AuthenticationRequestContext,
+    ): Uni<SecurityIdentity> =
+        when {
+            isAnonymous(identity) -> Uni.createFrom().item(identity)
 
-        isNotSystemUser(identity) -> Uni.createFrom().item(identity)
+            isNotSystemUser(identity) -> Uni.createFrom().item(identity)
 
-        else -> augmentIdentity(identity)
-    }
+            else -> augmentIdentity(identity)
+        }
 
     private fun isAnonymous(identity: SecurityIdentity): Boolean = identity.isAnonymous
 
@@ -39,26 +42,31 @@ class PermissionsIdentityAugmentor(
      */
     private fun isNotSystemUser(identity: SecurityIdentity): Boolean = !identity.roles.contains(AppConstants.APP_COMMON_ROLE)
 
-    private fun augmentIdentity(identity: SecurityIdentity): Uni<SecurityIdentity> = when (identity.principal) {
-        is JsonWebToken -> {
-            val principal = identity.principal as JsonWebToken
-            val userId = principal.subject.toLong()
-            val permissionsKey = "${AppConstants.APP_PERM_ACTION_CACHE_PREFIX}:$userId"
-            val commands = reactiveRedisDataSource.set(String::class.java)
+    private fun augmentIdentity(identity: SecurityIdentity): Uni<SecurityIdentity> =
+        when (identity.principal) {
+            is JsonWebToken -> {
+                val principal = identity.principal as JsonWebToken
+                val userId = principal.subject.toLong()
+                val permissionsKey = "${AppConstants.APP_PERM_ACTION_CACHE_PREFIX}:$userId"
+                val commands = reactiveRedisDataSource.set(String::class.java)
 
-            commands.smembers(permissionsKey)
-                .flatMap { permissions ->
-                    when {
-                        permissions.isNullOrEmpty() -> Uni.createFrom().item(identity)
-                        else -> buildSecurityIdentity(identity, permissions)
+                commands
+                    .smembers(permissionsKey)
+                    .flatMap { permissions ->
+                        when {
+                            permissions.isNullOrEmpty() -> Uni.createFrom().item(identity)
+                            else -> buildSecurityIdentity(identity, permissions)
+                        }
                     }
-                }
+            }
+
+            else -> Uni.createFrom().item(identity)
         }
 
-        else -> Uni.createFrom().item(identity)
-    }
-
-    private fun buildSecurityIdentity(identity: SecurityIdentity, permissions: Set<String>): Uni<SecurityIdentity> {
+    private fun buildSecurityIdentity(
+        identity: SecurityIdentity,
+        permissions: Set<String>,
+    ): Uni<SecurityIdentity> {
         val identityBuilder = QuarkusSecurityIdentity.builder(identity)
         identityBuilder.addPermissionChecker { requiredPermission ->
             val requiredPermName = requiredPermission.name

@@ -13,10 +13,18 @@ import io.smallrye.mutiny.replaceWithUnit
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class SystemRoleUserRepositoryImpl : SystemRoleUserRepository, PanacheRepositoryBase<SystemRoleUserEntity, String> {
-    override fun delByRoleId(roleId: String, tenantId: String): Uni<Long> = delete("roleId = ?1 and tenantId = ?2", roleId, tenantId)
+class SystemRoleUserRepositoryImpl :
+    SystemRoleUserRepository,
+    PanacheRepositoryBase<SystemRoleUserEntity, String> {
+    override fun delByRoleId(
+        roleId: String,
+        tenantId: String,
+    ): Uni<Long> = delete("roleId = ?1 and tenantId = ?2", roleId, tenantId)
 
-    override fun delByUserId(userId: String, tenantId: String): Uni<Long> = delete("userId = ?1 and tenantId = ?2", userId, tenantId)
+    override fun delByUserId(
+        userId: String,
+        tenantId: String,
+    ): Uni<Long> = delete("userId = ?1 and tenantId = ?2", userId, tenantId)
 
     override fun saveOrUpdate(roleUser: SystemRoleUserEntity): Uni<SystemRoleUserEntity> = persist(roleUser)
 

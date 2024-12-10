@@ -13,7 +13,10 @@ val md5DigestInstance: ThreadLocal<MessageDigest>
             MessageDigest.getInstance("MD5")
         }
 
-fun generateOperationId(httpMethod: String, path: String): String {
+fun generateOperationId(
+    httpMethod: String,
+    path: String,
+): String {
     val input = "$httpMethod$path"
 
     val hashBytes = md5DigestInstance.get().digest(input.toByteArray())

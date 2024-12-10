@@ -24,27 +24,28 @@ import cn.soybean.system.interfaces.rest.dto.response.route.MenuRoute
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
-fun SystemMenuEntity.toMenuResponse(): MenuResponse = MenuResponse(
-    id = id,
-    menuName = menuName,
-    menuType = menuType,
-    order = order,
-    parentId = parentId,
-    icon = icon,
-    iconType = iconType,
-    routeName = routeName,
-    routePath = routePath,
-    component = component,
-    i18nKey = i18nKey,
-    multiTab = multiTab,
-    activeMenu = activeMenu,
-    hideInMenu = hideInMenu,
-    status = status,
-    roles = roles,
-    keepAlive = keepAlive,
-    constant = constant,
-    href = href,
-)
+fun SystemMenuEntity.toMenuResponse(): MenuResponse =
+    MenuResponse(
+        id = id,
+        menuName = menuName,
+        menuType = menuType,
+        order = order,
+        parentId = parentId,
+        icon = icon,
+        iconType = iconType,
+        routeName = routeName,
+        routePath = routePath,
+        component = component,
+        i18nKey = i18nKey,
+        multiTab = multiTab,
+        activeMenu = activeMenu,
+        hideInMenu = hideInMenu,
+        status = status,
+        roles = roles,
+        keepAlive = keepAlive,
+        constant = constant,
+        href = href,
+    )
 
 @ApplicationScoped
 class RouteQueryHandler(
@@ -93,13 +94,16 @@ class RouteQueryHandler(
 
     override fun handle(query: RouteByIdBuiltInQuery): Uni<Boolean> = systemMenuRepository.getById(query.id).map { it?.builtIn != false }
 
-    override fun handle(query: RouteByConstantQuery): Uni<List<MenuRoute>> = systemMenuRepository.findAllByConstant(query.constant)
-        .map { menuList -> menuList.map { it.convertToMenuResponse() } }
+    override fun handle(query: RouteByConstantQuery): Uni<List<MenuRoute>> =
+        systemMenuRepository
+            .findAllByConstant(query.constant)
+            .map { menuList -> menuList.map { it.convertToMenuResponse() } }
 
-    override fun handle(query: RouteByTenantIdQuery): Uni<Set<String>> = when (query.tenantId) {
-        DbConstants.SUPER_TENANT -> systemMenuRepository.all().map { menus -> menus.map { it.id }.toSet() }
-        else -> systemTenantRepository.getById(query.tenantId).map { it.menuIds }
-    }
+    override fun handle(query: RouteByTenantIdQuery): Uni<Set<String>> =
+        when (query.tenantId) {
+            DbConstants.SUPER_TENANT -> systemMenuRepository.all().map { menus -> menus.map { it.id }.toSet() }
+            else -> systemTenantRepository.getById(query.tenantId).map { it.menuIds }
+        }
 
     override fun handle(query: ListTreeRoutesByUserIdAndConstantQuery): Uni<List<MenuResponse>> {
         val (userId, tenantId, constant) = query
@@ -119,20 +123,30 @@ class RouteQueryHandler(
         }
     }
 
-    private fun getRoutesByUserId(userId: String): Uni<List<SystemMenuEntity>> = when {
-        isSuperUser(userId) -> systemMenuRepository.all()
-        else -> systemMenuRepository.allByUserId(userId)
-    }
+    private fun getRoutesByUserId(userId: String): Uni<List<SystemMenuEntity>> =
+        when {
+            isSuperUser(userId) -> systemMenuRepository.all()
+            else -> systemMenuRepository.allByUserId(userId)
+        }
 
-    private fun listRoute(userId: String, tenantId: String): Uni<List<SystemMenuEntity>> = when {
-        isSuperUser(userId) -> systemMenuRepository.all()
-        else -> systemMenuRepository.allByTenantId(tenantId)
-    }
+    private fun listRoute(
+        userId: String,
+        tenantId: String,
+    ): Uni<List<SystemMenuEntity>> =
+        when {
+            isSuperUser(userId) -> systemMenuRepository.all()
+            else -> systemMenuRepository.allByTenantId(tenantId)
+        }
 
-    private fun listRouteByConstant(userId: String, tenantId: String, constant: Boolean): Uni<List<SystemMenuEntity>> = when {
-        isSuperUser(userId) -> systemMenuRepository.findAllByConstant(constant)
-        else -> systemMenuRepository.allByTenantIdAndConstant(tenantId, constant)
-    }
+    private fun listRouteByConstant(
+        userId: String,
+        tenantId: String,
+        constant: Boolean,
+    ): Uni<List<SystemMenuEntity>> =
+        when {
+            isSuperUser(userId) -> systemMenuRepository.findAllByConstant(constant)
+            else -> systemMenuRepository.allByTenantIdAndConstant(tenantId, constant)
+        }
 
     private fun <T, R> buildTree(
         items: List<T>,

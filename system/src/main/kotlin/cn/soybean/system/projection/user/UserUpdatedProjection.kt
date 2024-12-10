@@ -16,13 +16,16 @@ import io.smallrye.mutiny.replaceWithUnit
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class UserUpdatedProjection(private val userRepository: SystemUserRepository) : Projection {
+class UserUpdatedProjection(
+    private val userRepository: SystemUserRepository,
+) : Projection {
     @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =
             SerializerUtils.deserializeFromJsonBytes(eventEntity.data, UserCreatedOrUpdatedEventBase::class.java)
         return event.tenantId?.let { tenantId ->
-            userRepository.getById(event.aggregateId, tenantId)
+            userRepository
+                .getById(event.aggregateId, tenantId)
                 .flatMap { user ->
                     user?.let {
                         user.also {

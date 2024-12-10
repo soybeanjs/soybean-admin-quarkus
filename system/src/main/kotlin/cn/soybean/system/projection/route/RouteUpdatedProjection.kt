@@ -16,12 +16,15 @@ import io.smallrye.mutiny.replaceWithUnit
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class RouteUpdatedProjection(private val menuRepository: SystemMenuRepository) : Projection {
+class RouteUpdatedProjection(
+    private val menuRepository: SystemMenuRepository,
+) : Projection {
     @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =
             SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteCreatedOrUpdatedEventBase::class.java)
-        return menuRepository.getById(event.aggregateId)
+        return menuRepository
+            .getById(event.aggregateId)
             .flatMap { menu ->
                 menu.also {
                     menu.menuName = event.menuName

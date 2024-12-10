@@ -23,3 +23,6 @@ class PwdLoginRequest(
     @field:NotBlank(message = "{validation.PwdLoginRequest.password.NotBlank}")
     var password: String,
 )
+
+// TODO
+class CodeLoginRequest

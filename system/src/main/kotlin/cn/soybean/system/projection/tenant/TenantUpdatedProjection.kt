@@ -32,7 +32,8 @@ class TenantUpdatedProjection(
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =
             SerializerUtils.deserializeFromJsonBytes(eventEntity.data, TenantUpdatedEventBase::class.java)
-        return tenantRepository.getById(event.aggregateId)
+        return tenantRepository
+            .getById(event.aggregateId)
             .flatMap { tenant ->
                 tenant.also {
                     tenant.name = event.name
@@ -45,8 +46,7 @@ class TenantUpdatedProjection(
                     tenant.updateAccountName = event.updateAccountName
                 }
                 tenantRepository.saveOrUpdate(tenant)
-            }
-            .flatMap { tenant ->
+            }.flatMap { tenant ->
                 val menuIds = event.menuIds
                 when {
                     menuIds.isNullOrEmpty() -> Uni.createFrom().item(tenant)
@@ -61,8 +61,12 @@ class TenantUpdatedProjection(
             }.replaceWithUnit()
     }
 
-    private fun processMenuUpdate(tenantId: String, menuIds: Set<String>): Uni<Unit> {
-        return roleMenuRepository.findMenuIds(tenantId, SUPER_TENANT_ROLE_CODE)
+    private fun processMenuUpdate(
+        tenantId: String,
+        menuIds: Set<String>,
+    ): Uni<Unit> =
+        roleMenuRepository
+            .findMenuIds(tenantId, SUPER_TENANT_ROLE_CODE)
             .flatMap { menuEntities ->
                 val adminRoleId = menuEntities.firstOrNull()?.roleId
                 when {
@@ -82,10 +86,13 @@ class TenantUpdatedProjection(
                     }
                 }
             }
-    }
 
-    private fun processOperationUpdate(tenantId: String, operationIds: Set<String>): Uni<Unit> {
-        return roleApiRepository.findOperationIds(tenantId, SUPER_TENANT_ROLE_CODE)
+    private fun processOperationUpdate(
+        tenantId: String,
+        operationIds: Set<String>,
+    ): Uni<Unit> =
+        roleApiRepository
+            .findOperationIds(tenantId, SUPER_TENANT_ROLE_CODE)
             .flatMap { apiEntities ->
                 val adminRoleId = apiEntities.firstOrNull()?.roleId
                 when {
@@ -105,9 +112,13 @@ class TenantUpdatedProjection(
                     }
                 }
             }
-    }
 
-    private fun syncAdminMenuIds(tenantId: String, roleId: String, existingMenuIds: Set<String>, newMenuIds: Set<String>): Uni<Unit> {
+    private fun syncAdminMenuIds(
+        tenantId: String,
+        roleId: String,
+        existingMenuIds: Set<String>,
+        newMenuIds: Set<String>,
+    ): Uni<Unit> {
         val menusToAdd =
             newMenuIds.subtract(existingMenuIds).map { menuId ->
                 SystemRoleMenuEntity(roleId = roleId, menuId = menuId, tenantId = tenantId)
@@ -115,7 +126,8 @@ class TenantUpdatedProjection(
 
         val menusToRemove = existingMenuIds.subtract(newMenuIds)
 
-        return roleMenuRepository.saveOrUpdateAll(menusToAdd)
+        return roleMenuRepository
+            .saveOrUpdateAll(menusToAdd)
             .flatMap { roleMenuRepository.removeMenusByTenantId(tenantId, menusToRemove) }
             .replaceWithUnit()
     }
@@ -133,7 +145,8 @@ class TenantUpdatedProjection(
 
         val operationsToRemove = existingOperationIds.subtract(newOperationIds)
 
-        return roleApiRepository.saveOrUpdateAll(operationsToAdd)
+        return roleApiRepository
+            .saveOrUpdateAll(operationsToAdd)
             .flatMap { roleApiRepository.removeOperationsByTenantId(tenantId, operationsToRemove) }
             .replaceWithUnit()
     }

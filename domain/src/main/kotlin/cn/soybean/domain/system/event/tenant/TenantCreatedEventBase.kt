@@ -20,7 +20,8 @@ data class TenantCreatedEventBase(
     val expireTime: LocalDateTime,
     val menuIds: Set<String>? = null,
     val operationIds: Set<String>? = null,
-) : AggregateEventBase(aggregateId), DomainEvent {
+) : AggregateEventBase(aggregateId),
+    DomainEvent {
     companion object {
         const val TENANT_CREATED_V1 = "TENANT_CREATED_V1"
     }

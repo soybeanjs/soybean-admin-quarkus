@@ -26,10 +26,10 @@ import io.vertx.core.Vertx
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.ObservesAsync
 import jakarta.inject.Inject
-import java.time.Duration
-import java.util.*
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hibernate.reactive.mutiny.Mutiny
+import java.time.Duration
+import java.util.Optional
 
 @ApplicationScoped
 class SystemEventHandler(
@@ -41,46 +41,59 @@ class SystemEventHandler(
     @ConfigProperty(name = "mp.jwt.verify.token.age")
     private lateinit var mpJwtVerifyTokenAge: Optional<Long>
 
-    fun handleLoginLogEvent(@ObservesAsync loginLogEntity: SystemLoginLogEntity) {
-        sessionFactory.withStatelessSession { statelessSession ->
-            statelessSession.insert(loginLogEntity)
-        }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
-            .subscribe().with(
+    fun handleLoginLogEvent(
+        @ObservesAsync loginLogEntity: SystemLoginLogEntity,
+    ) {
+        sessionFactory
+            .withStatelessSession { statelessSession ->
+                statelessSession.insert(loginLogEntity)
+            }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
+            .subscribe()
+            .with(
                 { Log.trace("[SystemEventHandler] LoginLog event processed successfully") },
                 { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing LoginLog event") },
             )
     }
 
-    fun handleSystemApisEvent(@ObservesAsync apiEndpointEvent: ApiEndpointEvent) {
+    fun handleSystemApisEvent(
+        @ObservesAsync apiEndpointEvent: ApiEndpointEvent,
+    ) {
         VertxContextSupport.subscribeWith(
             { Multi.createFrom().item(apiEndpointEvent.data) },
             { item ->
-                Panache.withTransaction {
-                    SystemApisEntity.deleteAll()
-                        .flatMap { SystemApisEntity.persist(item.map { it.toSystemApisEntity() }.toList()) }
-                }.subscribe().with(
-                    { Log.trace("[SystemEventHandler] ApisEntity event processed successfully") },
-                    { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing ApisEntity event") },
-                )
+                Panache
+                    .withTransaction {
+                        SystemApisEntity
+                            .deleteAll()
+                            .flatMap { SystemApisEntity.persist(item.map { it.toSystemApisEntity() }.toList()) }
+                    }.subscribe()
+                    .with(
+                        { Log.trace("[SystemEventHandler] ApisEntity event processed successfully") },
+                        { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing ApisEntity event") },
+                    )
             },
         )
     }
 
-    fun handleUserPermActionEvent(@ObservesAsync userPermActionEvent: UserPermActionEvent) {
-        sessionFactory.withStatelessSession { statelessSession ->
-            when {
-                isSuperUser(userPermActionEvent.userId) ->
-                    getApiPermAction(statelessSession).map { apis ->
-                        storeUserPermAction(apis, userPermActionEvent.userId)
-                    }
+    fun handleUserPermActionEvent(
+        @ObservesAsync userPermActionEvent: UserPermActionEvent,
+    ) {
+        sessionFactory
+            .withStatelessSession { statelessSession ->
+                when {
+                    isSuperUser(userPermActionEvent.userId) ->
+                        getApiPermAction(statelessSession).map { apis ->
+                            storeUserPermAction(apis, userPermActionEvent.userId)
+                        }
 
-                else ->
-                    getApiPermActionByUserId(statelessSession, userPermActionEvent.userId).map { apis ->
-                        storeUserPermAction(apis, userPermActionEvent.userId)
-                    }
-            }
-        }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
-            .subscribe().with(
+                    else ->
+                        getApiPermActionByUserId(statelessSession, userPermActionEvent.userId).map { apis ->
+                            storeUserPermAction(apis, userPermActionEvent.userId)
+                        }
+                }
+            }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
+            .subscribe()
+            .with(
                 {
                     Log.trace(
                         "[SystemEventHandler] UserPermActionEvent event processed successfully. userId: ${userPermActionEvent.userId}",
@@ -90,17 +103,24 @@ class SystemEventHandler(
             )
     }
 
-    fun handleOperationLogEvent(@ObservesAsync operationLog: OperationLogDTO) {
-        sessionFactory.withStatelessSession { statelessSession ->
-            statelessSession.insert(operationLog.toOperateLogEntity())
-        }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
-            .subscribe().with(
+    fun handleOperationLogEvent(
+        @ObservesAsync operationLog: OperationLogDTO,
+    ) {
+        sessionFactory
+            .withStatelessSession { statelessSession ->
+                statelessSession.insert(operationLog.toOperateLogEntity())
+            }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
+            .subscribe()
+            .with(
                 { Log.trace("[SystemEventHandler] OperationLogDTO event processed successfully") },
                 { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing OperationLogDTO event") },
             )
     }
 
-    fun storeUserPermAction(apis: List<SystemApisEntity>, userId: String) {
+    fun storeUserPermAction(
+        apis: List<SystemApisEntity>,
+        userId: String,
+    ) {
         val permissionsKey = "${AppConstants.APP_PERM_ACTION_CACHE_PREFIX}:$userId"
         val permAction = extractPermissions(apis)
 
@@ -110,38 +130,51 @@ class SystemEventHandler(
                 val commands: ReactiveSetCommands<String, String> =
                     reactiveRedisDataSource.set(String::class.java, String::class.java)
 
-                reactiveRedisDataSource.key().del(permissionsKey)
+                reactiveRedisDataSource
+                    .key()
+                    .del(permissionsKey)
                     .flatMap { commands.sadd(permissionsKey, *permAction.toTypedArray()) }
                     .flatMap {
-                        reactiveRedisDataSource.key()
+                        reactiveRedisDataSource
+                            .key()
                             .expire(permissionsKey, Duration.ofSeconds(mpJwtVerifyTokenAge.get()))
-                    }.subscribe().with { _ ->
+                    }.subscribe()
+                    .with { _ ->
                         Log.info("[SystemEventHandler] storeUserPermAction processed successfully, Permissions updated for userId $userId")
                     }
             }
         }
     }
 
-    private fun extractPermissions(apis: List<SystemApisEntity>): Set<String> = apis.asSequence()
-        .mapNotNull { it.permissions }
-        .flatMap { it.split(",").asSequence().map(String::trim) }
-        .filterNot { it.isBlank() }
-        .toSet()
+    private fun extractPermissions(apis: List<SystemApisEntity>): Set<String> =
+        apis
+            .asSequence()
+            .mapNotNull { it.permissions }
+            .flatMap { it.split(",").asSequence().map(String::trim) }
+            .filterNot { it.isBlank() }
+            .toSet()
 
-    private fun getApiPermAction(statelessSession: Mutiny.StatelessSession): Uni<List<SystemApisEntity>> = statelessSession.createQuery(
-        "FROM SystemApisEntity",
-        SystemApisEntity::class.java,
-    ).resultList
+    private fun getApiPermAction(statelessSession: Mutiny.StatelessSession): Uni<List<SystemApisEntity>> =
+        statelessSession
+            .createQuery(
+                "FROM SystemApisEntity",
+                SystemApisEntity::class.java,
+            ).resultList
 
-    private fun getApiPermActionByUserId(statelessSession: Mutiny.StatelessSession, userId: String): Uni<List<SystemApisEntity>> =
-        statelessSession.createQuery(
-            """
+    private fun getApiPermActionByUserId(
+        statelessSession: Mutiny.StatelessSession,
+        userId: String,
+    ): Uni<List<SystemApisEntity>> =
+        statelessSession
+            .createQuery(
+                """
                 SELECT a
                 FROM SystemApisEntity a
                      LEFT JOIN SystemRoleApiEntity ra ON ra.operationId = a.operationId
                      LEFT JOIN SystemRoleUserEntity ru ON ru.roleId = ra.roleId
                 WHERE ru.userId = :userId
             """,
-            SystemApisEntity::class.java,
-        ).setParameter("userId", userId).resultList
+                SystemApisEntity::class.java,
+            ).setParameter("userId", userId)
+            .resultList
 }

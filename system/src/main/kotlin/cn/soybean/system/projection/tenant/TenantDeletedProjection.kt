@@ -25,17 +25,16 @@ class TenantDeletedProjection(
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =
             SerializerUtils.deserializeFromJsonBytes(eventEntity.data, TenantDeletedEventBase::class.java)
-        return tenantRepository.getById(event.aggregateId)
+        return tenantRepository
+            .getById(event.aggregateId)
             .flatMap { tenant ->
                 tenant.also {
                     tenant.status = event.status
                 }
                 tenantRepository.saveOrUpdate(tenant)
-            }
-            .map {
+            }.map {
                 eventInvoker.distributionProcess(event)
-            }
-            .replaceWithUnit()
+            }.replaceWithUnit()
     }
 
     override fun supports(eventType: String): Boolean = eventType == TenantDeletedEventBase.TENANT_DELETED_V1

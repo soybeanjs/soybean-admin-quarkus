@@ -10,7 +10,9 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Event
 
 @ApplicationScoped
-class DomainEventPublisher(private val event: Event<DomainEvent>) {
+class DomainEventPublisher(
+    private val event: Event<DomainEvent>,
+) {
     fun publish(event: DomainEvent) {
         this.event.fireAsync(event)
     }

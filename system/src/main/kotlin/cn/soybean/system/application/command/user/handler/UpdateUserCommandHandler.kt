@@ -17,22 +17,26 @@ import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class UpdateUserCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
-    CommandHandler<UpdateUserCommand, Boolean> {
-    override fun handle(command: UpdateUserCommand): Uni<Boolean> = eventStoreDB.load(command.id, UserAggregate::class.java)
-        .map { aggregate ->
-            aggregate.updateUser(
-                command.toUserCreatedOrUpdatedEventBase().also {
-                    it.tenantId = loginHelper.getTenantId()
-                    it.updateBy = loginHelper.getUserId()
-                    it.updateAccountName = loginHelper.getAccountName()
-                },
-            )
-            aggregate
-        }
-        .flatMap { aggregate -> eventStoreDB.save(aggregate) }
-        .replaceWith(true)
-        .onFailure().invoke { ex -> Log.errorf(ex, "UpdateUserCommandHandler fail") }
+class UpdateUserCommandHandler(
+    private val eventStoreDB: EventStoreDB,
+    private val loginHelper: LoginHelper,
+) : CommandHandler<UpdateUserCommand, Boolean> {
+    override fun handle(command: UpdateUserCommand): Uni<Boolean> =
+        eventStoreDB
+            .load(command.id, UserAggregate::class.java)
+            .map { aggregate ->
+                aggregate.updateUser(
+                    command.toUserCreatedOrUpdatedEventBase().also {
+                        it.tenantId = loginHelper.getTenantId()
+                        it.updateBy = loginHelper.getUserId()
+                        it.updateAccountName = loginHelper.getAccountName()
+                    },
+                )
+                aggregate
+            }.flatMap { aggregate -> eventStoreDB.save(aggregate) }
+            .replaceWith(true)
+            .onFailure()
+            .invoke { ex -> Log.errorf(ex, "UpdateUserCommandHandler fail") }
 
     override fun canHandle(command: Command): Boolean = command is UpdateUserCommand
 }

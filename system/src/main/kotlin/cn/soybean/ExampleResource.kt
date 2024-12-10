@@ -53,7 +53,9 @@ class ExampleResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "apiKey验证", description = "apiKey请求验证")
-    fun apiKey(@Context context: ContainerRequestContext): String {
+    fun apiKey(
+        @Context context: ContainerRequestContext,
+    ): String {
         val tenantId = context.getHeaderString(AppConstants.API_TENANT_ID)
         Log.info("Tenant ID from header: ${tenantId ?: "Not provided"}")
 
@@ -65,7 +67,9 @@ class ExampleResource {
     @Produces("application/x-msgpack")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "msgPack验证", description = "msgPack请求验证")
-    fun msgPack(@Valid dto: MsgTempData): Uni<ResponseEntity<MsgTempData>> = uni { ResponseEntity.ok(dto) }
+    fun msgPack(
+        @Valid dto: MsgTempData,
+    ): Uni<ResponseEntity<MsgTempData>> = uni { ResponseEntity.ok(dto) }
 
     class MsgTempData {
         val name: String? = null

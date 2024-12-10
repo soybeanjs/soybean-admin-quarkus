@@ -14,7 +14,10 @@ import jakarta.enterprise.context.ApplicationScoped
 class ApiKeyCache {
     private val cache: Cache<String, SystemApiKeyEntity> = Caffeine.newBuilder().build()
 
-    fun set(key: String, value: SystemApiKeyEntity) = cache.put(key, value)
+    fun set(
+        key: String,
+        value: SystemApiKeyEntity,
+    ) = cache.put(key, value)
 
     fun get(key: String): SystemApiKeyEntity? = cache.getIfPresent(key)
 

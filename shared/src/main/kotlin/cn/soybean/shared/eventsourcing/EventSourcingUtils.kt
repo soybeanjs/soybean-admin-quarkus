@@ -22,6 +22,8 @@ object EventSourcingUtils {
         return snapshotEntity
     }
 
-    fun <T : AggregateRoot> aggregateFromSnapshot(snapshotEntity: AggregateSnapshotEntity, valueType: Class<T>): T =
-        SerializerUtils.deserializeFromJsonBytes(snapshotEntity.data, valueType)
+    fun <T : AggregateRoot> aggregateFromSnapshot(
+        snapshotEntity: AggregateSnapshotEntity,
+        valueType: Class<T>,
+    ): T = SerializerUtils.deserializeFromJsonBytes(snapshotEntity.data, valueType)
 }

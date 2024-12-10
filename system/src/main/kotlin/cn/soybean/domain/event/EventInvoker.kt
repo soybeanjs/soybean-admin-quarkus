@@ -11,7 +11,9 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Instance
 
 @ApplicationScoped
-class EventInvoker(private val handlers: Instance<DomainEventListener<*>>) {
+class EventInvoker(
+    private val handlers: Instance<DomainEventListener<*>>,
+) {
     fun distributionProcess(event: DomainEvent) {
         handlers.forEach { handler ->
             if (handler.supports(event)) {
@@ -21,7 +23,10 @@ class EventInvoker(private val handlers: Instance<DomainEventListener<*>>) {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <E : DomainEvent> callHandlerSafely(handler: DomainEventListener<*>, event: E) {
+    private fun <E : DomainEvent> callHandlerSafely(
+        handler: DomainEventListener<*>,
+        event: E,
+    ) {
         (handler as DomainEventListener<E>).onEvent(event)
     }
 }

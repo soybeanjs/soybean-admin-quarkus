@@ -18,18 +18,21 @@ import cn.soybean.system.interfaces.rest.dto.response.tenant.TenantResponse
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
-fun SystemTenantEntity.toTenantResponse(): TenantResponse = TenantResponse(
-    name = name,
-    contactAccountName = contactAccountName,
-    status = status,
-    website = website,
-    expireTime = expireTime,
-    menuIds = menuIds,
-    operationIds = operationIds,
-)
+fun SystemTenantEntity.toTenantResponse(): TenantResponse =
+    TenantResponse(
+        name = name,
+        contactAccountName = contactAccountName,
+        status = status,
+        website = website,
+        expireTime = expireTime,
+        menuIds = menuIds,
+        operationIds = operationIds,
+    )
 
 @ApplicationScoped
-class TenantQueryHandler(private val systemTenantRepository: SystemTenantRepository) : TenantQueryService {
+class TenantQueryHandler(
+    private val systemTenantRepository: SystemTenantRepository,
+) : TenantQueryService {
     override fun handle(query: TenantByNameQuery): Uni<SystemTenantEntity> = systemTenantRepository.findByName(query.name)
 
     override fun handle(query: PageTenantQuery): Uni<PageResult<TenantResponse>> {

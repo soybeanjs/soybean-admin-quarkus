@@ -10,13 +10,15 @@ import jakarta.persistence.Converter
 
 @Converter
 class JsonStringListConverter : AttributeConverter<List<String>, String> {
-    override fun convertToDatabaseColumn(attribute: List<String>?): String? = when {
-        attribute.isNullOrEmpty() -> null
-        else -> attribute.joinToString(separator = ",")
-    }
+    override fun convertToDatabaseColumn(attribute: List<String>?): String? =
+        when {
+            attribute.isNullOrEmpty() -> null
+            else -> attribute.joinToString(separator = ",")
+        }
 
-    override fun convertToEntityAttribute(dbData: String?): List<String> = when {
-        dbData.isNullOrBlank() -> emptyList()
-        else -> dbData.split(",").map { it.trim() }
-    }
+    override fun convertToEntityAttribute(dbData: String?): List<String> =
+        when {
+            dbData.isNullOrBlank() -> emptyList()
+            else -> dbData.split(",").map { it.trim() }
+        }
 }

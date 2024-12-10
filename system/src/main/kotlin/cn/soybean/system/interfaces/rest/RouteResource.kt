@@ -65,28 +65,33 @@ class RouteResource(
     @WithSession
     @Operation(summary = "路由列表", description = "获取路由列表")
     fun getMenuList(): Uni<ResponseEntity<List<MenuResponse>>> =
-        routeQueryService.handle(ListTreeRoutesByUserIdQuery(loginHelper.getUserId(), loginHelper.getTenantId()))
+        routeQueryService
+            .handle(ListTreeRoutesByUserIdQuery(loginHelper.getUserId(), loginHelper.getTenantId()))
             .map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.create")
     @POST
     @WithTransaction
     @Operation(summary = "创建路由", description = "创建路由信息")
-    fun createRoute(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RouteRequest): Uni<ResponseEntity<Boolean>> =
-        routeService.createRoute(req.toCreateRouteCommand()).map { ResponseEntity.ok(it) }
+    fun createRoute(
+        @Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RouteRequest,
+    ): Uni<ResponseEntity<Boolean>> = routeService.createRoute(req.toCreateRouteCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新路由", description = "更新路由信息")
-    fun updateRoute(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RouteRequest): Uni<ResponseEntity<Boolean>> =
-        routeService.updateRoute(req.toUpdateRouteCommand()).map { ResponseEntity.ok(it) }
+    fun updateRoute(
+        @Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RouteRequest,
+    ): Uni<ResponseEntity<Boolean>> = routeService.updateRoute(req.toUpdateRouteCommand()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.delete")
     @DELETE
     @WithTransaction
     @Operation(summary = "删除路由", description = "删除路由信息")
-    fun deleteRoute(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
+    fun deleteRoute(
+        @Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>,
+    ): Uni<ResponseEntity<Boolean>> =
         routeService.deleteRoute(DeleteRouteCommand(ids)).map { (isSuccess, message) ->
             when {
                 isSuccess -> ResponseEntity.ok(true)
@@ -106,8 +111,11 @@ class RouteResource(
     @Path("/listMenuIdByRoleId/{roleId}")
     @WithSession
     @Operation(summary = "根据角色获取已授权路由资源", description = "根据角色获取已授权路由资源")
-    fun listMenuIdByRoleId(@PathParam("roleId") roleId: String): Uni<ResponseEntity<List<String>>> =
-        SystemMenuEntity.listMenuIdByRoleId(roleId, loginHelper.getUserId(), loginHelper.getTenantId())
+    fun listMenuIdByRoleId(
+        @PathParam("roleId") roleId: String,
+    ): Uni<ResponseEntity<List<String>>> =
+        SystemMenuEntity
+            .listMenuIdByRoleId(roleId, loginHelper.getUserId(), loginHelper.getTenantId())
             .map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}route.tree")
@@ -115,11 +123,12 @@ class RouteResource(
     @Path("/tree")
     @WithSession
     @Operation(summary = "路由🌲结构", description = "获取路由🌲")
-    fun getMenuTree(): Uni<ResponseEntity<List<MenuResponse>>> = routeQueryService.handle(
-        ListTreeRoutesByUserIdAndConstantQuery(
-            loginHelper.getUserId(),
-            loginHelper.getTenantId(),
-        ),
-    )
-        .map { ResponseEntity.ok(it) }
+    fun getMenuTree(): Uni<ResponseEntity<List<MenuResponse>>> =
+        routeQueryService
+            .handle(
+                ListTreeRoutesByUserIdAndConstantQuery(
+                    loginHelper.getUserId(),
+                    loginHelper.getTenantId(),
+                ),
+            ).map { ResponseEntity.ok(it) }
 }

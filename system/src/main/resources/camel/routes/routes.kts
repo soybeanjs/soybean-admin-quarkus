@@ -34,7 +34,8 @@ from("direct:post")
     .process { e -> e.getIn().body = "{ 'message': 'Hello POST' }" }
 
 val caffeineCache: Cache<String, String> =
-    Caffeine.newBuilder()
+    Caffeine
+        .newBuilder()
         .maximumSize(1000L)
         .build()
 
@@ -52,8 +53,7 @@ from("disruptor:processCache")
         } else {
             exchange.getIn().body = "Returned existing value: $currentValue"
         }
-    }
-    .log("Cache operation completed: \${body}")
+    }.log("Cache operation completed: \${body}")
     .process { _ ->
         val allEntries =
             caffeineCache.asMap().entries.joinToString(", ") { entry ->

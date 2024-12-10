@@ -27,15 +27,18 @@ class CaffeineCacheRoute : RouteBuilder() {
             .bindingMode(RestBindingMode.auto)
 
         from("rest:get:rest/hello")
-            .transform().constant("Hello World from Camel")
+            .transform()
+            .constant("Hello World from Camel")
             .log("Current thread name: \${threadName}")
 
         from("rest:get:rest/echo")
-            .transform().simple("\${header.name}")
+            .transform()
+            .simple("\${header.name}")
             .log("Received query parameter: \${header.name}")
 
         from("rest:get:rest/echo/{param}")
-            .transform().simple("\${header.param}")
+            .transform()
+            .simple("\${header.param}")
             .log("Received path parameter: \${header.param}")
 
         from("direct:cachePut")
@@ -57,25 +60,34 @@ class CaffeineCacheRoute : RouteBuilder() {
 
 @Path("/camel")
 @ApplicationScoped
-class CacheResource(private val producerTemplate: ProducerTemplate) {
+class CacheResource(
+    private val producerTemplate: ProducerTemplate,
+) {
     @WithSpan
     @POST
     @Path("/cache/put/{key}/{value}")
-    fun putCache(@PathParam("key") key: String, @PathParam("value") value: String): Uni<String> = Uni.createFrom().future {
-        producerTemplate.asyncRequestBodyAndHeaders(
-            "direct:start",
-            value,
-            mapOf("CamelCaffeineKey" to key),
-        ).thenApply {
-            "Cache Updated for key: $key with value: $value"
+    fun putCache(
+        @PathParam("key") key: String,
+        @PathParam("value") value: String,
+    ): Uni<String> =
+        Uni.createFrom().future {
+            producerTemplate
+                .asyncRequestBodyAndHeaders(
+                    "direct:start",
+                    value,
+                    mapOf("CamelCaffeineKey" to key),
+                ).thenApply {
+                    "Cache Updated for key: $key with value: $value"
+                }
         }
-    }
 
     @WithSpan
     @GET
     @Path("/cache/get/{key}")
-    fun getCache(@PathParam("key") key: String): Uni<String> {
-        return Uni.createFrom().future(
+    fun getCache(
+        @PathParam("key") key: String,
+    ): Uni<String> =
+        Uni.createFrom().future(
             producerTemplate.asyncRequestBodyAndHeader(
                 "direct:cacheGet",
                 null,
@@ -84,5 +96,4 @@ class CacheResource(private val producerTemplate: ProducerTemplate) {
                 String::class.java,
             ),
         )
-    }
 }

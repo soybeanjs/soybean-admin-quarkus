@@ -40,20 +40,16 @@ subprojects {
             // Target all Kotlin files in the project
             target("**/*.kt", "**/*.kts")
             // Exclude generated files
-            targetExclude("**/build/**/*.kt", "**/build/**/*.kts", "**/generated/**")
+            targetExclude("**/build/**/*.kt", "**/build/**/*.kts", "**/bin/**/*.kt", "**/bin/**/*.kts", "**/generated/**")
 
             // Use ktlint for code formatting
-            ktlint("1.0.1")
+            ktlint("1.5.0")
                 .setEditorConfigPath("${rootProject.projectDir.resolve(".editorconfig").absolutePath}")
-                .editorConfigOverride(mapOf(
-                    "max_line_length" to "140",
-                    "ktlint_standard_filename" to "disabled",  // 暂时禁用文件命名规则
-                ))
 
             // Apply additional formatting rules
-            trimTrailingWhitespace()
-            indentWithSpaces(4)
-            endWithNewline()
+            // trimTrailingWhitespace()
+            // indentWithSpaces(4)
+            // endWithNewline()
 
             // License header configuration
             licenseHeader(

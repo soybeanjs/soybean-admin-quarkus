@@ -16,7 +16,9 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "sys_api_key")
-open class SystemApiKeyEntity : BaseTenantEntity(), PanacheEntityBase {
+open class SystemApiKeyEntity :
+    BaseTenantEntity(),
+    PanacheEntityBase {
     /**
      * key
      */

@@ -12,7 +12,9 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Instance
 
 @ApplicationScoped
-class QueryInvoker(private val handlers: Instance<QueryHandler<*, *>>) {
+class QueryInvoker(
+    private val handlers: Instance<QueryHandler<*, *>>,
+) {
     @Suppress("UNCHECKED_CAST")
     fun <C : Query, R> dispatch(query: C): Uni<R> {
         val handler =

@@ -50,35 +50,44 @@ open class SystemApisEntity(
     var createTime: LocalDateTime? = null,
 ) : PanacheEntityBase {
     companion object : PanacheCompanion<SystemApisEntity> {
-        fun listApi(userId: String, tenantId: String): Uni<List<SystemApisEntity>> = when {
-            isSuperUser(userId) -> listAll().map { list -> list.filter { !it.permissions.isNullOrEmpty() } }
+        fun listApi(
+            userId: String,
+            tenantId: String,
+        ): Uni<List<SystemApisEntity>> =
+            when {
+                isSuperUser(userId) -> listAll().map { list -> list.filter { !it.permissions.isNullOrEmpty() } }
 
-            else ->
-                SystemTenantEntity.getTenantOperationIds(tenantId).flatMap { operationIds ->
-                    if (operationIds.isEmpty()) {
-                        Uni.createFrom().item(emptyList())
-                    } else {
-                        list(
-                            "SELECT a FROM SystemApisEntity a WHERE a.operationId IN ?1 AND a.permissions IS NOT NULL",
-                            operationIds,
-                        )
+                else ->
+                    SystemTenantEntity.getTenantOperationIds(tenantId).flatMap { operationIds ->
+                        if (operationIds.isEmpty()) {
+                            Uni.createFrom().item(emptyList())
+                        } else {
+                            list(
+                                "SELECT a FROM SystemApisEntity a WHERE a.operationId IN ?1 AND a.permissions IS NOT NULL",
+                                operationIds,
+                            )
+                        }
                     }
-                }
-        }
+            }
 
-        fun listApiOperationIdByRoleId(roleId: String, userId: String, tenantId: String): Uni<List<String>> = when {
-            isSuperUser(userId) && isSuperRole(roleId) -> listAll().map { apis -> apis.mapNotNull { it.operationId } }
+        fun listApiOperationIdByRoleId(
+            roleId: String,
+            userId: String,
+            tenantId: String,
+        ): Uni<List<String>> =
+            when {
+                isSuperUser(userId) && isSuperRole(roleId) -> listAll().map { apis -> apis.mapNotNull { it.operationId } }
 
-            else ->
-                list(
-                    """
+                else ->
+                    list(
+                        """
                        SELECT a FROM SystemApisEntity a
                        LEFT JOIN SystemRoleApiEntity ra ON ra.operationId = a.operationId
                        WHERE ra.roleId = ?1 AND ra.tenantId = ?2
                 """,
-                    roleId,
-                    tenantId,
-                ).map { apis -> apis.mapNotNull { it.operationId } }
-        }
+                        roleId,
+                        tenantId,
+                    ).map { apis -> apis.mapNotNull { it.operationId } }
+            }
     }
 }

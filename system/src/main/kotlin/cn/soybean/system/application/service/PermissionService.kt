@@ -39,7 +39,10 @@ class PermissionService(
     private val roleApiRepository: SystemRoleApiRepository,
     private val roleUserRepository: SystemRoleUserRepository,
 ) {
-    fun authorizeRoleMenus(command: AuthorizeRoleMenuCommand, tenantId: String): Uni<Pair<Boolean, String>> =
+    fun authorizeRoleMenus(
+        command: AuthorizeRoleMenuCommand,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
         checkRole(command.roleId, tenantId).flatMap { (flag, msg) ->
             when {
                 flag -> processAuthorizeRoleMenus(command.roleId, command.menuIds, tenantId)
@@ -47,38 +50,58 @@ class PermissionService(
             }
         }
 
-    private fun processAuthorizeRoleMenus(roleId: String, menuIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> =
+    private fun processAuthorizeRoleMenus(
+        roleId: String,
+        menuIds: Set<String>,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
         routeQueryService.handle(RouteByTenantIdQuery(tenantId)).flatMap { availableMenuIds ->
             val validMenuIds = menuIds.intersect(availableMenuIds)
             if (validMenuIds.isEmpty()) {
                 Uni.createFrom().item(Pair(false, "No valid menu IDs to assign."))
             } else {
-                roleMenuRepository.delByRoleId(roleId, tenantId)
+                roleMenuRepository
+                    .delByRoleId(roleId, tenantId)
                     .flatMap { addNewRoleMenus(roleId, validMenuIds, tenantId) }
             }
         }
 
-    private fun addNewRoleMenus(roleId: String, menuIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> {
+    private fun addNewRoleMenus(
+        roleId: String,
+        menuIds: Set<String>,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> {
         val roleMenus =
             menuIds.map { menuId ->
                 SystemRoleMenuEntity(roleId = roleId, menuId = menuId, tenantId = tenantId)
             }
-        return roleMenuRepository.saveOrUpdateAll(roleMenus)
+        return roleMenuRepository
+            .saveOrUpdateAll(roleMenus)
             .map { Pair(true, "Menu IDs successfully assigned to role.") }
-            .onFailure().recoverWithItem { _ -> Pair(false, "Failed to assign menus to role.") }
+            .onFailure()
+            .recoverWithItem { _ -> Pair(false, "Failed to assign menus to role.") }
     }
 
-    private fun addNewRoleUsers(roleId: String, userIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> {
+    private fun addNewRoleUsers(
+        roleId: String,
+        userIds: Set<String>,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> {
         val roleUsers =
             userIds.map { userId ->
                 SystemRoleUserEntity(roleId = roleId, userId = userId, tenantId = tenantId)
             }
-        return roleUserRepository.saveOrUpdateAll(roleUsers)
+        return roleUserRepository
+            .saveOrUpdateAll(roleUsers)
             .map { Pair(true, "User IDs successfully assigned to role.") }
-            .onFailure().recoverWithItem { _ -> Pair(false, "Failed to assign users to role.") }
+            .onFailure()
+            .recoverWithItem { _ -> Pair(false, "Failed to assign users to role.") }
     }
 
-    fun authorizeUserRoles(command: AuthorizeRoleUserCommand, tenantId: String): Uni<Pair<Boolean, String>> =
+    fun authorizeUserRoles(
+        command: AuthorizeRoleUserCommand,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
         checkRole(command.roleId, tenantId).flatMap { (flag, msg) ->
             when {
                 flag -> processAuthorizeRoleUsers(command.roleId, command.userIds, tenantId)
@@ -86,7 +109,10 @@ class PermissionService(
             }
         }
 
-    fun authorizeRoleOperations(command: AuthorizeRoleOperationCommand, tenantId: String): Uni<Pair<Boolean, String>> =
+    fun authorizeRoleOperations(
+        command: AuthorizeRoleOperationCommand,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
         checkRole(command.roleId, tenantId).flatMap { (flag, msg) ->
             when {
                 flag -> processAuthorizeRoleOperations(command.roleId, command.operationIds, tenantId)
@@ -94,51 +120,73 @@ class PermissionService(
             }
         }
 
-    private fun processAuthorizeRoleUsers(roleId: String, userIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> =
+    private fun processAuthorizeRoleUsers(
+        roleId: String,
+        userIds: Set<String>,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
         userQueryService.handle(UserByTenantIdQuery(tenantId)).flatMap { availableUserIds ->
             val validUserIds = userIds.intersect(availableUserIds)
             if (validUserIds.isEmpty()) {
                 Uni.createFrom().item(Pair(false, "No valid user IDs to assign."))
             } else {
-                roleUserRepository.delByRoleId(roleId, tenantId)
+                roleUserRepository
+                    .delByRoleId(roleId, tenantId)
                     .flatMap { addNewRoleUsers(roleId, validUserIds, tenantId) }
             }
         }
 
-    private fun processAuthorizeRoleOperations(roleId: String, operationIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> {
-        return apisByTenantId(tenantId).flatMap { availableOperationIds ->
+    private fun processAuthorizeRoleOperations(
+        roleId: String,
+        operationIds: Set<String>,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
+        apisByTenantId(tenantId).flatMap { availableOperationIds ->
             val validOperationIds = availableOperationIds.intersect(operationIds)
             if (validOperationIds.isEmpty()) {
                 Uni.createFrom().item(Pair(false, "No valid operation IDs to assign."))
             } else {
-                roleApiRepository.delByRoleId(roleId, tenantId)
+                roleApiRepository
+                    .delByRoleId(roleId, tenantId)
                     .flatMap { addNewRoleOperationIds(roleId, validOperationIds, tenantId) }
             }
         }
-    }
 
-    private fun addNewRoleOperationIds(roleId: String, operationIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> {
+    private fun addNewRoleOperationIds(
+        roleId: String,
+        operationIds: Set<String>,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> {
         val roleOperationIds =
             operationIds.map { operationId ->
                 SystemRoleApiEntity(roleId = roleId, operationId = operationId, tenantId = tenantId)
             }
-        return roleApiRepository.saveOrUpdateAll(roleOperationIds)
+        return roleApiRepository
+            .saveOrUpdateAll(roleOperationIds)
             .map { Pair(true, "Operation IDs successfully assigned to role.") }
-            .onFailure().recoverWithItem { _ -> Pair(false, "Failed to assign operations to role.") }
+            .onFailure()
+            .recoverWithItem { _ -> Pair(false, "Failed to assign operations to role.") }
     }
 
-    private fun apisByTenantId(tenantId: String): Uni<Set<String>> = when (tenantId) {
-        DbConstants.SUPER_TENANT ->
-            SystemApisEntity.listAll()
-                .map { apis -> apis.mapNotNull { it.operationId }.toSet() }
+    private fun apisByTenantId(tenantId: String): Uni<Set<String>> =
+        when (tenantId) {
+            DbConstants.SUPER_TENANT ->
+                SystemApisEntity
+                    .listAll()
+                    .map { apis -> apis.mapNotNull { it.operationId }.toSet() }
 
-        else ->
-            roleApiRepository.findOperationIds(tenantId, SUPER_TENANT_ROLE_CODE)
-                .map { apis -> apis.mapNotNull { it.operationId }.toSet() }
-    }
+            else ->
+                roleApiRepository
+                    .findOperationIds(tenantId, SUPER_TENANT_ROLE_CODE)
+                    .map { apis -> apis.mapNotNull { it.operationId }.toSet() }
+        }
 
-    private fun checkRole(roleId: String, tenantId: String): Uni<Pair<Boolean, String>> =
-        roleQueryService.handle(RoleByIdQuery(roleId, tenantId))
+    private fun checkRole(
+        roleId: String,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
+        roleQueryService
+            .handle(RoleByIdQuery(roleId, tenantId))
             .flatMap { role ->
                 when {
                     role.code == DbConstants.SUPER_SYSTEM_ROLE_CODE || role.code == SUPER_TENANT_ROLE_CODE ->
@@ -148,8 +196,12 @@ class PermissionService(
                 }
             }
 
-    private fun checkUser(userId: String, tenantId: String): Uni<Pair<Boolean, String>> =
-        userQueryService.handle(UserByIdQuery(userId, tenantId))
+    private fun checkUser(
+        userId: String,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
+        userQueryService
+            .handle(UserByIdQuery(userId, tenantId))
             .flatMap { user ->
                 when {
                     user == null -> Uni.createFrom().failure(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))

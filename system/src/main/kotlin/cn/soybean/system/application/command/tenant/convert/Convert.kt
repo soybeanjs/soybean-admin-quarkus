@@ -14,18 +14,19 @@ fun CreateTenantCommand.convert2TenantCreatedOrUpdatedEventBase(
     createBy: String,
     createAccountName: String,
     contactUserId: String,
-): TenantCreatedEventBase = TenantCreatedEventBase(
-    aggregateId = id,
-    name = name,
-    contactUserId = contactUserId,
-    contactAccountName = contactAccountName,
-    status = status,
-    website = website,
-    expireTime = expireTime,
-    menuIds = menuIds,
-    operationIds = operationIds,
-).also {
-    it.tenantId = tenantId
-    it.createBy = createBy
-    it.createAccountName = createAccountName
-}
+): TenantCreatedEventBase =
+    TenantCreatedEventBase(
+        aggregateId = id,
+        name = name,
+        contactUserId = contactUserId,
+        contactAccountName = contactAccountName,
+        status = status,
+        website = website,
+        expireTime = expireTime,
+        menuIds = menuIds,
+        operationIds = operationIds,
+    ).also {
+        it.tenantId = tenantId
+        it.createBy = createBy
+        it.createAccountName = createAccountName
+    }

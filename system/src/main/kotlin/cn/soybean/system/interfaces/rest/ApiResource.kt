@@ -25,7 +25,9 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Apis", description = "Operations related to apis")
-class ApiResource(private val loginHelper: LoginHelper) {
+class ApiResource(
+    private val loginHelper: LoginHelper,
+) {
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}api.list")
     @GET
     @WithSession
@@ -38,7 +40,10 @@ class ApiResource(private val loginHelper: LoginHelper) {
     @Path("/listApiOperationIdByRoleId/{roleId}")
     @WithSession
     @Operation(summary = "根据角色获取已授权接口资源", description = "根据角色获取已授权接口资源")
-    fun listApiOperationIdByRoleId(@PathParam("roleId") roleId: String): Uni<ResponseEntity<List<String>>> =
-        SystemApisEntity.listApiOperationIdByRoleId(roleId, loginHelper.getUserId(), loginHelper.getTenantId())
+    fun listApiOperationIdByRoleId(
+        @PathParam("roleId") roleId: String,
+    ): Uni<ResponseEntity<List<String>>> =
+        SystemApisEntity
+            .listApiOperationIdByRoleId(roleId, loginHelper.getUserId(), loginHelper.getTenantId())
             .map { ResponseEntity.ok(it) }
 }

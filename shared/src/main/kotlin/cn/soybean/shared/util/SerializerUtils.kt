@@ -25,25 +25,31 @@ object SerializerUtils {
         }
 
     @JvmStatic
-    fun serializeToJsonBytes(obj: Any): ByteArray = try {
-        objectMapper.writeValueAsBytes(obj)
-    } catch (e: JsonProcessingException) {
-        throw RuntimeException(e.message, e)
-    }
+    fun serializeToJsonBytes(obj: Any): ByteArray =
+        try {
+            objectMapper.writeValueAsBytes(obj)
+        } catch (e: JsonProcessingException) {
+            throw RuntimeException(e.message, e)
+        }
 
     @JvmStatic
-    fun <T> deserializeFromJsonBytes(jsonBytes: ByteArray, valueType: Class<T>): T = try {
-        objectMapper.readValue(jsonBytes, valueType)
-    } catch (e: IOException) {
-        throw RuntimeException(e.message, e)
-    }
+    fun <T> deserializeFromJsonBytes(
+        jsonBytes: ByteArray,
+        valueType: Class<T>,
+    ): T =
+        try {
+            objectMapper.readValue(jsonBytes, valueType)
+        } catch (e: IOException) {
+            throw RuntimeException(e.message, e)
+        }
 
     @JvmStatic
-    fun deserializeEventsFromJsonBytes(jsonBytes: ByteArray): Array<AggregateEventEntity> = try {
-        objectMapper.readValue(jsonBytes, Array<AggregateEventEntity>::class.java)
-    } catch (e: IOException) {
-        throw RuntimeException(e.message, e)
-    }
+    fun deserializeEventsFromJsonBytes(jsonBytes: ByteArray): Array<AggregateEventEntity> =
+        try {
+            objectMapper.readValue(jsonBytes, Array<AggregateEventEntity>::class.java)
+        } catch (e: IOException) {
+            throw RuntimeException(e.message, e)
+        }
 
     @JvmStatic
     fun deserializeEventsMetadata(metaData: ByteArray): HashMap<String, ByteArray> {
@@ -56,10 +62,11 @@ object SerializerUtils {
     }
 
     @JvmStatic
-    fun serializeEventsMetadata(metaData: HashMap<String, ByteArray>): ByteArray = try {
-        val valueAsString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(metaData)
-        valueAsString.toByteArray(StandardCharsets.UTF_8)
-    } catch (e: IOException) {
-        throw RuntimeException(e.message, e)
-    }
+    fun serializeEventsMetadata(metaData: HashMap<String, ByteArray>): ByteArray =
+        try {
+            val valueAsString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(metaData)
+            valueAsString.toByteArray(StandardCharsets.UTF_8)
+        } catch (e: IOException) {
+            throw RuntimeException(e.message, e)
+        }
 }

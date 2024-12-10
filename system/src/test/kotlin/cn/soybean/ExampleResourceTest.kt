@@ -10,9 +10,9 @@ import cn.soybean.system.infrastructure.util.SignUtil.createSign
 import cn.soybean.system.infrastructure.util.SignUtil.getRandomString
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
-import java.time.Instant
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.jupiter.api.Test
+import java.time.Instant
 
 @QuarkusTest
 class ExampleResourceTest {
@@ -39,9 +39,10 @@ class ExampleResourceTest {
                     "HmacSHA256",
                     apiSecret,
                 ),
-            )
-            .log().all()
-            .`when`().get("/hello/sign")
+            ).log()
+            .all()
+            .`when`()
+            .get("/hello/sign")
             .then()
             .statusCode(200)
             .body(`is`("sign request success"))
@@ -51,8 +52,10 @@ class ExampleResourceTest {
     fun testApiKeyEndpoint() {
         given()
             .header(AppConstants.API_KEY, apiKey)
-            .log().all()
-            .`when`().get("/hello/apiKey")
+            .log()
+            .all()
+            .`when`()
+            .get("/hello/apiKey")
             .then()
             .statusCode(200)
             .body(`is`("apiKey request success"))

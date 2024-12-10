@@ -5,7 +5,9 @@
  */
 package cn.soybean.shared.domain.aggregate
 
-abstract class AggregateEventBase(aggregateId: String) {
+abstract class AggregateEventBase(
+    aggregateId: String,
+) {
     init {
         require(aggregateId.isNotBlank()) { "AggregateEventBase aggregateId is required" }
     }

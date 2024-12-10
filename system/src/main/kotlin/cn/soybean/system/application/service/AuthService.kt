@@ -35,8 +35,8 @@ import io.smallrye.mutiny.Uni
 import io.vertx.ext.web.RoutingContext
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Event
-import java.time.LocalDateTime
 import org.eclipse.microprofile.jwt.Claims
+import java.time.LocalDateTime
 
 @ApplicationScoped
 class AuthService(
@@ -47,51 +47,71 @@ class AuthService(
     private val eventBus: Event<SystemLoginLogEntity>,
     private val eventPublisher: DomainEventPublisher,
 ) {
-    fun pwdLogin(command: PwdLoginCommand): Uni<LoginResponse> = findAndVerifyTenant(command.tenantName)
-        .flatMap { tenant ->
-            findAndVerifyUserCredentials(command.userName, command.password, tenant.id)
-                .flatMap { user ->
-                    roleQueryService.handle(RoleCodeByUserIdQuery(user.id))
-                        .map { roles -> Triple(tenant, user, roles) }
+    fun pwdLogin(command: PwdLoginCommand): Uni<LoginResponse> =
+        findAndVerifyTenant(command.tenantName)
+            .flatMap { tenant ->
+                findAndVerifyUserCredentials(command.userName, command.password, tenant.id)
+                    .flatMap { user ->
+                        roleQueryService
+                            .handle(RoleCodeByUserIdQuery(user.id))
+                            .map { roles -> Triple(tenant, user, roles) }
+                    }
+            }.map { (tenant, user, roles) ->
+                createLoginResponse(tenant, user, roles).also {
+                    saveLoginLog(user, tenant.id)
                 }
-        }
-        .map { (tenant, user, roles) ->
-            createLoginResponse(tenant, user, roles).also {
-                saveLoginLog(user, tenant.id)
             }
+
+    fun findAndVerifyTenant(tenantName: String): Uni<SystemTenantEntity> =
+        tenantQueryService
+            .handle(TenantByNameQuery(tenantName))
+            .onItem()
+            .ifNull()
+            .failWith(ServiceException(ErrorCode.TENANT_NOT_FOUND))
+            .flatMap { tenant -> verifyTenantStatus(tenant) }
+
+    fun verifyTenantStatus(tenant: SystemTenantEntity): Uni<SystemTenantEntity> =
+        when {
+            tenant.status == DbEnums.Status.DISABLED ->
+                Uni
+                    .createFrom()
+                    .failure(ServiceException(ErrorCode.TENANT_DISABLED))
+
+            LocalDateTime.now().isAfter(tenant.expireTime) ->
+                Uni.createFrom().failure(ServiceException(ErrorCode.TENANT_EXPIRED))
+
+            else -> Uni.createFrom().item(tenant)
         }
 
-    fun findAndVerifyTenant(tenantName: String): Uni<SystemTenantEntity> = tenantQueryService.handle(TenantByNameQuery(tenantName))
-        .onItem().ifNull().failWith(ServiceException(ErrorCode.TENANT_NOT_FOUND))
-        .flatMap { tenant -> verifyTenantStatus(tenant) }
-
-    fun verifyTenantStatus(tenant: SystemTenantEntity): Uni<SystemTenantEntity> = when {
-        tenant.status == DbEnums.Status.DISABLED ->
-            Uni.createFrom()
-                .failure(ServiceException(ErrorCode.TENANT_DISABLED))
-
-        LocalDateTime.now().isAfter(tenant.expireTime) ->
-            Uni.createFrom().failure(ServiceException(ErrorCode.TENANT_EXPIRED))
-
-        else -> Uni.createFrom().item(tenant)
-    }
-
-    fun findAndVerifyUserCredentials(accountName: String, password: String, tenantId: String): Uni<SystemUserEntity> =
-        userQueryService.handle(UserByAccountQuery(accountName, tenantId))
-            .onItem().ifNull().failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
+    fun findAndVerifyUserCredentials(
+        accountName: String,
+        password: String,
+        tenantId: String,
+    ): Uni<SystemUserEntity> =
+        userQueryService
+            .handle(UserByAccountQuery(accountName, tenantId))
+            .onItem()
+            .ifNull()
+            .failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
             .flatMap { user -> verifyUserCredentials(user, password) }
 
-    fun verifyUserCredentials(user: SystemUserEntity, password: String): Uni<SystemUserEntity> = when {
-        !BcryptUtil.matches(password, user.accountPassword) ->
-            Uni.createFrom()
-                .failure(ServiceException(ErrorCode.ACCOUNT_CREDENTIALS_INVALID))
+    fun verifyUserCredentials(
+        user: SystemUserEntity,
+        password: String,
+    ): Uni<SystemUserEntity> =
+        when {
+            !BcryptUtil.matches(password, user.accountPassword) ->
+                Uni
+                    .createFrom()
+                    .failure(ServiceException(ErrorCode.ACCOUNT_CREDENTIALS_INVALID))
 
-        user.status == DbEnums.Status.DISABLED ->
-            Uni.createFrom()
-                .failure(ServiceException(ErrorCode.ACCOUNT_DISABLED))
+            user.status == DbEnums.Status.DISABLED ->
+                Uni
+                    .createFrom()
+                    .failure(ServiceException(ErrorCode.ACCOUNT_DISABLED))
 
-        else -> Uni.createFrom().item(user)
-    }
+            else -> Uni.createFrom().item(user)
+        }
 
     private fun createLoginResponse(
         tenantEntity: SystemTenantEntity,
@@ -99,7 +119,8 @@ class AuthService(
         roleCodes: Set<String>,
     ): LoginResponse {
         val tokenValue =
-            Jwt.upn(systemUserEntity.accountName)
+            Jwt
+                .upn(systemUserEntity.accountName)
                 .subject(systemUserEntity.id)
                 .groups(roleCodes + AppConstants.APP_COMMON_ROLE)
                 .claim(TENANT_KEY, tenantEntity.id)
@@ -113,7 +134,10 @@ class AuthService(
         return LoginResponse(tokenValue, "")
     }
 
-    private fun saveLoginLog(user: SystemUserEntity, tenantId: String) {
+    private fun saveLoginLog(
+        user: SystemUserEntity,
+        tenantId: String,
+    ) {
         val (ip, port) = getClientIPAndPort(routingContext.request())
         val loginLogEntity =
             SystemLoginLogEntity(

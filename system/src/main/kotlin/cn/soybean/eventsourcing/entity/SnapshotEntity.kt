@@ -9,8 +9,8 @@ import cn.soybean.domain.aggregate.AggregateConstants
 import io.quarkus.mongodb.panache.common.MongoEntity
 import io.quarkus.mongodb.panache.kotlin.reactive.ReactivePanacheMongoCompanion
 import io.quarkus.mongodb.panache.kotlin.reactive.ReactivePanacheMongoEntity
-import java.time.LocalDateTime
 import org.bson.codecs.pojo.annotations.BsonProperty
+import java.time.LocalDateTime
 
 @MongoEntity(collection = AggregateConstants.SNAPSHOT)
 class SnapshotEntity : ReactivePanacheMongoEntity() {

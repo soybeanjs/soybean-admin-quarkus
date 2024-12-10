@@ -18,8 +18,10 @@ import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class CreateRouteCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
-    CommandHandler<CreateRouteCommand, Boolean> {
+class CreateRouteCommandHandler(
+    private val eventStoreDB: EventStoreDB,
+    private val loginHelper: LoginHelper,
+) : CommandHandler<CreateRouteCommand, Boolean> {
     override fun handle(command: CreateRouteCommand): Uni<Boolean> {
         val aggregate = RouteAggregate(YitIdHelper.nextId().toString())
         aggregate.createRoute(
@@ -30,8 +32,11 @@ class CreateRouteCommandHandler(private val eventStoreDB: EventStoreDB, private 
                 loginHelper.getAccountName(),
             ),
         )
-        return eventStoreDB.save(aggregate).replaceWith(true)
-            .onFailure().invoke { ex -> Log.errorf(ex, "CreateRouteCommandHandler fail") }
+        return eventStoreDB
+            .save(aggregate)
+            .replaceWith(true)
+            .onFailure()
+            .invoke { ex -> Log.errorf(ex, "CreateRouteCommandHandler fail") }
     }
 
     override fun canHandle(command: Command): Boolean = command is CreateRouteCommand

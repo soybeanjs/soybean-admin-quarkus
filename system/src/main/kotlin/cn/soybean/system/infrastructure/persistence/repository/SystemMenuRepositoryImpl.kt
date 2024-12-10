@@ -14,19 +14,22 @@ import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<SystemMenuEntity, String> {
+class SystemMenuRepositoryImpl :
+    SystemMenuRepository,
+    PanacheRepositoryBase<SystemMenuEntity, String> {
     override fun all(): Uni<List<SystemMenuEntity>> = listAll()
 
-    override fun allByUserId(userId: String): Uni<List<SystemMenuEntity>> = list(
-        """
+    override fun allByUserId(userId: String): Uni<List<SystemMenuEntity>> =
+        list(
+            """
                     select m from SystemMenuEntity m
                     left join SystemRoleMenuEntity rm on m.id = rm.menuId
                     left join SystemRoleUserEntity ur on rm.roleId = ur.roleId
                     where ur.userId = ?1 and m.status = ?2
                 """,
-        userId,
-        DbEnums.Status.ENABLED,
-    )
+            userId,
+            DbEnums.Status.ENABLED,
+        )
 
     override fun allByTenantId(tenantId: String): Uni<List<SystemMenuEntity>> =
         SystemTenantEntity.getTenantMenuIds(tenantId).flatMap { menuIds ->
@@ -45,7 +48,10 @@ class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<Sys
 
     override fun findAllByConstant(constant: Boolean): Uni<List<SystemMenuEntity>> = list("constant", constant)
 
-    override fun allByTenantIdAndConstant(tenantId: String, constant: Boolean): Uni<List<SystemMenuEntity>> =
+    override fun allByTenantIdAndConstant(
+        tenantId: String,
+        constant: Boolean,
+    ): Uni<List<SystemMenuEntity>> =
         SystemTenantEntity.getTenantMenuIds(tenantId).flatMap { menuIds ->
             if (menuIds.isEmpty()) {
                 Uni.createFrom().item(emptyList())

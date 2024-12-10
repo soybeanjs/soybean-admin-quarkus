@@ -21,7 +21,8 @@ data class RoleCreatedOrUpdatedEventBase(
     val userId: String? = null,
     val menuIds: Set<String>? = null,
     val operationIds: Set<String>? = null,
-) : AggregateEventBase(aggregateId), DomainEvent {
+) : AggregateEventBase(aggregateId),
+    DomainEvent {
     companion object {
         const val ROLE_CREATED_V1 = "ROLE_CREATED_V1"
         const val ROLE_TENANT_ASSOCIATES_V1 = "ROLE_TENANT_ASSOCIATES_V1"

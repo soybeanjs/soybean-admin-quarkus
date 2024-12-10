@@ -23,44 +23,65 @@ import io.smallrye.mutiny.replaceWithUnit
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class UserService(private val userQueryService: UserQueryService, private val commandInvoker: CommandInvoker) {
-    fun createUser(command: CreateUserCommand, tenantId: String): Uni<Boolean> =
+class UserService(
+    private val userQueryService: UserQueryService,
+    private val commandInvoker: CommandInvoker,
+) {
+    fun createUser(
+        command: CreateUserCommand,
+        tenantId: String,
+    ): Uni<Boolean> =
         validateUserForCreateOrUpdate(null, tenantId, command.accountName, command.email, command.phoneNumber).flatMap {
             commandInvoker.dispatch<CreateUserCommand, Boolean>(command).map { it }
         }
 
-    fun updateUser(command: UpdateUserCommand, tenantId: String): Uni<Boolean> = validateUserForCreateOrUpdate(
-        command.id,
-        tenantId,
-        command.accountName,
-        command.email,
-        command.phoneNumber,
-    ).flatMap {
-        commandInvoker.dispatch<UpdateUserCommand, Boolean>(command).map { it }
-    }
+    fun updateUser(
+        command: UpdateUserCommand,
+        tenantId: String,
+    ): Uni<Boolean> =
+        validateUserForCreateOrUpdate(
+            command.id,
+            tenantId,
+            command.accountName,
+            command.email,
+            command.phoneNumber,
+        ).flatMap {
+            commandInvoker.dispatch<UpdateUserCommand, Boolean>(command).map { it }
+        }
 
-    fun deleteUser(command: DeleteUserCommand, tenantId: String): Uni<Pair<Boolean, String>> = Multi.createFrom().iterable(command.ids)
-        .onItem().transformToUniAndMerge { id ->
-            userQueryService.handle(UserByIdBuiltInQuery(id, tenantId))
-                .flatMap { isBuiltIn ->
-                    when {
-                        isBuiltIn ->
-                            Uni.createFrom()
-                                .item(Pair(false, "User does not exist or Built-in users cannot be modified."))
+    fun deleteUser(
+        command: DeleteUserCommand,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
+        Multi
+            .createFrom()
+            .iterable(command.ids)
+            .onItem()
+            .transformToUniAndMerge { id ->
+                userQueryService
+                    .handle(UserByIdBuiltInQuery(id, tenantId))
+                    .flatMap { isBuiltIn ->
+                        when {
+                            isBuiltIn ->
+                                Uni
+                                    .createFrom()
+                                    .item(Pair(false, "User does not exist or Built-in users cannot be modified."))
 
-                        else -> Uni.createFrom().nullItem()
+                            else -> Uni.createFrom().nullItem()
+                        }
                     }
-                }
-        }
-        .collect().asList()
-        .flatMap { results ->
-            val errorResult = results.find { !it.first }
-            errorResult?.let { Uni.createFrom().item(it) } ?: commandInvoker.dispatch<DeleteUserCommand, Boolean>(
-                command,
-            ).map { Pair(it, "") }
-        }.onFailure().recoverWithItem { _ ->
-            Pair(false, "An error occurred during user delete.")
-        }
+            }.collect()
+            .asList()
+            .flatMap { results ->
+                val errorResult = results.find { !it.first }
+                errorResult?.let { Uni.createFrom().item(it) } ?: commandInvoker
+                    .dispatch<DeleteUserCommand, Boolean>(
+                        command,
+                    ).map { Pair(it, "") }
+            }.onFailure()
+            .recoverWithItem { _ ->
+                Pair(false, "An error occurred during user delete.")
+            }
 
     private fun validateUserForCreateOrUpdate(
         id: String?,
@@ -68,61 +89,90 @@ class UserService(private val userQueryService: UserQueryService, private val co
         accountName: String,
         email: String?,
         phoneNumber: String?,
-    ): Uni<Unit> = validateUserExists(id, tenantId)
-        .flatMap { validateAccountNameUnique(id, tenantId, accountName) }
-        .flatMap { validateEmailUnique(id, tenantId, email) }
-        .flatMap { validatePhoneNumberUnique(id, tenantId, phoneNumber) }
+    ): Uni<Unit> =
+        validateUserExists(id, tenantId)
+            .flatMap { validateAccountNameUnique(id, tenantId, accountName) }
+            .flatMap { validateEmailUnique(id, tenantId, email) }
+            .flatMap { validatePhoneNumberUnique(id, tenantId, phoneNumber) }
 
-    private fun validateUserExists(id: String?, tenantId: String): Uni<Unit> = when (id) {
-        null -> Uni.createFrom().item(Unit)
-        else ->
-            userQueryService.handle(UserByIdQuery(id, tenantId))
-                .onItem().ifNull().failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
-                .replaceWithUnit()
-    }
+    private fun validateUserExists(
+        id: String?,
+        tenantId: String,
+    ): Uni<Unit> =
+        when (id) {
+            null -> Uni.createFrom().item(Unit)
+            else ->
+                userQueryService
+                    .handle(UserByIdQuery(id, tenantId))
+                    .onItem()
+                    .ifNull()
+                    .failWith(ServiceException(ErrorCode.ACCOUNT_NOT_FOUND))
+                    .replaceWithUnit()
+        }
 
-    private fun validateAccountNameUnique(id: String?, tenantId: String, accountName: String?): Uni<Unit> = when {
-        accountName.isNullOrBlank() -> Uni.createFrom().item(Unit)
-        else ->
-            userQueryService.handle(UserByaAccountNameQuery(accountName, tenantId))
-                .flatMap { user ->
-                    when {
-                        user != null && (id == null || user.id != id) ->
-                            Uni.createFrom()
-                                .failure(ServiceException(ErrorCode.ACCOUNT_NAME_EXISTS))
+    private fun validateAccountNameUnique(
+        id: String?,
+        tenantId: String,
+        accountName: String?,
+    ): Uni<Unit> =
+        when {
+            accountName.isNullOrBlank() -> Uni.createFrom().item(Unit)
+            else ->
+                userQueryService
+                    .handle(UserByaAccountNameQuery(accountName, tenantId))
+                    .flatMap { user ->
+                        when {
+                            user != null && (id == null || user.id != id) ->
+                                Uni
+                                    .createFrom()
+                                    .failure(ServiceException(ErrorCode.ACCOUNT_NAME_EXISTS))
 
-                        else -> Uni.createFrom().item(Unit)
+                            else -> Uni.createFrom().item(Unit)
+                        }
                     }
-                }
-    }
+        }
 
-    private fun validateEmailUnique(id: String?, tenantId: String, email: String?): Uni<Unit> = when {
-        email.isNullOrBlank() -> Uni.createFrom().item(Unit)
-        else ->
-            userQueryService.handle(UserByEmailQuery(email, tenantId))
-                .flatMap { user ->
-                    when {
-                        user != null && (id == null || user.id != id) ->
-                            Uni.createFrom()
-                                .failure(ServiceException(ErrorCode.ACCOUNT_EMAIL_EXISTS))
+    private fun validateEmailUnique(
+        id: String?,
+        tenantId: String,
+        email: String?,
+    ): Uni<Unit> =
+        when {
+            email.isNullOrBlank() -> Uni.createFrom().item(Unit)
+            else ->
+                userQueryService
+                    .handle(UserByEmailQuery(email, tenantId))
+                    .flatMap { user ->
+                        when {
+                            user != null && (id == null || user.id != id) ->
+                                Uni
+                                    .createFrom()
+                                    .failure(ServiceException(ErrorCode.ACCOUNT_EMAIL_EXISTS))
 
-                        else -> Uni.createFrom().item(Unit)
+                            else -> Uni.createFrom().item(Unit)
+                        }
                     }
-                }
-    }
+        }
 
-    private fun validatePhoneNumberUnique(id: String?, tenantId: String, phoneNumber: String?): Uni<Unit> = when {
-        phoneNumber.isNullOrBlank() -> Uni.createFrom().item(Unit)
-        else ->
-            userQueryService.handle(UserByPhoneNumberQuery(phoneNumber, tenantId))
-                .flatMap { user ->
-                    when {
-                        user != null && (id == null || user.id != id) ->
-                            Uni.createFrom()
-                                .failure(ServiceException(ErrorCode.ACCOUNT_PHONE_NUMBER_EXISTS))
+    private fun validatePhoneNumberUnique(
+        id: String?,
+        tenantId: String,
+        phoneNumber: String?,
+    ): Uni<Unit> =
+        when {
+            phoneNumber.isNullOrBlank() -> Uni.createFrom().item(Unit)
+            else ->
+                userQueryService
+                    .handle(UserByPhoneNumberQuery(phoneNumber, tenantId))
+                    .flatMap { user ->
+                        when {
+                            user != null && (id == null || user.id != id) ->
+                                Uni
+                                    .createFrom()
+                                    .failure(ServiceException(ErrorCode.ACCOUNT_PHONE_NUMBER_EXISTS))
 
-                        else -> Uni.createFrom().item(Unit)
+                            else -> Uni.createFrom().item(Unit)
+                        }
                     }
-                }
-    }
+        }
 }

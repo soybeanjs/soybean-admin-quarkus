@@ -54,7 +54,9 @@ class UserResource(
     @GET
     @WithSession
     @Operation(summary = "用户列表", description = "获取用户列表")
-    fun getUserList(@Parameter @BeanParam queryParam: UserQuery): Uni<ResponseEntity<PageResult<UserResponse>>> {
+    fun getUserList(
+        @Parameter @BeanParam queryParam: UserQuery,
+    ): Uni<ResponseEntity<PageResult<UserResponse>>> {
         val queryBuilder = QueryBuilder(loginHelper.getTenantId())
         queryParam.accountName?.let { queryBuilder.addLikeCondition("accountName", it) }
         queryParam.gender?.let { queryBuilder.addCondition("gender", it) }
@@ -63,7 +65,8 @@ class UserResource(
         queryParam.email?.let { queryBuilder.addCondition("email", it) }
         queryParam.status?.let { queryBuilder.addCondition("status", it) }
         val (query, params) = queryBuilder.buildParameters()
-        return userQueryService.handle(PageUserQuery(query, params, queryParam.ofPage()))
+        return userQueryService
+            .handle(PageUserQuery(query, params, queryParam.ofPage()))
             .map { ResponseEntity.ok(it) }
     }
 
@@ -71,21 +74,27 @@ class UserResource(
     @POST
     @WithTransaction
     @Operation(summary = "创建用户", description = "创建用户信息")
-    fun createUser(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: UserRequest): Uni<ResponseEntity<Boolean>> =
+    fun createUser(
+        @Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: UserRequest,
+    ): Uni<ResponseEntity<Boolean>> =
         userService.createUser(req.toCreateUserCommand(), loginHelper.getTenantId()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}user.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新用户", description = "更新用户信息")
-    fun updateUser(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: UserRequest): Uni<ResponseEntity<Boolean>> =
+    fun updateUser(
+        @Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: UserRequest,
+    ): Uni<ResponseEntity<Boolean>> =
         userService.updateUser(req.toUpdateUserCommand(), loginHelper.getTenantId()).map { ResponseEntity.ok(it) }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}user.delete")
     @DELETE
     @WithTransaction
     @Operation(summary = "删除用户", description = "删除用户信息")
-    fun deleteUser(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
+    fun deleteUser(
+        @Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>,
+    ): Uni<ResponseEntity<Boolean>> =
         userService.deleteUser(DeleteUserCommand(ids), loginHelper.getTenantId()).map { (isSuccess, message) ->
             when {
                 isSuccess -> ResponseEntity.ok(true)

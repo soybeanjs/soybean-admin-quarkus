@@ -18,7 +18,8 @@ from("timer://foo?fixedRate=true&period=60000")
         val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         println("[camel.scheduler]: Trigger Disruptor Event: Execution #$currentCount at $currentTime")
 
-        exchange.context.createProducerTemplate()
+        exchange.context
+            .createProducerTemplate()
             .asyncRequestBody("disruptor:schedulerDisruptor", "Execution #$currentCount at $currentTime")
 
         if (currentCount >= 3) {

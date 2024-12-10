@@ -8,16 +8,15 @@ package cn.soybean.system.infrastructure.util
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.system.infrastructure.util.SignUtil.createSign
 import cn.soybean.system.infrastructure.util.SignUtil.getRandomString
+import org.jetbrains.annotations.Contract
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.time.Instant
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import java.util.function.Consumer
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-import org.jetbrains.annotations.Contract
 
 fun main() {
     val paramMap: MutableMap<String, Any> = LinkedHashMap()
@@ -47,7 +46,10 @@ object SignUtil {
      * @return 加工后的参数列表 转化为的参数字符串
      */
     @Throws(NoSuchAlgorithmException::class)
-    fun addSignParamsAndJoin(paramsMap: MutableMap<String, Any>, algorithm: String?): String {
+    fun addSignParamsAndJoin(
+        paramsMap: MutableMap<String, Any>,
+        algorithm: String?,
+    ): String {
         // 追加参数
         addSignParams(paramsMap, algorithm)
 
@@ -61,7 +63,10 @@ object SignUtil {
      * @param paramsMap 参数列表
      */
     @Throws(NoSuchAlgorithmException::class)
-    fun addSignParams(paramsMap: MutableMap<String, Any>, algorithm: String?) {
+    fun addSignParams(
+        paramsMap: MutableMap<String, Any>,
+        algorithm: String?,
+    ) {
         paramsMap[AppConstants.API_TIMESTAMP] = Instant.now().toEpochMilli()
         paramsMap[AppConstants.API_NONCE] = getRandomString(32)
         paramsMap[AppConstants.API_SIGNATURE] = createSign(paramsMap, algorithm)
@@ -90,7 +95,10 @@ object SignUtil {
      * @return 签名
      */
     @Throws(NoSuchAlgorithmException::class)
-    fun createSign(paramsMapIn: Map<String, *>, algorithm: String?): String {
+    fun createSign(
+        paramsMapIn: Map<String, *>,
+        algorithm: String?,
+    ): String {
         // 如果调用者不小心传入了 sign 参数，则此处需要将 sign 参数排除在外
         var paramsMap = paramsMapIn
         if (paramsMap.containsKey(AppConstants.API_SIGNATURE)) {
@@ -116,7 +124,11 @@ object SignUtil {
     }
 
     @Throws(NoSuchAlgorithmException::class)
-    fun createSign(paramsMapIn: Map<String, *>, algorithm: String?, secretKey: String): String {
+    fun createSign(
+        paramsMapIn: Map<String, *>,
+        algorithm: String?,
+        secretKey: String,
+    ): String {
         // 如果调用者不小心传入了 sign 参数，则此处需要将 sign 参数排除在外
         var paramsMap = paramsMapIn
         if (paramsMap.containsKey(AppConstants.API_SIGNATURE)) {
@@ -171,7 +183,11 @@ object SignUtil {
             Consumer { key: String ->
                 val value = paramsMap[key]
                 if (!isEmpty(value)) {
-                    sb.append(key).append("=").append(value).append("&")
+                    sb
+                        .append(key)
+                        .append("=")
+                        .append(value)
+                        .append("&")
                 }
             },
         )
@@ -272,7 +288,10 @@ object SignUtil {
     }
 
     @Throws(NoSuchAlgorithmException::class)
-    fun hmacSHA256(strIn: String?, secret: String): String {
+    fun hmacSHA256(
+        strIn: String?,
+        secret: String,
+    ): String {
         val str = strIn ?: ""
         val secretKeySpec = SecretKeySpec(secret.toByteArray(StandardCharsets.UTF_8), HMAC_SHA_256)
         val mac = Mac.getInstance(HMAC_SHA_256)

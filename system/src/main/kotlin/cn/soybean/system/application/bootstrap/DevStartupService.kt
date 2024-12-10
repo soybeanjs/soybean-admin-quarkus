@@ -14,8 +14,12 @@ import jakarta.enterprise.event.Observes
 
 @IfBuildProfile(anyOf = ["dev", "docker"])
 @ApplicationScoped
-class DevStartupService(private val pgPool: PgPool) {
-    fun onStart(@Observes ev: StartupEvent) {
+class DevStartupService(
+    private val pgPool: PgPool,
+) {
+    fun onStart(
+        @Observes ev: StartupEvent,
+    ) {
         initDevDbSql()
     }
 
@@ -28,10 +32,17 @@ class DevStartupService(private val pgPool: PgPool) {
     }
 
     private fun executeSql(sql: String) {
-        pgPool.query(sql).execute()
-            .onItem().invoke { _ -> Log.debug("SQL script executed successfully.") }
-            .onItem().ignore().andContinueWithNull()
-            .onFailure().invoke { ex -> Log.errorf(ex, "Error executing SQL script") }
-            .await().indefinitely()
+        pgPool
+            .query(sql)
+            .execute()
+            .onItem()
+            .invoke { _ -> Log.debug("SQL script executed successfully.") }
+            .onItem()
+            .ignore()
+            .andContinueWithNull()
+            .onFailure()
+            .invoke { ex -> Log.errorf(ex, "Error executing SQL script") }
+            .await()
+            .indefinitely()
     }
 }

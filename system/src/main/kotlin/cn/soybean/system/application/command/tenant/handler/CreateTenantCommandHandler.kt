@@ -18,8 +18,10 @@ import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class CreateTenantCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
-    CommandHandler<CreateTenantCommand, TenantAggregate> {
+class CreateTenantCommandHandler(
+    private val eventStoreDB: EventStoreDB,
+    private val loginHelper: LoginHelper,
+) : CommandHandler<CreateTenantCommand, TenantAggregate> {
     override fun handle(command: CreateTenantCommand): Uni<TenantAggregate> {
         val aggregate = TenantAggregate(YitIdHelper.nextId().toString())
         aggregate.createTenant(
@@ -31,8 +33,11 @@ class CreateTenantCommandHandler(private val eventStoreDB: EventStoreDB, private
                 YitIdHelper.nextId().toString(),
             ),
         )
-        return eventStoreDB.save(aggregate).replaceWith(aggregate)
-            .onFailure().invoke { ex -> Log.errorf(ex, "CreateTenantCommandHandler fail") }
+        return eventStoreDB
+            .save(aggregate)
+            .replaceWith(aggregate)
+            .onFailure()
+            .invoke { ex -> Log.errorf(ex, "CreateTenantCommandHandler fail") }
     }
 
     override fun canHandle(command: Command): Boolean = command is CreateTenantCommand

@@ -14,15 +14,31 @@ import io.smallrye.mutiny.Uni
 interface SystemRoleRepository {
     fun getRoleCodesByUserId(userId: String): Uni<Set<String>>
 
-    fun getRoleList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemRoleEntity>
+    fun getRoleList(
+        query: String,
+        sort: Sort,
+        params: Parameters,
+    ): PanacheQuery<SystemRoleEntity>
 
     fun saveOrUpdate(entity: SystemRoleEntity): Uni<SystemRoleEntity>
 
-    fun getById(id: String, tenantId: String): Uni<SystemRoleEntity?>
+    fun getById(
+        id: String,
+        tenantId: String,
+    ): Uni<SystemRoleEntity?>
 
-    fun existsByCode(code: String, tenantId: String): Uni<Boolean>
+    fun existsByCode(
+        code: String,
+        tenantId: String,
+    ): Uni<Boolean>
 
-    fun delById(id: String, tenantId: String): Uni<Long>
+    fun delById(
+        id: String,
+        tenantId: String,
+    ): Uni<Long>
 
-    fun getByCode(tenantId: String, code: String): Uni<SystemRoleEntity>
+    fun getByCode(
+        tenantId: String,
+        code: String,
+    ): Uni<SystemRoleEntity>
 }

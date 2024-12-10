@@ -54,13 +54,16 @@ class RoleResource(
     @GET
     @WithSession
     @Operation(summary = "角色列表", description = "获取角色列表")
-    fun getRoleList(@Parameter @BeanParam queryParam: RoleQuery): Uni<ResponseEntity<PageResult<RoleResponse>>> {
+    fun getRoleList(
+        @Parameter @BeanParam queryParam: RoleQuery,
+    ): Uni<ResponseEntity<PageResult<RoleResponse>>> {
         val queryBuilder = QueryBuilder(loginHelper.getTenantId())
         queryParam.name?.let { queryBuilder.addLikeCondition("name", it) }
         queryParam.code?.let { queryBuilder.addLikeCondition("code", it) }
         queryParam.status?.let { queryBuilder.addCondition("status", it) }
         val (query, params) = queryBuilder.buildParameters()
-        return roleQueryService.handle(PageRoleQuery(query, params, queryParam.ofPage()))
+        return roleQueryService
+            .handle(PageRoleQuery(query, params, queryParam.ofPage()))
             .map { ResponseEntity.ok(it) }
     }
 
@@ -68,7 +71,9 @@ class RoleResource(
     @POST
     @WithTransaction
     @Operation(summary = "创建角色", description = "创建角色信息")
-    fun createRole(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RoleRequest): Uni<ResponseEntity<Boolean>> =
+    fun createRole(
+        @Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: RoleRequest,
+    ): Uni<ResponseEntity<Boolean>> =
         roleService.createRole(req.toCreateRoleCommand(), loginHelper.getTenantId()).map { (isSuccess, message) ->
             when {
                 isSuccess -> ResponseEntity.ok(true)
@@ -80,7 +85,9 @@ class RoleResource(
     @PUT
     @WithTransaction
     @Operation(summary = "更新角色", description = "更新角色信息")
-    fun updateRole(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RoleRequest): Uni<ResponseEntity<Boolean>> =
+    fun updateRole(
+        @Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: RoleRequest,
+    ): Uni<ResponseEntity<Boolean>> =
         roleService.updateRole(req.toUpdateRoleCommand(), loginHelper.getTenantId()).map { (isSuccess, message) ->
             when {
                 isSuccess -> ResponseEntity.ok(true)
@@ -92,7 +99,9 @@ class RoleResource(
     @DELETE
     @WithTransaction
     @Operation(summary = "删除角色", description = "删除角色信息")
-    fun deleteRole(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
+    fun deleteRole(
+        @Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>,
+    ): Uni<ResponseEntity<Boolean>> =
         roleService.deleteRole(DeleteRoleCommand(ids), loginHelper.getTenantId()).map { (isSuccess, message) ->
             when {
                 isSuccess -> ResponseEntity.ok(true)

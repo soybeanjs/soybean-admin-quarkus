@@ -23,12 +23,15 @@ import jakarta.ws.rs.container.ResourceInfo
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.ext.Provider
+import org.jboss.resteasy.reactive.server.ServerRequestFilter
 import java.time.Duration
 import java.time.Instant
 import kotlin.math.abs
-import org.jboss.resteasy.reactive.server.ServerRequestFilter
 
-data class ApiRequestAnnotation(val type: ApiRequestType, val keyName: String = "")
+data class ApiRequestAnnotation(
+    val type: ApiRequestType,
+    val keyName: String = "",
+)
 
 enum class ApiRequestType {
     API_KEY,
@@ -82,7 +85,10 @@ class ApiSecurityRequestFilter(
         }
     }
 
-    private fun validateHeaderAndParams(context: ContainerRequestContext, keyName: String): Uni<Response> {
+    private fun validateHeaderAndParams(
+        context: ContainerRequestContext,
+        keyName: String,
+    ): Uni<Response> {
         val keyValue = context.getHeaderString(keyName) ?: context.uriInfo.queryParameters.getFirst(keyName)
         return keyValue?.let {
             val (isValid, errorMessage) = validateApiKeyValue(it, context)
@@ -93,7 +99,10 @@ class ApiSecurityRequestFilter(
         } ?: Uni.createFrom().item(badRequestResponse(i18n.getMessage("http.security.apiKeyMissing", keyName)))
     }
 
-    private fun validateApiKeyValue(keyValue: String, context: ContainerRequestContext): Triple<Boolean, String, String> {
+    private fun validateApiKeyValue(
+        keyValue: String,
+        context: ContainerRequestContext,
+    ): Triple<Boolean, String, String> {
         val apikeyEntity = apiKeyCache.get(keyValue)
         return when {
             apikeyEntity == null -> Triple(false, i18n.getMessage("http.security.apiKeyNotExists"), "")
@@ -154,15 +163,17 @@ class ApiSecurityRequestFilter(
         return Pair(true, "")
     }
 
-    private fun validateTimestamp(timestamp: String): Uni<Pair<Boolean, String>> = when {
-        abs(
-            Instant.now().toEpochMilli() - timestamp.toLong(),
-        ) > AppConstants.API_TIMESTAMP_DISPARITY ->
-            Uni.createFrom()
-                .item(Pair(false, i18n.getMessage("http.security.timestampOff")))
+    private fun validateTimestamp(timestamp: String): Uni<Pair<Boolean, String>> =
+        when {
+            abs(
+                Instant.now().toEpochMilli() - timestamp.toLong(),
+            ) > AppConstants.API_TIMESTAMP_DISPARITY ->
+                Uni
+                    .createFrom()
+                    .item(Pair(false, i18n.getMessage("http.security.timestampOff")))
 
-        else -> Uni.createFrom().item(Pair(true, ""))
-    }
+            else -> Uni.createFrom().item(Pair(true, ""))
+        }
 
     private fun validateNonce(nonce: String): Uni<Pair<Boolean, String>> =
         reactiveRedisDataSource.key().exists("${AppConstants.API_NONCE_CACHE_PREFIX}::$nonce").flatMap { exists ->
@@ -198,18 +209,20 @@ class ApiSecurityRequestFilter(
                             Duration.ofMillis(
                                 AppConstants.API_TIMESTAMP_DISPARITY + AppConstants.API_TIMESTAMP_EXTRA_TIME_MARGIN,
                             )
-                        reactiveRedisDataSource.value(String::class.java)
+                        reactiveRedisDataSource
+                            .value(String::class.java)
                             .set(
                                 key,
                                 "1",
-                                SetArgs().nx()
+                                SetArgs()
+                                    .nx()
                                     .ex(expiration),
-                            )
-                            .flatMap { Uni.createFrom().nullItem() }
+                            ).flatMap { Uni.createFrom().nullItem() }
                     }
 
                     else ->
-                        Uni.createFrom()
+                        Uni
+                            .createFrom()
                             .item(badRequestResponse(i18n.getMessage("http.security.signatureOff")))
                 }
             }
@@ -218,8 +231,10 @@ class ApiSecurityRequestFilter(
         }
     }
 
-    private fun badRequestResponse(message: String): Response = Response.status(Response.Status.BAD_REQUEST)
-        .type(MediaType.APPLICATION_JSON)
-        .entity(ResponseEntity.fail<Any>(message))
-        .build()
+    private fun badRequestResponse(message: String): Response =
+        Response
+            .status(Response.Status.BAD_REQUEST)
+            .type(MediaType.APPLICATION_JSON)
+            .entity(ResponseEntity.fail<Any>(message))
+            .build()
 }

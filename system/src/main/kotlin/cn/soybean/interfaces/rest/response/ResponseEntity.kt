@@ -21,16 +21,30 @@ class ResponseEntity<T>(
         private const val MSG_SUCCESS = "success"
         private const val MSG_FAIL = "fail"
 
-        private fun <T> response(code: String, msg: String = MSG_SUCCESS, data: T? = null) = ResponseEntity(code, msg, data)
+        private fun <T> response(
+            code: String,
+            msg: String = MSG_SUCCESS,
+            data: T? = null,
+        ) = ResponseEntity(code, msg, data)
 
         fun <T> ok(data: T? = null) = response(SUCCESS, MSG_SUCCESS, data)
 
-        fun <T> ok(msg: String, data: T? = null) = response(SUCCESS, msg, data)
+        fun <T> ok(
+            msg: String,
+            data: T? = null,
+        ) = response(SUCCESS, msg, data)
 
         fun <T> fail(data: T? = null) = response(FAIL, MSG_FAIL, data)
 
-        fun <T> fail(msg: String, data: T? = null) = response(FAIL, msg, data)
+        fun <T> fail(
+            msg: String,
+            data: T? = null,
+        ) = response(FAIL, msg, data)
 
-        fun <T> error(code: String, msg: String, data: T? = null) = response(code, msg, data)
+        fun <T> error(
+            code: String,
+            msg: String,
+            data: T? = null,
+        ) = response(code, msg, data)
     }
 }

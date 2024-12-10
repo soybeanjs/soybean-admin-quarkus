@@ -6,7 +6,7 @@
 package cn.soybean.shared.domain.aggregate
 
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Collections
 
 abstract class AggregateRoot(
     open val aggregateId: String,
@@ -49,7 +49,11 @@ abstract class AggregateRoot(
         }
     }
 
-    protected fun createEvent(eventType: String, data: ByteArray, metaData: ByteArray?): AggregateEventEntity {
+    protected fun createEvent(
+        eventType: String,
+        data: ByteArray,
+        metaData: ByteArray?,
+    ): AggregateEventEntity {
         val eventEntity = AggregateEventEntity()
         eventEntity.aggregateId = this.aggregateId
         eventEntity.aggregateType = this.aggregateType

@@ -17,7 +17,9 @@ import io.smallrye.mutiny.replaceWithUnit
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class UserCreatedProjection(private val userRepository: SystemUserRepository) : Projection {
+class UserCreatedProjection(
+    private val userRepository: SystemUserRepository,
+) : Projection {
     @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =

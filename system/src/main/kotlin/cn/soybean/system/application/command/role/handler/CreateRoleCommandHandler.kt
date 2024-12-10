@@ -18,8 +18,10 @@ import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class CreateRoleCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
-    CommandHandler<CreateRoleCommand, Boolean> {
+class CreateRoleCommandHandler(
+    private val eventStoreDB: EventStoreDB,
+    private val loginHelper: LoginHelper,
+) : CommandHandler<CreateRoleCommand, Boolean> {
     override fun handle(command: CreateRoleCommand): Uni<Boolean> {
         val aggregate = RoleAggregate(YitIdHelper.nextId().toString())
         aggregate.createRole(
@@ -30,8 +32,11 @@ class CreateRoleCommandHandler(private val eventStoreDB: EventStoreDB, private v
                 loginHelper.getAccountName(),
             ),
         )
-        return eventStoreDB.save(aggregate).replaceWith(true)
-            .onFailure().invoke { ex -> Log.errorf(ex, "CreateRoleCommandHandler fail") }
+        return eventStoreDB
+            .save(aggregate)
+            .replaceWith(true)
+            .onFailure()
+            .invoke { ex -> Log.errorf(ex, "CreateRoleCommandHandler fail") }
     }
 
     override fun canHandle(command: Command): Boolean = command is CreateRoleCommand

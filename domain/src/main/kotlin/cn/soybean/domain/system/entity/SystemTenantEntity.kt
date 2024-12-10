@@ -69,14 +69,17 @@ open class SystemTenantEntity(
     @Column(name = "operation_ids", length = DbConstants.LENGTH_2048)
     @Convert(converter = JsonStringSetTypeHandler::class)
     var operationIds: Set<String>? = null,
-) : BaseEntity(), PanacheEntityBase {
+) : BaseEntity(),
+    PanacheEntityBase {
     companion object : PanacheCompanionBase<SystemTenantEntity, String> {
-        fun getTenantOperationIds(tenantId: String): Uni<Set<String>> = findById(tenantId).map { tenant ->
-            tenant?.operationIds ?: emptySet()
-        }
+        fun getTenantOperationIds(tenantId: String): Uni<Set<String>> =
+            findById(tenantId).map { tenant ->
+                tenant?.operationIds ?: emptySet()
+            }
 
-        fun getTenantMenuIds(tenantId: String): Uni<Set<String>> = findById(tenantId).map { tenant ->
-            tenant?.menuIds ?: emptySet()
-        }
+        fun getTenantMenuIds(tenantId: String): Uni<Set<String>> =
+            findById(tenantId).map { tenant ->
+                tenant?.menuIds ?: emptySet()
+            }
     }
 }

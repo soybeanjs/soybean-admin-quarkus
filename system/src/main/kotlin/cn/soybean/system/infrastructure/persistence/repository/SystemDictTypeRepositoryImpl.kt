@@ -11,4 +11,6 @@ import io.quarkus.hibernate.reactive.panache.kotlin.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class SystemDictTypeRepositoryImpl : SystemDictTypeRepository, PanacheRepositoryBase<SystemDictTypeEntity, String>
+class SystemDictTypeRepositoryImpl :
+    SystemDictTypeRepository,
+    PanacheRepositoryBase<SystemDictTypeEntity, String>

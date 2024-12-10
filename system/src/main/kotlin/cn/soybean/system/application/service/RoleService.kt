@@ -19,89 +19,126 @@ import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class RoleService(private val roleQueryService: RoleQueryService, private val commandInvoker: CommandInvoker) {
-    fun createRole(command: CreateRoleCommand, tenantId: String): Uni<Pair<Boolean, String>> =
-        checkRoleCode(command.code, tenantId).flatMap { (flag, msg) ->
-            when {
-                flag -> commandInvoker.dispatch<CreateRoleCommand, Boolean>(command).map { Pair(it, "") }
-                else -> Uni.createFrom().item(Pair(false, msg))
-            }
-        }.onFailure().recoverWithItem { _ ->
-            Pair(false, "An error occurred during role creation.")
-        }
-
-    fun updateRole(command: UpdateRoleCommand, tenantId: String): Uni<Pair<Boolean, String>> = when {
-        command.id.isBlank() -> Uni.createFrom().item(Pair(false, "ID cannot be null or blank."))
-        else ->
-            checkRoleCodeForUpdate(command.code, tenantId, command.id).flatMap { (flag, msg) ->
+class RoleService(
+    private val roleQueryService: RoleQueryService,
+    private val commandInvoker: CommandInvoker,
+) {
+    fun createRole(
+        command: CreateRoleCommand,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
+        checkRoleCode(command.code, tenantId)
+            .flatMap { (flag, msg) ->
                 when {
-                    flag ->
-                        roleQueryService.handle(RoleByIdBuiltInQuery(command.id, tenantId)).flatMap { builtIn ->
-                            when {
-                                builtIn -> Uni.createFrom().item(Pair(false, "Built-in roles cannot be modified."))
-
-                                else -> commandInvoker.dispatch<UpdateRoleCommand, Boolean>(command).map { Pair(it, "") }
-                            }
-                        }
-
+                    flag -> commandInvoker.dispatch<CreateRoleCommand, Boolean>(command).map { Pair(it, "") }
                     else -> Uni.createFrom().item(Pair(false, msg))
                 }
-            }.onFailure().recoverWithItem { _ ->
-                Pair(false, "An error occurred during role update.")
+            }.onFailure()
+            .recoverWithItem { _ ->
+                Pair(false, "An error occurred during role creation.")
             }
-    }
 
-    fun deleteRole(command: DeleteRoleCommand, tenantId: String): Uni<Pair<Boolean, String>> = Multi.createFrom().iterable(command.ids)
-        .onItem().transformToUniAndMerge { id ->
-            roleQueryService.handle(RoleByIdBuiltInQuery(id, tenantId))
-                .flatMap { isBuiltIn ->
-                    when {
-                        isBuiltIn ->
-                            Uni.createFrom()
-                                .item(Pair(false, "Role does not exist or Built-in roles cannot be modified."))
+    fun updateRole(
+        command: UpdateRoleCommand,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
+        when {
+            command.id.isBlank() -> Uni.createFrom().item(Pair(false, "ID cannot be null or blank."))
+            else ->
+                checkRoleCodeForUpdate(command.code, tenantId, command.id)
+                    .flatMap { (flag, msg) ->
+                        when {
+                            flag ->
+                                roleQueryService.handle(RoleByIdBuiltInQuery(command.id, tenantId)).flatMap { builtIn ->
+                                    when {
+                                        builtIn -> Uni.createFrom().item(Pair(false, "Built-in roles cannot be modified."))
 
-                        else -> Uni.createFrom().nullItem()
+                                        else -> commandInvoker.dispatch<UpdateRoleCommand, Boolean>(command).map { Pair(it, "") }
+                                    }
+                                }
+
+                            else -> Uni.createFrom().item(Pair(false, msg))
+                        }
+                    }.onFailure()
+                    .recoverWithItem { _ ->
+                        Pair(false, "An error occurred during role update.")
                     }
-                }
         }
-        .collect().asList()
-        .flatMap { results ->
-            val errorResult = results.find { !it.first }
-            errorResult?.let { Uni.createFrom().item(it) } ?: commandInvoker.dispatch<DeleteRoleCommand, Boolean>(
-                command,
-            ).map { Pair(it, "") }
-        }.onFailure().recoverWithItem { _ ->
-            Pair(false, "An error occurred during role delete.")
+
+    fun deleteRole(
+        command: DeleteRoleCommand,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
+        Multi
+            .createFrom()
+            .iterable(command.ids)
+            .onItem()
+            .transformToUniAndMerge { id ->
+                roleQueryService
+                    .handle(RoleByIdBuiltInQuery(id, tenantId))
+                    .flatMap { isBuiltIn ->
+                        when {
+                            isBuiltIn ->
+                                Uni
+                                    .createFrom()
+                                    .item(Pair(false, "Role does not exist or Built-in roles cannot be modified."))
+
+                            else -> Uni.createFrom().nullItem()
+                        }
+                    }
+            }.collect()
+            .asList()
+            .flatMap { results ->
+                val errorResult = results.find { !it.first }
+                errorResult?.let { Uni.createFrom().item(it) } ?: commandInvoker
+                    .dispatch<DeleteRoleCommand, Boolean>(
+                        command,
+                    ).map { Pair(it, "") }
+            }.onFailure()
+            .recoverWithItem { _ ->
+                Pair(false, "An error occurred during role delete.")
+            }
+
+    private fun checkRoleCode(
+        code: String,
+        tenantId: String,
+    ): Uni<Pair<Boolean, String>> =
+        when (code) {
+            DbConstants.SUPER_SYSTEM_ROLE_CODE, DbConstants.SUPER_TENANT_ROLE_CODE ->
+                Uni.createFrom().item(Pair(false, "Role code usage is not permitted."))
+
+            else ->
+                roleQueryService
+                    .handle(RoleExistsQuery(code, tenantId))
+                    .flatMap { exist ->
+                        when {
+                            exist -> Uni.createFrom().item(Pair(false, "Role code already exists."))
+                            else -> Uni.createFrom().item(Pair(true, ""))
+                        }
+                    }
         }
 
-    private fun checkRoleCode(code: String, tenantId: String): Uni<Pair<Boolean, String>> = when (code) {
-        DbConstants.SUPER_SYSTEM_ROLE_CODE, DbConstants.SUPER_TENANT_ROLE_CODE ->
-            Uni.createFrom().item(Pair(false, "Role code usage is not permitted."))
+    private fun checkRoleCodeForUpdate(
+        currentCode: String,
+        tenantId: String,
+        id: String,
+    ): Uni<Pair<Boolean, String>> =
+        when (currentCode) {
+            DbConstants.SUPER_SYSTEM_ROLE_CODE, DbConstants.SUPER_TENANT_ROLE_CODE ->
+                Uni.createFrom().item(Pair(false, "Role code usage is not permitted."))
 
-        else ->
-            roleQueryService.handle(RoleExistsQuery(code, tenantId))
-                .flatMap { exist ->
-                    when {
-                        exist -> Uni.createFrom().item(Pair(false, "Role code already exists."))
-                        else -> Uni.createFrom().item(Pair(true, ""))
+            else ->
+                roleQueryService
+                    .handle(RoleByIdQuery(id, tenantId))
+                    .flatMap { role ->
+                        when {
+                            role.code != currentCode ->
+                                Uni
+                                    .createFrom()
+                                    .item(Pair(false, "Role code modification is not permitted."))
+
+                            else -> Uni.createFrom().item(Pair(true, ""))
+                        }
                     }
-                }
-    }
-
-    private fun checkRoleCodeForUpdate(currentCode: String, tenantId: String, id: String): Uni<Pair<Boolean, String>> = when (currentCode) {
-        DbConstants.SUPER_SYSTEM_ROLE_CODE, DbConstants.SUPER_TENANT_ROLE_CODE ->
-            Uni.createFrom().item(Pair(false, "Role code usage is not permitted."))
-
-        else ->
-            roleQueryService.handle(RoleByIdQuery(id, tenantId))
-                .flatMap { role ->
-                    when {
-                        role.code != currentCode ->
-                            Uni.createFrom()
-                                .item(Pair(false, "Role code modification is not permitted."))
-
-                        else -> Uni.createFrom().item(Pair(true, ""))
-                    }
-                }
-    }
+        }
 }

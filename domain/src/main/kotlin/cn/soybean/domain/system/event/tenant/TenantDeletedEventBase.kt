@@ -12,7 +12,8 @@ import cn.soybean.shared.domain.event.DomainEvent
 data class TenantDeletedEventBase(
     val aggregateId: String,
     val status: DbEnums.Status,
-) : AggregateEventBase(aggregateId), DomainEvent {
+) : AggregateEventBase(aggregateId),
+    DomainEvent {
     companion object {
         const val TENANT_DELETED_V1 = "TENANT_DELETED_V1"
     }

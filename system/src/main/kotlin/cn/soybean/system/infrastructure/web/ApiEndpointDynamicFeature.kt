@@ -13,10 +13,10 @@ import jakarta.ws.rs.container.DynamicFeature
 import jakarta.ws.rs.container.ResourceInfo
 import jakarta.ws.rs.core.FeatureContext
 import jakarta.ws.rs.ext.Provider
+import org.eclipse.microprofile.openapi.annotations.Operation
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.kotlinFunction
-import org.eclipse.microprofile.openapi.annotations.Operation
 
 @Provider
 class ApiEndpointDynamicFeature : DynamicFeature {
@@ -24,7 +24,10 @@ class ApiEndpointDynamicFeature : DynamicFeature {
         val apiEndpoints = mutableSetOf<ApiEndpoint>()
     }
 
-    override fun configure(resourceInfo: ResourceInfo, context: FeatureContext) {
+    override fun configure(
+        resourceInfo: ResourceInfo,
+        context: FeatureContext,
+    ) {
         val resourceClass = resourceInfo.resourceClass.kotlin
         val resourceMethod = resourceInfo.resourceMethod.kotlinFunction
 
@@ -34,9 +37,13 @@ class ApiEndpointDynamicFeature : DynamicFeature {
             if (classPath.isNotEmpty() && methodPath.isNotEmpty()) "$classPath$methodPath" else classPath + methodPath
 
         val httpMethod =
-            resourceMethod?.javaMethod?.declaredAnnotations?.find { annotation ->
-                annotation.annotationClass.annotations.any { it is HttpMethod }
-            }?.annotationClass?.simpleName
+            resourceMethod
+                ?.javaMethod
+                ?.declaredAnnotations
+                ?.find { annotation ->
+                    annotation.annotationClass.annotations.any { it is HttpMethod }
+                }?.annotationClass
+                ?.simpleName
 
         val operationAnnotation = resourceMethod?.findAnnotation<Operation>()
         val summary = operationAnnotation?.summary

@@ -10,8 +10,8 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.QueryParam
-import java.io.Serializable
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
+import java.io.Serializable
 
 open class BasePageParam(
     /**

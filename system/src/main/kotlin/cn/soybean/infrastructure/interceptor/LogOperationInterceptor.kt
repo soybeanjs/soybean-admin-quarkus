@@ -18,14 +18,14 @@ import jakarta.ws.rs.container.ContainerRequestContext
 import jakarta.ws.rs.container.ContainerResponseContext
 import jakarta.ws.rs.container.ResourceInfo
 import jakarta.ws.rs.ext.Provider
-import java.time.LocalDateTime
 import org.jboss.resteasy.reactive.server.ServerRequestFilter
 import org.jboss.resteasy.reactive.server.ServerResponseFilter
+import java.time.LocalDateTime
 
 @Provider
 @ApplicationScoped
 @Priority(1)
-class ReactiveLoggingInterceptor(
+class LogOperationInterceptor(
     private val routingContext: RoutingContext,
     private val resourceInfo: ResourceInfo,
     private val loginHelper: LoginHelper,
@@ -46,7 +46,10 @@ class ReactiveLoggingInterceptor(
     }
 
     @ServerResponseFilter
-    fun filterResponse(requestContext: ContainerRequestContext, responseContext: ContainerResponseContext) {
+    fun filterResponse(
+        requestContext: ContainerRequestContext,
+        responseContext: ContainerResponseContext,
+    ) {
         val loggable = getLoggableMetadata()
         if (loggable != null) {
             val startTime = requestContext.getProperty(START_TIME_PROPERTY) as Long
@@ -92,20 +95,28 @@ class ReactiveLoggingInterceptor(
         }
     }
 
-    private fun extractRequestInfo(logReqParams: Boolean, context: ContainerRequestContext): String? = when {
-        logReqParams ->
-            context.uriInfo.queryParameters.entries.joinToString("&") { entry ->
-                entry.value.joinToString("&") { value -> "${entry.key}=$value" }
-            }
+    private fun extractRequestInfo(
+        logReqParams: Boolean,
+        context: ContainerRequestContext,
+    ): String? =
+        when {
+            logReqParams ->
+                context.uriInfo.queryParameters.entries.joinToString("&") { entry ->
+                    entry.value.joinToString("&") { value -> "${entry.key}=$value" }
+                }
 
-        else -> null
-    }
+            else -> null
+        }
 
-    private fun extractResponseInfo(logResBody: Boolean, context: ContainerResponseContext): String? = when {
-        logResBody -> Json.encode(context.entity)
+    private fun extractResponseInfo(
+        logResBody: Boolean,
+        context: ContainerResponseContext,
+    ): String? =
+        when {
+            logResBody -> Json.encode(context.entity)
 
-        else -> null
-    }
+            else -> null
+        }
 
     private fun getLoggableMetadata(): LogOperation? {
         val resourceMethod = resourceInfo.resourceMethod

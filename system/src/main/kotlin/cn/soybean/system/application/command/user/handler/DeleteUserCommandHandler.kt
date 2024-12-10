@@ -19,29 +19,37 @@ import io.smallrye.mutiny.replaceWithUnit
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class DeleteUserCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
-    CommandHandler<DeleteUserCommand, Boolean> {
-    override fun handle(command: DeleteUserCommand): Uni<Boolean> = Multi.createFrom().iterable(command.ids)
-        .onItem().transformToUniAndMerge { id ->
-            eventStoreDB.load(id, UserAggregate::class.java)
-                .map { aggregate ->
-                    aggregate.deleteUser(
-                        UserDeletedEventBase(id).also {
-                            it.tenantId = loginHelper.getTenantId()
-                            it.updateBy = loginHelper.getUserId()
-                            it.updateAccountName = loginHelper.getAccountName()
-                        },
-                    )
-                    aggregate
-                }
-                .flatMap { aggregate -> eventStoreDB.save(aggregate) }
-                .onFailure().invoke { ex ->
-                    Log.errorf(ex, "Failed to delete user with ID: $id")
-                }.replaceWithUnit()
-        }
-        .collect().asList()
-        .replaceWith(true)
-        .onFailure().invoke { ex -> Log.errorf(ex, "DeleteUserCommandHandler fail") }
+class DeleteUserCommandHandler(
+    private val eventStoreDB: EventStoreDB,
+    private val loginHelper: LoginHelper,
+) : CommandHandler<DeleteUserCommand, Boolean> {
+    override fun handle(command: DeleteUserCommand): Uni<Boolean> =
+        Multi
+            .createFrom()
+            .iterable(command.ids)
+            .onItem()
+            .transformToUniAndMerge { id ->
+                eventStoreDB
+                    .load(id, UserAggregate::class.java)
+                    .map { aggregate ->
+                        aggregate.deleteUser(
+                            UserDeletedEventBase(id).also {
+                                it.tenantId = loginHelper.getTenantId()
+                                it.updateBy = loginHelper.getUserId()
+                                it.updateAccountName = loginHelper.getAccountName()
+                            },
+                        )
+                        aggregate
+                    }.flatMap { aggregate -> eventStoreDB.save(aggregate) }
+                    .onFailure()
+                    .invoke { ex ->
+                        Log.errorf(ex, "Failed to delete user with ID: $id")
+                    }.replaceWithUnit()
+            }.collect()
+            .asList()
+            .replaceWith(true)
+            .onFailure()
+            .invoke { ex -> Log.errorf(ex, "DeleteUserCommandHandler fail") }
 
     override fun canHandle(command: Command): Boolean = command is DeleteUserCommand
 }

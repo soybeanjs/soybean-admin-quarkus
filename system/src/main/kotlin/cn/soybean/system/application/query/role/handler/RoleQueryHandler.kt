@@ -21,20 +21,23 @@ import io.quarkus.panache.common.Sort
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 
-fun SystemRoleEntity.toRoleResponse(): RoleResponse = RoleResponse(
-    id = this.id,
-    name = this.name,
-    code = this.code,
-    order = this.order,
-    status = this.status,
-    builtIn = this.builtIn,
-    dataScope = this.dataScope,
-    dataScopeDeptIds = this.dataScopeDeptIds,
-    remark = this.remark,
-)
+fun SystemRoleEntity.toRoleResponse(): RoleResponse =
+    RoleResponse(
+        id = this.id,
+        name = this.name,
+        code = this.code,
+        order = this.order,
+        status = this.status,
+        builtIn = this.builtIn,
+        dataScope = this.dataScope,
+        dataScopeDeptIds = this.dataScopeDeptIds,
+        remark = this.remark,
+    )
 
 @ApplicationScoped
-class RoleQueryHandler(private val systemRoleRepository: SystemRoleRepository) : RoleQueryService {
+class RoleQueryHandler(
+    private val systemRoleRepository: SystemRoleRepository,
+) : RoleQueryService {
     override fun handle(query: PageRoleQuery): Uni<PageResult<RoleResponse>> {
         val (q, params, page) = query
         val panacheQuery = systemRoleRepository.getRoleList(q, Sort.by("order"), params).page(page)

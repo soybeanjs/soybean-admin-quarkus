@@ -29,7 +29,8 @@ data class RouteCreatedOrUpdatedEventBase(
     val keepAlive: Boolean = false,
     val constant: Boolean = false,
     val href: String? = null,
-) : AggregateEventBase(aggregateId), DomainEvent {
+) : AggregateEventBase(aggregateId),
+    DomainEvent {
     companion object {
         const val ROUTE_CREATED_V1 = "ROUTE_CREATED_V1"
         const val ROUTE_UPDATED_V1 = "ROUTE_UPDATED_V1"

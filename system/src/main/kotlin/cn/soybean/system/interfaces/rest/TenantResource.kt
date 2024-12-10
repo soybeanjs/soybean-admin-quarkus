@@ -54,7 +54,9 @@ class TenantResource(
     @GET
     @WithSession
     @Operation(summary = "租户列表", description = "获取租户列表")
-    fun pageQuery(@Parameter @BeanParam queryParam: TenantQuery): Uni<ResponseEntity<PageResult<TenantResponse>>> {
+    fun pageQuery(
+        @Parameter @BeanParam queryParam: TenantQuery,
+    ): Uni<ResponseEntity<PageResult<TenantResponse>>> {
         var query = ""
         val params = Parameters()
 
@@ -67,7 +69,8 @@ class TenantResource(
             query += " and status = status"
             params.and("status", "%$it%")
         }
-        return tenantQueryService.handle(PageTenantQuery(query, params, queryParam.ofPage()))
+        return tenantQueryService
+            .handle(PageTenantQuery(query, params, queryParam.ofPage()))
             .map { ResponseEntity.ok(it) }
     }
 
@@ -77,12 +80,13 @@ class TenantResource(
     @Operation(summary = "创建租户", description = "创建租户信息")
     fun createTenant(
         @Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: TenantRequest,
-    ): Uni<ResponseEntity<Boolean>> = tenantService.createTenant(req.toCreateTenantCommand()).map { (isSuccess, message) ->
-        when {
-            isSuccess -> ResponseEntity.ok(true)
-            else -> ResponseEntity.fail(message, false)
+    ): Uni<ResponseEntity<Boolean>> =
+        tenantService.createTenant(req.toCreateTenantCommand()).map { (isSuccess, message) ->
+            when {
+                isSuccess -> ResponseEntity.ok(true)
+                else -> ResponseEntity.fail(message, false)
+            }
         }
-    }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}tenant.update")
     @PUT
@@ -90,18 +94,21 @@ class TenantResource(
     @Operation(summary = "更新租户", description = "更新租户信息")
     fun updateTenant(
         @Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: TenantRequest,
-    ): Uni<ResponseEntity<Boolean>> = tenantService.updateTenant(req.toUpdateTenantCommand()).map { (isSuccess, message) ->
-        when {
-            isSuccess -> ResponseEntity.ok(true)
-            else -> ResponseEntity.fail(message, false)
+    ): Uni<ResponseEntity<Boolean>> =
+        tenantService.updateTenant(req.toUpdateTenantCommand()).map { (isSuccess, message) ->
+            when {
+                isSuccess -> ResponseEntity.ok(true)
+                else -> ResponseEntity.fail(message, false)
+            }
         }
-    }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}tenant.delete")
     @DELETE
     @WithTransaction
     @Operation(summary = "删除租户", description = "删除租户信息")
-    fun deleteTenant(@Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>): Uni<ResponseEntity<Boolean>> =
+    fun deleteTenant(
+        @Valid @NotEmpty(message = "{validation.delete.id.NotEmpty}") ids: Set<String>,
+    ): Uni<ResponseEntity<Boolean>> =
         tenantService.deleteTenant(DeleteTenantCommand(ids)).map { (isSuccess, message) ->
             when {
                 isSuccess -> ResponseEntity.ok(true)

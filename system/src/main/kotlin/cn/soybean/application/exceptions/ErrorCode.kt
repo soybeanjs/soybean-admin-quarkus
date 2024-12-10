@@ -5,7 +5,10 @@
  */
 package cn.soybean.application.exceptions
 
-enum class ErrorCode(val code: Int, val message: String) {
+enum class ErrorCode(
+    val code: Int,
+    val message: String,
+) {
     AGGREGATE_EVENT_NOT_FOUND(501, "The aggregate event does not exist."),
 
     TENANT_NOT_FOUND(1001, "The tenant does not exist."),

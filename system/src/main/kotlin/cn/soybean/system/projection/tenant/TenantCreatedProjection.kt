@@ -90,13 +90,19 @@ class TenantCreatedProjection(
                 it.createAccountName = event.createAccountName
             }
 
-        return tenantRepository.saveOrUpdate(tenant).flatMap { userRepository.saveOrUpdate(user) }
+        return tenantRepository
+            .saveOrUpdate(tenant)
+            .flatMap { userRepository.saveOrUpdate(user) }
             .flatMap { processAssociatesRole(roleEntity, event) }
             .replaceWithUnit()
     }
 
-    private fun processAssociatesRole(roleEntity: SystemRoleEntity, event: TenantCreatedEventBase): Uni<Unit> =
-        roleRepository.saveOrUpdate(roleEntity)
+    private fun processAssociatesRole(
+        roleEntity: SystemRoleEntity,
+        event: TenantCreatedEventBase,
+    ): Uni<Unit> =
+        roleRepository
+            .saveOrUpdate(roleEntity)
             .flatMap { role ->
                 val tenantId = role?.tenantId
                 val userId = event.contactUserId
@@ -108,8 +114,7 @@ class TenantCreatedProjection(
 
                     else -> Uni.createFrom().item(role)
                 }
-            }
-            .flatMap { role ->
+            }.flatMap { role ->
                 val menuIds = event.menuIds
                 when {
                     menuIds.isNullOrEmpty() -> Uni.createFrom().item(role)
@@ -121,8 +126,7 @@ class TenantCreatedProjection(
                         roleMenuRepository.saveOrUpdateAll(roleMenus).replaceWith(role)
                     }
                 }
-            }
-            .flatMap { role ->
+            }.flatMap { role ->
                 val operationIds = event.operationIds
                 when {
                     operationIds.isNullOrEmpty() -> Uni.createFrom().nullItem()

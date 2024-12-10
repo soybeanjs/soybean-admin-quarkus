@@ -24,7 +24,8 @@ class RouteDeletedProjection(
     @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RouteDeletedEventBase::class.java)
-        return menuRepository.delById(event.aggregateId)
+        return menuRepository
+            .delById(event.aggregateId)
             .flatMap { event.tenantId?.let { tenantId -> roleMenuRepository.delByMenuId(event.aggregateId, tenantId) } }
             .replaceWithUnit()
     }

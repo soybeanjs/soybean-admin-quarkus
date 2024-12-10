@@ -15,9 +15,9 @@ import io.smallrye.mutiny.replaceWithUnit
 import io.smallrye.reactive.messaging.kafka.KafkaClientService
 import io.vertx.core.Vertx
 import jakarta.enterprise.context.ApplicationScoped
-import java.time.Duration
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.eclipse.microprofile.config.inject.ConfigProperty
+import java.time.Duration
 
 @ApplicationScoped
 class AggregateEventBusWithKafka(
@@ -40,32 +40,40 @@ class AggregateEventBusWithKafka(
             return Uni.createFrom().item(Unit)
         }
 
-        return Uni.createFrom().item {
-            context.runOnContext {
-                val firstEventType = eventEntities.first().eventType
-                val eventsBytes = serializeToJsonBytes(eventEntities.toTypedArray())
-                val record = ProducerRecord(eventStoreTopic, firstEventType, eventsBytes)
-                kafkaClientService.getProducer<String, ByteArray>("eventstore-out")
-                    .send(record)
-                    .ifNoItem().after(Duration.ofMillis(PUBLISH_TIMEOUT)).fail()
-                    .onFailure().invoke { ex ->
-                        Log.errorf(
-                            ex,
-                            "[AggregateEventBusWithKafka] Error publishing events to Kafka topic $eventStoreTopic. Payload: %s",
-                            String(record.value()),
-                        )
-                    }
-                    .onFailure().retry().withBackOff(Duration.ofMillis(BACKOFF_TIMEOUT)).atMost(RETRY_COUNT)
-                    .onItem().invoke { _ ->
-                        Log.debugf(
-                            "[AggregateEventBusWithKafka] Successfully published events to Kafka topic key %s. Payload: %s",
-                            record.key(),
-                            String(record.value()),
-                        )
-                    }
-                    .subscribeAsCompletionStage()
-            }
-        }.replaceWithUnit()
+        return Uni
+            .createFrom()
+            .item {
+                context.runOnContext {
+                    val firstEventType = eventEntities.first().eventType
+                    val eventsBytes = serializeToJsonBytes(eventEntities.toTypedArray())
+                    val record = ProducerRecord(eventStoreTopic, firstEventType, eventsBytes)
+                    kafkaClientService
+                        .getProducer<String, ByteArray>("eventstore-out")
+                        .send(record)
+                        .ifNoItem()
+                        .after(Duration.ofMillis(PUBLISH_TIMEOUT))
+                        .fail()
+                        .onFailure()
+                        .invoke { ex ->
+                            Log.errorf(
+                                ex,
+                                "[AggregateEventBusWithKafka] Error publishing events to Kafka topic $eventStoreTopic. Payload: %s",
+                                String(record.value()),
+                            )
+                        }.onFailure()
+                        .retry()
+                        .withBackOff(Duration.ofMillis(BACKOFF_TIMEOUT))
+                        .atMost(RETRY_COUNT)
+                        .onItem()
+                        .invoke { _ ->
+                            Log.debugf(
+                                "[AggregateEventBusWithKafka] Successfully published events to Kafka topic key %s. Payload: %s",
+                                record.key(),
+                                String(record.value()),
+                            )
+                        }.subscribeAsCompletionStage()
+                }
+            }.replaceWithUnit()
     }
 
     companion object {

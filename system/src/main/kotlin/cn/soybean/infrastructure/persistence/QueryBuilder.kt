@@ -7,7 +7,9 @@ package cn.soybean.infrastructure.persistence
 
 import io.quarkus.panache.common.Parameters
 
-class QueryBuilder(tenantId: String) {
+class QueryBuilder(
+    tenantId: String,
+) {
     private val conditions = mutableListOf<String>()
     private val parameters = mutableMapOf<String, Any>()
 
@@ -20,7 +22,12 @@ class QueryBuilder(tenantId: String) {
         parameters["tenantId"] = tenantId
     }
 
-    fun addCondition(field: String, value: Any?, operator: String = "=", prefix: String = "AND"): QueryBuilder {
+    fun addCondition(
+        field: String,
+        value: Any?,
+        operator: String = "=",
+        prefix: String = "AND",
+    ): QueryBuilder {
         value?.let {
             val condition = "$field $operator :$field"
             val wrappedCondition = if (conditions.isNotEmpty()) " $prefix $condition" else condition
@@ -30,9 +37,15 @@ class QueryBuilder(tenantId: String) {
         return this
     }
 
-    fun addLikeCondition(field: String, value: String?): QueryBuilder = addCondition(field, value?.let { "%$it%" }, "LIKE")
+    fun addLikeCondition(
+        field: String,
+        value: String?,
+    ): QueryBuilder = addCondition(field, value?.let { "%$it%" }, "LIKE")
 
-    fun addCompositeCondition(composite: () -> QueryBuilder, prefix: String = "AND"): QueryBuilder {
+    fun addCompositeCondition(
+        composite: () -> QueryBuilder,
+        prefix: String = "AND",
+    ): QueryBuilder {
         val builder = composite()
         if (builder.conditions.isNotEmpty()) {
             val compositeCondition = "(${builder.conditions.joinToString(" ")})"

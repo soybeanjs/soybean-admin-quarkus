@@ -27,7 +27,8 @@ class RoleDeletedProjection(
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RoleDeletedEventBase::class.java)
         return event.tenantId?.let { tenantId ->
-            roleRepository.delById(event.aggregateId, tenantId)
+            roleRepository
+                .delById(event.aggregateId, tenantId)
                 .flatMap { roleMenuRepository.delByRoleId(event.aggregateId, tenantId) }
                 .flatMap { roleUserRepository.delByRoleId(event.aggregateId, tenantId) }
                 .replaceWithUnit()
