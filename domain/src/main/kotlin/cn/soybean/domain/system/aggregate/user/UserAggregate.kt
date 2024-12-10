@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.domain.system.aggregate.user
 
 import cn.soybean.domain.system.enums.DbEnums
@@ -10,9 +15,12 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.quarkus.elytron.security.common.BcryptUtil
 
-class UserAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggregateId: String) :
+class UserAggregate
+@JsonCreator
+constructor(
+    @JsonProperty("aggregateId") aggregateId: String,
+) :
     AggregateRoot(aggregateId, AGGREGATE_TYPE) {
-
     private var accountName: String? = null
     private var accountPassword: String? = null
     private var nickName: String? = null
@@ -28,17 +36,19 @@ class UserAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggreg
 
     override fun whenCondition(eventEntity: AggregateEventEntity) {
         when (eventEntity.eventType) {
-            UserCreatedOrUpdatedEventBase.USER_CREATED_V1, UserCreatedOrUpdatedEventBase.USER_UPDATED_V1 -> handle(
+            UserCreatedOrUpdatedEventBase.USER_CREATED_V1, UserCreatedOrUpdatedEventBase.USER_UPDATED_V1 ->
+                handle(
+                    SerializerUtils.deserializeFromJsonBytes(
+                        eventEntity.data,
+                        UserCreatedOrUpdatedEventBase::class.java,
+                    ),
+                )
+
+            UserDeletedEventBase.USER_DELETED_V1 ->
                 SerializerUtils.deserializeFromJsonBytes(
                     eventEntity.data,
-                    UserCreatedOrUpdatedEventBase::class.java
+                    UserDeletedEventBase::class.java,
                 )
-            )
-
-            UserDeletedEventBase.USER_DELETED_V1 -> SerializerUtils.deserializeFromJsonBytes(
-                eventEntity.data,
-                UserDeletedEventBase::class.java
-            )
 
             else -> throw RuntimeException(eventEntity.eventType)
         }

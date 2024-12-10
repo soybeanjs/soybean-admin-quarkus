@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.projection.user
 
 import cn.soybean.domain.system.event.user.UserDeletedEventBase
@@ -14,9 +19,8 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class UserDeletedProjection(
     private val userRepository: SystemUserRepository,
-    private val roleUserRepository: SystemRoleUserRepository
+    private val roleUserRepository: SystemRoleUserRepository,
 ) : Projection {
-
     @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, UserDeletedEventBase::class.java)

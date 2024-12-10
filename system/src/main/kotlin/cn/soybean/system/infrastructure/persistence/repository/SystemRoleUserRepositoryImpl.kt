@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.infrastructure.persistence.repository
 
 import cn.soybean.domain.system.entity.SystemRoleUserEntity
@@ -9,13 +14,11 @@ import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
 class SystemRoleUserRepositoryImpl : SystemRoleUserRepository, PanacheRepositoryBase<SystemRoleUserEntity, String> {
-    override fun delByRoleId(roleId: String, tenantId: String): Uni<Long> =
-        delete("roleId = ?1 and tenantId = ?2", roleId, tenantId)
+    override fun delByRoleId(roleId: String, tenantId: String): Uni<Long> = delete("roleId = ?1 and tenantId = ?2", roleId, tenantId)
 
-    override fun delByUserId(userId: String, tenantId: String): Uni<Long> =
-        delete("userId = ?1 and tenantId = ?2", userId, tenantId)
+    override fun delByUserId(userId: String, tenantId: String): Uni<Long> = delete("userId = ?1 and tenantId = ?2", userId, tenantId)
 
     override fun saveOrUpdate(roleUser: SystemRoleUserEntity): Uni<SystemRoleUserEntity> = persist(roleUser)
-    override fun saveOrUpdateAll(roleUsers: List<SystemRoleUserEntity>): Uni<Unit> =
-        persist(roleUsers).replaceWithUnit()
+
+    override fun saveOrUpdateAll(roleUsers: List<SystemRoleUserEntity>): Uni<Unit> = persist(roleUsers).replaceWithUnit()
 }

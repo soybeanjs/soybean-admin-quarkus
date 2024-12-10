@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.query.tenant.service
 
 import cn.soybean.domain.system.entity.SystemTenantEntity
@@ -12,8 +17,12 @@ import io.smallrye.mutiny.Uni
 
 interface TenantQueryService {
     fun handle(query: TenantByNameQuery): Uni<SystemTenantEntity>
+
     fun handle(query: PageTenantQuery): Uni<PageResult<TenantResponse>>
+
     fun handle(query: TenantByNameExistsQuery): Uni<Boolean>
+
     fun handle(query: TenantByIdBuiltInQuery): Uni<Boolean>
+
     fun handle(query: TenantByIdQuery): Uni<SystemTenantEntity>
 }

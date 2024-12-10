@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.interfaces.rest
 
 import cn.soybean.infrastructure.config.consts.AppConstants
@@ -43,9 +48,8 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 class RoleResource(
     private val roleQueryService: RoleQueryService,
     private val roleService: RoleService,
-    private val loginHelper: LoginHelper
+    private val loginHelper: LoginHelper,
 ) {
-
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}role.list")
     @GET
     @WithSession

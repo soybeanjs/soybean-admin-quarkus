@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.infrastructure.localization
 
 import io.vertx.ext.web.RoutingContext
@@ -9,7 +14,6 @@ private val fallbackLocale = Locale.CHINA
 
 @ApplicationScoped
 class LocalizationService(private val routingContext: RoutingContext) {
-
     fun getMessage(key: String): String = try {
         getResourceBundle().getString(key)
     } catch (e: MissingResourceException) {

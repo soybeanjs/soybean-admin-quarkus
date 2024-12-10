@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.interfaces.rest.dto.request.user
 
 import cn.soybean.domain.system.enums.DbEnums
@@ -11,44 +16,34 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Null
 
 @KonvertTo(
-    CreateUserCommand::class, options = [
-        Konfig(key = "konvert.enforce-not-null", value = "true")
-    ]
+    CreateUserCommand::class,
+    options = [
+        Konfig(key = "konvert.enforce-not-null", value = "true"),
+    ],
 )
 @KonvertTo(
-    UpdateUserCommand::class, options = [
-        Konfig(key = "konvert.enforce-not-null", value = "true")
-    ]
+    UpdateUserCommand::class,
+    options = [
+        Konfig(key = "konvert.enforce-not-null", value = "true"),
+    ],
 )
 data class UserRequest(
     @field:Null(groups = [ValidationGroups.OnCreate::class])
     @field:NotNull(groups = [ValidationGroups.OnUpdate::class])
     var id: String? = null,
-
     @field:NotBlank
     var accountName: String? = null,
-
     @field:NotBlank
     var accountPassword: String? = null,
-
     @field:NotBlank
     var nickName: String? = null,
-
     var personalProfile: String? = null,
-
     var email: String? = null,
-
     var countryCode: String = DbEnums.CountryInfo.CN.countryCode,
-
     var phoneCode: String = DbEnums.CountryInfo.CN.phoneCode,
-
     var phoneNumber: String? = null,
-
     var gender: DbEnums.Gender? = null,
-
     var avatar: String? = null,
-
     var deptId: String? = null,
-
-    var status: DbEnums.Status = DbEnums.Status.ENABLED
+    var status: DbEnums.Status = DbEnums.Status.ENABLED,
 )

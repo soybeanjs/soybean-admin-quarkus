@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.interfaces.rest
 
 import cn.soybean.domain.system.entity.SystemApisEntity
@@ -21,7 +26,6 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Apis", description = "Operations related to apis")
 class ApiResource(private val loginHelper: LoginHelper) {
-
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}api.list")
     @GET
     @WithSession

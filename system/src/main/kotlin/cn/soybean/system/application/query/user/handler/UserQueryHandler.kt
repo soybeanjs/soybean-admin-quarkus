@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.query.user.handler
 
 import cn.soybean.domain.system.entity.SystemUserEntity
@@ -29,12 +34,11 @@ fun SystemUserEntity.toUserResponse(): UserResponse = UserResponse(
     gender = gender,
     avatar = avatar,
     deptId = deptId,
-    status = status
+    status = status,
 )
 
 @ApplicationScoped
 class UserQueryHandler(private val systemUserRepository: SystemUserRepository) : UserQueryService {
-
     override fun handle(query: PageUserQuery): Uni<PageResult<UserResponse>> {
         val (q, params, page) = query
         val panacheQuery = systemUserRepository.getUserList(q, Sort.by("id"), params).page(page)
@@ -45,8 +49,7 @@ class UserQueryHandler(private val systemUserRepository: SystemUserRepository) :
         }
     }
 
-    override fun handle(query: UserByIdQuery): Uni<SystemUserEntity?> =
-        systemUserRepository.getById(query.id, query.tenantId)
+    override fun handle(query: UserByIdQuery): Uni<SystemUserEntity?> = systemUserRepository.getById(query.id, query.tenantId)
 
     override fun handle(query: UserByaAccountNameQuery): Uni<SystemUserEntity?> =
         systemUserRepository.getByAccountName(query.accountName, query.tenantId)
@@ -54,8 +57,7 @@ class UserQueryHandler(private val systemUserRepository: SystemUserRepository) :
     override fun handle(query: UserByPhoneNumberQuery): Uni<SystemUserEntity?> =
         systemUserRepository.getByPhoneNumber(query.phoneNumber, query.tenantId)
 
-    override fun handle(query: UserByEmailQuery): Uni<SystemUserEntity?> =
-        systemUserRepository.getByEmail(query.email, query.tenantId)
+    override fun handle(query: UserByEmailQuery): Uni<SystemUserEntity?> = systemUserRepository.getByEmail(query.email, query.tenantId)
 
     override fun handle(query: UserByIdBuiltInQuery): Uni<Boolean> =
         systemUserRepository.getById(query.id, query.tenantId).map { it?.builtIn != false }
@@ -63,7 +65,6 @@ class UserQueryHandler(private val systemUserRepository: SystemUserRepository) :
     override fun handle(query: UserByAccountQuery): Uni<SystemUserEntity> =
         systemUserRepository.findByAccountNameOrEmailOrPhoneNumber(query.accountName, query.tenantId)
 
-    override fun handle(query: UserByTenantIdQuery): Uni<Set<String>> =
-        systemUserRepository.findByTenantId(query.tenantId)
-            .map { users -> users.map { it.id }.toSet() }
+    override fun handle(query: UserByTenantIdQuery): Uni<Set<String>> = systemUserRepository.findByTenantId(query.tenantId)
+        .map { users -> users.map { it.id }.toSet() }
 }

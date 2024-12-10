@@ -1,17 +1,21 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.domain.base
 
 import cn.soybean.domain.system.config.DbConstants
 import cn.soybean.shared.domain.entity.EntityBase
 import jakarta.persistence.Column
 import jakarta.persistence.MappedSuperclass
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
 import java.time.LocalDateTime
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 
 @MappedSuperclass
 abstract class BaseEntity : EntityBase<String>(), Serializable {
-
     /**
      * 创建时间
      */

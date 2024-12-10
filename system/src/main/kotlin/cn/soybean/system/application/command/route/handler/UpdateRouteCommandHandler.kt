@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.command.route.handler
 
 import cn.soybean.domain.system.aggregate.route.RouteAggregate
@@ -14,21 +19,20 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class UpdateRouteCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
     CommandHandler<UpdateRouteCommand, Boolean> {
-    override fun handle(command: UpdateRouteCommand): Uni<Boolean> =
-        eventStoreDB.load(command.id, RouteAggregate::class.java)
-            .map { aggregate ->
-                aggregate.updateRoute(
-                    command.toRouteCreatedOrUpdatedEventBase().also {
-                        it.tenantId = loginHelper.getTenantId()
-                        it.updateBy = loginHelper.getUserId()
-                        it.updateAccountName = loginHelper.getAccountName()
-                    }
-                )
-                aggregate
-            }
-            .flatMap { aggregate -> eventStoreDB.save(aggregate) }
-            .replaceWith(true)
-            .onFailure().invoke { ex -> Log.errorf(ex, "UpdateRouteCommandHandler fail") }
+    override fun handle(command: UpdateRouteCommand): Uni<Boolean> = eventStoreDB.load(command.id, RouteAggregate::class.java)
+        .map { aggregate ->
+            aggregate.updateRoute(
+                command.toRouteCreatedOrUpdatedEventBase().also {
+                    it.tenantId = loginHelper.getTenantId()
+                    it.updateBy = loginHelper.getUserId()
+                    it.updateAccountName = loginHelper.getAccountName()
+                },
+            )
+            aggregate
+        }
+        .flatMap { aggregate -> eventStoreDB.save(aggregate) }
+        .replaceWith(true)
+        .onFailure().invoke { ex -> Log.errorf(ex, "UpdateRouteCommandHandler fail") }
 
     override fun canHandle(command: Command): Boolean = command is UpdateRouteCommand
 }

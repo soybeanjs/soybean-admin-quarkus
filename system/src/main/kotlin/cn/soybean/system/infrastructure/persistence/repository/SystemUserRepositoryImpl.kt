@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.infrastructure.persistence.repository
 
 import cn.soybean.domain.system.entity.SystemUserEntity
@@ -11,18 +16,15 @@ import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
 class SystemUserRepositoryImpl : SystemUserRepository, PanacheRepositoryBase<SystemUserEntity, String> {
-    override fun findByAccountNameOrEmailOrPhoneNumber(accountName: String, tenantId: String): Uni<SystemUserEntity> =
-        find(
-            "tenantId = ?1 and (accountName = ?2 or email = ?2 or phoneNumber = ?2)",
-            tenantId,
-            accountName
-        ).singleResult()
+    override fun findByAccountNameOrEmailOrPhoneNumber(accountName: String, tenantId: String): Uni<SystemUserEntity> = find(
+        "tenantId = ?1 and (accountName = ?2 or email = ?2 or phoneNumber = ?2)",
+        tenantId,
+        accountName,
+    ).singleResult()
 
-    override fun findByTenantId(tenantId: String): Uni<List<SystemUserEntity>> =
-        find("tenantId", tenantId).list()
+    override fun findByTenantId(tenantId: String): Uni<List<SystemUserEntity>> = find("tenantId", tenantId).list()
 
-    override fun getUserList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemUserEntity> =
-        find(query, sort, params)
+    override fun getUserList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemUserEntity> = find(query, sort, params)
 
     override fun getById(id: String, tenantId: String): Uni<SystemUserEntity?> =
         find("id = ?1 and tenantId = ?2", id, tenantId).firstResult()

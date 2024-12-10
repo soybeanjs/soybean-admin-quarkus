@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.interfaces.rest.util
 
 import io.quarkus.logging.Log
@@ -12,8 +17,9 @@ object Ip2RegionUtil {
     fun initialize() {
         val dbPath = "ip2region/ip2region.xdb"
         try {
-            val inputStream = Thread.currentThread().contextClassLoader.getResourceAsStream(dbPath)
-                ?: throw IllegalStateException("Cannot find $dbPath in classpath")
+            val inputStream =
+                Thread.currentThread().contextClassLoader.getResourceAsStream(dbPath)
+                    ?: throw IllegalStateException("Cannot find $dbPath in classpath")
             val cBuff = inputStream.readBytes()
             searcher = Searcher.newWithBuffer(cBuff)
             Log.info("Ip2Region searcher initialized successfully.")
@@ -29,12 +35,13 @@ object Ip2RegionUtil {
                 return "Unknown"
             }
 
-            else -> try {
-                return searcher.search(ip)
-            } catch (e: Exception) {
-                Log.errorf(e, "Error searching IP $ip")
-                return "Unknown"
-            }
+            else ->
+                try {
+                    return searcher.search(ip)
+                } catch (e: Exception) {
+                    Log.errorf(e, "Error searching IP $ip")
+                    return "Unknown"
+                }
         }
     }
 

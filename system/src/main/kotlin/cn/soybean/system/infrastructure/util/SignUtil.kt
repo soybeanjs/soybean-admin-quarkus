@@ -1,9 +1,13 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.infrastructure.util
 
 import cn.soybean.infrastructure.config.consts.AppConstants
 import cn.soybean.system.infrastructure.util.SignUtil.createSign
 import cn.soybean.system.infrastructure.util.SignUtil.getRandomString
-import org.jetbrains.annotations.Contract
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -13,6 +17,7 @@ import java.util.concurrent.ThreadLocalRandom
 import java.util.function.Consumer
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import org.jetbrains.annotations.Contract
 
 fun main() {
     val paramMap: MutableMap<String, Any> = LinkedHashMap()
@@ -28,7 +33,6 @@ fun main() {
 }
 
 object SignUtil {
-
     private const val SECRET_KEY = "1"
     private const val MD5 = "MD5"
     private const val SHA1 = "SHA1"
@@ -161,15 +165,16 @@ object SignUtil {
      * @return 拼接出的参数字符串
      */
     private fun joinParams(paramsMap: Map<String, *>): String {
-
         // 按照 k1=v1&k2=v2&k3=v3 排列
         val sb = StringBuilder()
-        paramsMap.keys.forEach(Consumer { key: String ->
-            val value = paramsMap[key]
-            if (!isEmpty(value)) {
-                sb.append(key).append("=").append(value).append("&")
-            }
-        })
+        paramsMap.keys.forEach(
+            Consumer { key: String ->
+                val value = paramsMap[key]
+                if (!isEmpty(value)) {
+                    sb.append(key).append("=").append(value).append("&")
+                }
+            },
+        )
 
         // 删除最后一位 &
         if (sb.isNotEmpty()) {

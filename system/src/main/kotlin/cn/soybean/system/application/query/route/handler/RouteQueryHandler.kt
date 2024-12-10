@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.query.route.handler
 
 import cn.soybean.domain.system.config.DbConstants
@@ -38,30 +43,30 @@ fun SystemMenuEntity.toMenuResponse(): MenuResponse = MenuResponse(
     roles = roles,
     keepAlive = keepAlive,
     constant = constant,
-    href = href
+    href = href,
 )
 
 @ApplicationScoped
 class RouteQueryHandler(
     private val systemMenuRepository: SystemMenuRepository,
-    private val systemTenantRepository: SystemTenantRepository
+    private val systemTenantRepository: SystemTenantRepository,
 ) : RouteQueryService {
-
     override fun handle(query: GetRoutesByUserIdQuery): Uni<Map<String, Any>> {
         val (userId) = query
         val menusUni: Uni<List<SystemMenuEntity>> = getRoutesByUserId(userId)
 
         return menusUni.map { menuItems ->
-            val menuRoutes = buildTree(
-                items = menuItems,
-                idSelector = { it.id },
-                parentIdSelector = { it.parentId ?: DbConstants.PARENT_ID_ROOT },
-                rootId = DbConstants.PARENT_ID_ROOT,
-                orderSelector = { it.order ?: 0 },
-                transform = { item, children ->
-                    item.convertToMenuResponse().apply { this.children = children }
-                }
-            )
+            val menuRoutes =
+                buildTree(
+                    items = menuItems,
+                    idSelector = { it.id },
+                    parentIdSelector = { it.parentId ?: DbConstants.PARENT_ID_ROOT },
+                    rootId = DbConstants.PARENT_ID_ROOT,
+                    orderSelector = { it.order ?: 0 },
+                    transform = { item, children ->
+                        item.convertToMenuResponse().apply { this.children = children }
+                    },
+                )
             mapOf("routes" to menuRoutes, "home" to "home")
         }
     }
@@ -79,24 +84,22 @@ class RouteQueryHandler(
                 orderSelector = { it.order ?: 0 },
                 transform = { item, children ->
                     item.toMenuResponse().apply { this.children = children }
-                }
+                },
             )
         }
     }
 
     override fun handle(query: RouteByIdQuery): Uni<SystemMenuEntity> = systemMenuRepository.getById(query.id)
-    override fun handle(query: RouteByIdBuiltInQuery): Uni<Boolean> =
-        systemMenuRepository.getById(query.id).map { it?.builtIn != false }
 
-    override fun handle(query: RouteByConstantQuery): Uni<List<MenuRoute>> =
-        systemMenuRepository.findAllByConstant(query.constant)
-            .map { menuList -> menuList.map { it.convertToMenuResponse() } }
+    override fun handle(query: RouteByIdBuiltInQuery): Uni<Boolean> = systemMenuRepository.getById(query.id).map { it?.builtIn != false }
 
-    override fun handle(query: RouteByTenantIdQuery): Uni<Set<String>> =
-        when (query.tenantId) {
-            DbConstants.SUPER_TENANT -> systemMenuRepository.all().map { menus -> menus.map { it.id }.toSet() }
-            else -> systemTenantRepository.getById(query.tenantId).map { it.menuIds }
-        }
+    override fun handle(query: RouteByConstantQuery): Uni<List<MenuRoute>> = systemMenuRepository.findAllByConstant(query.constant)
+        .map { menuList -> menuList.map { it.convertToMenuResponse() } }
+
+    override fun handle(query: RouteByTenantIdQuery): Uni<Set<String>> = when (query.tenantId) {
+        DbConstants.SUPER_TENANT -> systemMenuRepository.all().map { menus -> menus.map { it.id }.toSet() }
+        else -> systemTenantRepository.getById(query.tenantId).map { it.menuIds }
+    }
 
     override fun handle(query: ListTreeRoutesByUserIdAndConstantQuery): Uni<List<MenuResponse>> {
         val (userId, tenantId, constant) = query
@@ -111,7 +114,7 @@ class RouteQueryHandler(
                 orderSelector = { it.order ?: 0 },
                 transform = { item, children ->
                     item.toMenuResponse().apply { this.children = children }
-                }
+                },
             )
         }
     }
@@ -126,11 +129,10 @@ class RouteQueryHandler(
         else -> systemMenuRepository.allByTenantId(tenantId)
     }
 
-    private fun listRouteByConstant(userId: String, tenantId: String, constant: Boolean): Uni<List<SystemMenuEntity>> =
-        when {
-            isSuperUser(userId) -> systemMenuRepository.findAllByConstant(constant)
-            else -> systemMenuRepository.allByTenantIdAndConstant(tenantId, constant)
-        }
+    private fun listRouteByConstant(userId: String, tenantId: String, constant: Boolean): Uni<List<SystemMenuEntity>> = when {
+        isSuperUser(userId) -> systemMenuRepository.findAllByConstant(constant)
+        else -> systemMenuRepository.allByTenantIdAndConstant(tenantId, constant)
+    }
 
     private fun <T, R> buildTree(
         items: List<T>,
@@ -138,15 +140,16 @@ class RouteQueryHandler(
         parentIdSelector: (T) -> String,
         rootId: String,
         orderSelector: (T) -> Int,
-        transform: (T, children: List<R>) -> R
+        transform: (T, children: List<R>) -> R,
     ): List<R> {
         val childrenByParentId = items.groupBy(parentIdSelector)
 
         fun buildNode(item: T): R {
-            val children = childrenByParentId[idSelector(item)]
-                ?.sortedBy(orderSelector)
-                ?.map(::buildNode)
-                .orEmpty()
+            val children =
+                childrenByParentId[idSelector(item)]
+                    ?.sortedBy(orderSelector)
+                    ?.map(::buildNode)
+                    .orEmpty()
             return transform(item, children)
         }
 

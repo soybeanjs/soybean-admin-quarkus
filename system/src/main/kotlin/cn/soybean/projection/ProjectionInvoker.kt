@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.projection
 
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
@@ -15,7 +20,6 @@ import org.eclipse.microprofile.reactive.messaging.Message
 
 @ApplicationScoped
 class ProjectionInvoker(private val handlers: Instance<Projection>) {
-
     private fun distributionProcess(eventEntity: AggregateEventEntity): Uni<Unit> {
         val supportedHandlers = handlers.filter { it.supports(eventEntity.eventType) }
 
@@ -26,23 +30,24 @@ class ProjectionInvoker(private val handlers: Instance<Projection>) {
             }
 
             else -> {
-                val processingUnis = supportedHandlers.map { handler ->
-                    handler.process(eventEntity)
-                        .onItem().invoke { _ ->
-                            Log.debugf(
-                                "[ProjectionInvoker] Processed event %s by %s",
-                                eventEntity.eventType,
-                                handler::class.java.simpleName
-                            )
-                        }.onFailure().invoke { ex ->
-                            Log.errorf(
-                                ex,
-                                "[ProjectionInvoker] Error processing event %s by %s",
-                                eventEntity.eventType,
-                                handler::class.java.simpleName
-                            )
-                        }
-                }
+                val processingUnis =
+                    supportedHandlers.map { handler ->
+                        handler.process(eventEntity)
+                            .onItem().invoke { _ ->
+                                Log.debugf(
+                                    "[ProjectionInvoker] Processed event %s by %s",
+                                    eventEntity.eventType,
+                                    handler::class.java.simpleName,
+                                )
+                            }.onFailure().invoke { ex ->
+                                Log.errorf(
+                                    ex,
+                                    "[ProjectionInvoker] Error processing event %s by %s",
+                                    eventEntity.eventType,
+                                    handler::class.java.simpleName,
+                                )
+                            }
+                    }
                 Uni.combine().all().unis<Unit>(processingUnis).discardItems().replaceWithUnit()
             }
         }
@@ -55,22 +60,24 @@ class ProjectionInvoker(private val handlers: Instance<Projection>) {
         val events = SerializerUtils.deserializeEventsFromJsonBytes(message.payload)
 
         return when {
-            events.isEmpty() -> Uni.createFrom().item(Unit)
-                .onItem().invoke { _ -> Log.warn("[ProjectionInvoker] empty events list") }
-                .onItem().invoke { _ -> message.ack() }
-                .onFailure().invoke { ex -> Log.errorf(ex, "[ProjectionInvoker] (process) msg ack exception") }
+            events.isEmpty() ->
+                Uni.createFrom().item(Unit)
+                    .onItem().invoke { _ -> Log.warn("[ProjectionInvoker] empty events list") }
+                    .onItem().invoke { _ -> message.ack() }
+                    .onFailure().invoke { ex -> Log.errorf(ex, "[ProjectionInvoker] (process) msg ack exception") }
 
-            else -> Multi.createFrom().iterable(events.toList())
-                .onItem().call { event -> distributionProcess(event) }.toUni().replaceWithUnit()
-                .onItem().invoke { _ -> message.ack() }
-                .onFailure()
-                .invoke { ex ->
-                    Log.errorf(
-                        ex,
-                        "[ProjectionInvoker] consumer process events aggregateId: %s",
-                        events[0].aggregateId
-                    )
-                }
+            else ->
+                Multi.createFrom().iterable(events.toList())
+                    .onItem().call { event -> distributionProcess(event) }.toUni().replaceWithUnit()
+                    .onItem().invoke { _ -> message.ack() }
+                    .onFailure()
+                    .invoke { ex ->
+                        Log.errorf(
+                            ex,
+                            "[ProjectionInvoker] consumer process events aggregateId: %s",
+                            events[0].aggregateId,
+                        )
+                    }
         }
     }
 }

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.service
 
 import cn.soybean.application.exceptions.ErrorCode
@@ -34,7 +39,6 @@ class PermissionService(
     private val roleApiRepository: SystemRoleApiRepository,
     private val roleUserRepository: SystemRoleUserRepository,
 ) {
-
     fun authorizeRoleMenus(command: AuthorizeRoleMenuCommand, tenantId: String): Uni<Pair<Boolean, String>> =
         checkRole(command.roleId, tenantId).flatMap { (flag, msg) ->
             when {
@@ -43,11 +47,7 @@ class PermissionService(
             }
         }
 
-    private fun processAuthorizeRoleMenus(
-        roleId: String,
-        menuIds: Set<String>,
-        tenantId: String
-    ): Uni<Pair<Boolean, String>> =
+    private fun processAuthorizeRoleMenus(roleId: String, menuIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> =
         routeQueryService.handle(RouteByTenantIdQuery(tenantId)).flatMap { availableMenuIds ->
             val validMenuIds = menuIds.intersect(availableMenuIds)
             if (validMenuIds.isEmpty()) {
@@ -58,27 +58,21 @@ class PermissionService(
             }
         }
 
-    private fun addNewRoleMenus(
-        roleId: String,
-        menuIds: Set<String>,
-        tenantId: String
-    ): Uni<Pair<Boolean, String>> {
-        val roleMenus = menuIds.map { menuId ->
-            SystemRoleMenuEntity(roleId = roleId, menuId = menuId, tenantId = tenantId)
-        }
+    private fun addNewRoleMenus(roleId: String, menuIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> {
+        val roleMenus =
+            menuIds.map { menuId ->
+                SystemRoleMenuEntity(roleId = roleId, menuId = menuId, tenantId = tenantId)
+            }
         return roleMenuRepository.saveOrUpdateAll(roleMenus)
             .map { Pair(true, "Menu IDs successfully assigned to role.") }
             .onFailure().recoverWithItem { _ -> Pair(false, "Failed to assign menus to role.") }
     }
 
-    private fun addNewRoleUsers(
-        roleId: String,
-        userIds: Set<String>,
-        tenantId: String
-    ): Uni<Pair<Boolean, String>> {
-        val roleUsers = userIds.map { userId ->
-            SystemRoleUserEntity(roleId = roleId, userId = userId, tenantId = tenantId)
-        }
+    private fun addNewRoleUsers(roleId: String, userIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> {
+        val roleUsers =
+            userIds.map { userId ->
+                SystemRoleUserEntity(roleId = roleId, userId = userId, tenantId = tenantId)
+            }
         return roleUserRepository.saveOrUpdateAll(roleUsers)
             .map { Pair(true, "User IDs successfully assigned to role.") }
             .onFailure().recoverWithItem { _ -> Pair(false, "Failed to assign users to role.") }
@@ -100,11 +94,7 @@ class PermissionService(
             }
         }
 
-    private fun processAuthorizeRoleUsers(
-        roleId: String,
-        userIds: Set<String>,
-        tenantId: String
-    ): Uni<Pair<Boolean, String>> =
+    private fun processAuthorizeRoleUsers(roleId: String, userIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> =
         userQueryService.handle(UserByTenantIdQuery(tenantId)).flatMap { availableUserIds ->
             val validUserIds = userIds.intersect(availableUserIds)
             if (validUserIds.isEmpty()) {
@@ -115,11 +105,7 @@ class PermissionService(
             }
         }
 
-    private fun processAuthorizeRoleOperations(
-        roleId: String,
-        operationIds: Set<String>,
-        tenantId: String
-    ): Uni<Pair<Boolean, String>> {
+    private fun processAuthorizeRoleOperations(roleId: String, operationIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> {
         return apisByTenantId(tenantId).flatMap { availableOperationIds ->
             val validOperationIds = availableOperationIds.intersect(operationIds)
             if (validOperationIds.isEmpty()) {
@@ -131,27 +117,25 @@ class PermissionService(
         }
     }
 
-    private fun addNewRoleOperationIds(
-        roleId: String,
-        operationIds: Set<String>,
-        tenantId: String
-    ): Uni<Pair<Boolean, String>> {
-        val roleOperationIds = operationIds.map { operationId ->
-            SystemRoleApiEntity(roleId = roleId, operationId = operationId, tenantId = tenantId)
-        }
+    private fun addNewRoleOperationIds(roleId: String, operationIds: Set<String>, tenantId: String): Uni<Pair<Boolean, String>> {
+        val roleOperationIds =
+            operationIds.map { operationId ->
+                SystemRoleApiEntity(roleId = roleId, operationId = operationId, tenantId = tenantId)
+            }
         return roleApiRepository.saveOrUpdateAll(roleOperationIds)
             .map { Pair(true, "Operation IDs successfully assigned to role.") }
             .onFailure().recoverWithItem { _ -> Pair(false, "Failed to assign operations to role.") }
     }
 
-    private fun apisByTenantId(tenantId: String): Uni<Set<String>> =
-        when (tenantId) {
-            DbConstants.SUPER_TENANT -> SystemApisEntity.listAll()
+    private fun apisByTenantId(tenantId: String): Uni<Set<String>> = when (tenantId) {
+        DbConstants.SUPER_TENANT ->
+            SystemApisEntity.listAll()
                 .map { apis -> apis.mapNotNull { it.operationId }.toSet() }
 
-            else -> roleApiRepository.findOperationIds(tenantId, SUPER_TENANT_ROLE_CODE)
+        else ->
+            roleApiRepository.findOperationIds(tenantId, SUPER_TENANT_ROLE_CODE)
                 .map { apis -> apis.mapNotNull { it.operationId }.toSet() }
-        }
+    }
 
     private fun checkRole(roleId: String, tenantId: String): Uni<Pair<Boolean, String>> =
         roleQueryService.handle(RoleByIdQuery(roleId, tenantId))

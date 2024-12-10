@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.interfaces.rest.dto.request.permission
 
 import cn.soybean.system.application.command.permission.AuthorizeRoleMenuCommand
@@ -10,43 +15,43 @@ import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 
 @KonvertTo(
-    AuthorizeRoleMenuCommand::class, options = [
-        Konfig(key = "konvert.enforce-not-null", value = "true")
-    ]
+    AuthorizeRoleMenuCommand::class,
+    options = [
+        Konfig(key = "konvert.enforce-not-null", value = "true"),
+    ],
 )
 data class AuthorizeRoleMenuRequest(
     @field:NotBlank
     var roleId: String? = null,
-
     @field:NotNull
     @field:NotEmpty
-    var menuIds: Set<String>? = null
+    var menuIds: Set<String>? = null,
 )
 
 @KonvertTo(
-    AuthorizeRoleUserCommand::class, options = [
-        Konfig(key = "konvert.enforce-not-null", value = "true")
-    ]
+    AuthorizeRoleUserCommand::class,
+    options = [
+        Konfig(key = "konvert.enforce-not-null", value = "true"),
+    ],
 )
 data class AuthorizeUserRoleRequest(
     @field:NotBlank
     var roleId: String? = null,
-
     @field:NotNull
     @field:NotEmpty
-    var userIds: Set<String>? = null
+    var userIds: Set<String>? = null,
 )
 
 @KonvertTo(
-    AuthorizeRoleOperationCommand::class, options = [
-        Konfig(key = "konvert.enforce-not-null", value = "true")
-    ]
+    AuthorizeRoleOperationCommand::class,
+    options = [
+        Konfig(key = "konvert.enforce-not-null", value = "true"),
+    ],
 )
 data class AuthorizeRoleOperationRequest(
     @field:NotBlank
     var roleId: String? = null,
-
     @field:NotNull
     @field:NotEmpty
-    var operationIds: Set<String>? = null
+    var operationIds: Set<String>? = null,
 )

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.eventsourcing
 
 import cn.soybean.shared.domain.aggregate.AggregateEventEntity
@@ -10,19 +15,18 @@ import io.smallrye.mutiny.replaceWithUnit
 import io.smallrye.reactive.messaging.kafka.KafkaClientService
 import io.vertx.core.Vertx
 import jakarta.enterprise.context.ApplicationScoped
+import java.time.Duration
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.eclipse.microprofile.config.inject.ConfigProperty
-import java.time.Duration
 
 @ApplicationScoped
 class AggregateEventBusWithKafka(
     private val kafkaClientService: KafkaClientService,
     @ConfigProperty(
         name = "mp.messaging.incoming.eventstore-in.topic",
-        defaultValue = "eventstore"
-    ) private val eventStoreTopic: String
+        defaultValue = "eventstore",
+    ) private val eventStoreTopic: String,
 ) : EventBus {
-
     @WithSpan
     override fun publish(eventEntities: MutableList<AggregateEventEntity>): Uni<Unit> {
         val context = Vertx.currentContext()
@@ -48,7 +52,7 @@ class AggregateEventBusWithKafka(
                         Log.errorf(
                             ex,
                             "[AggregateEventBusWithKafka] Error publishing events to Kafka topic $eventStoreTopic. Payload: %s",
-                            String(record.value())
+                            String(record.value()),
                         )
                     }
                     .onFailure().retry().withBackOff(Duration.ofMillis(BACKOFF_TIMEOUT)).atMost(RETRY_COUNT)
@@ -56,7 +60,7 @@ class AggregateEventBusWithKafka(
                         Log.debugf(
                             "[AggregateEventBusWithKafka] Successfully published events to Kafka topic key %s. Payload: %s",
                             record.key(),
-                            String(record.value())
+                            String(record.value()),
                         )
                     }
                     .subscribeAsCompletionStage()

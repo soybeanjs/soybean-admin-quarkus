@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.infrastructure.interceptor
 
 import cn.soybean.infrastructure.interceptor.dto.OperationLogDTO
@@ -13,9 +18,9 @@ import jakarta.ws.rs.container.ContainerRequestContext
 import jakarta.ws.rs.container.ContainerResponseContext
 import jakarta.ws.rs.container.ResourceInfo
 import jakarta.ws.rs.ext.Provider
+import java.time.LocalDateTime
 import org.jboss.resteasy.reactive.server.ServerRequestFilter
 import org.jboss.resteasy.reactive.server.ServerResponseFilter
-import java.time.LocalDateTime
 
 @Provider
 @ApplicationScoped
@@ -24,9 +29,8 @@ class ReactiveLoggingInterceptor(
     private val routingContext: RoutingContext,
     private val resourceInfo: ResourceInfo,
     private val loginHelper: LoginHelper,
-    private val eventBus: Event<OperationLogDTO>
+    private val eventBus: Event<OperationLogDTO>,
 ) {
-
     companion object {
         private const val START_TIME_PROPERTY = "startTime"
         private const val START_DATE_TIME_PROPERTY = "startDateTime"
@@ -42,10 +46,7 @@ class ReactiveLoggingInterceptor(
     }
 
     @ServerResponseFilter
-    fun filterResponse(
-        requestContext: ContainerRequestContext,
-        responseContext: ContainerResponseContext
-    ) {
+    fun filterResponse(requestContext: ContainerRequestContext, responseContext: ContainerResponseContext) {
         val loggable = getLoggableMetadata()
         if (loggable != null) {
             val startTime = requestContext.getProperty(START_TIME_PROPERTY) as Long
@@ -85,16 +86,17 @@ class ReactiveLoggingInterceptor(
                     responseInfo = responseInfo,
                     processingTime = formattedTime,
                     resultCode = responseContext.status,
-                    resultMsg = responseContext.statusInfo.reasonPhrase
-                )
+                    resultMsg = responseContext.statusInfo.reasonPhrase,
+                ),
             )
         }
     }
 
     private fun extractRequestInfo(logReqParams: Boolean, context: ContainerRequestContext): String? = when {
-        logReqParams -> context.uriInfo.queryParameters.entries.joinToString("&") { entry ->
-            entry.value.joinToString("&") { value -> "${entry.key}=$value" }
-        }
+        logReqParams ->
+            context.uriInfo.queryParameters.entries.joinToString("&") { entry ->
+                entry.value.joinToString("&") { value -> "${entry.key}=$value" }
+            }
 
         else -> null
     }
@@ -108,9 +110,10 @@ class ReactiveLoggingInterceptor(
     private fun getLoggableMetadata(): LogOperation? {
         val resourceMethod = resourceInfo.resourceMethod
         return when {
-            resourceMethod != null && resourceMethod.isAnnotationPresent(LogOperation::class.java) -> resourceMethod.getAnnotation(
-                LogOperation::class.java
-            )
+            resourceMethod != null && resourceMethod.isAnnotationPresent(LogOperation::class.java) ->
+                resourceMethod.getAnnotation(
+                    LogOperation::class.java,
+                )
 
             else -> null
         }

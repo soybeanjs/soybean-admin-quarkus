@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.convert
 
 import cn.soybean.domain.system.entity.SystemMenuEntity
@@ -9,7 +14,8 @@ fun SystemMenuEntity.convertToMenuResponse(): MenuRoute = MenuRoute(
     name = this.routeName,
     path = this.routePath,
     component = this.component,
-    meta = RouteMeta(
+    meta =
+    RouteMeta(
         title = this.routeName,
         i18nKey = this.i18nKey,
         roles = this.roles,
@@ -20,6 +26,6 @@ fun SystemMenuEntity.convertToMenuResponse(): MenuRoute = MenuRoute(
         href = this.href,
         hideInMenu = this.hideInMenu,
         activeMenu = this.activeMenu,
-        multiTab = this.multiTab
-    )
+        multiTab = this.multiTab,
+    ),
 )

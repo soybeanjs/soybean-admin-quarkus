@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -22,7 +27,7 @@ val msgpackVersion = "0.9.8"
 
 dependencies {
     implementation("jakarta.persistence:jakarta.persistence-api")
-    implementation("com.github.yitter:yitter-idgenerator:${idgeneratorVersion}")
+    implementation("com.github.yitter:yitter-idgenerator:$idgeneratorVersion")
 
     implementation("io.quarkus:quarkus-kubernetes")
     implementation("io.quarkus:quarkus-container-image-jib")
@@ -49,32 +54,32 @@ dependencies {
     implementation("io.quarkus:quarkus-hibernate-validator")
     implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-rest-jackson")
-    implementation("org.lionsoul:ip2region:${ip2regionVersion}")
+    implementation("org.lionsoul:ip2region:$ip2regionVersion")
 
-    implementation("org.msgpack:jackson-dataformat-msgpack:${msgpackVersion}")
+    implementation("org.msgpack:jackson-dataformat-msgpack:$msgpackVersion")
 
     implementation("io.quarkus:quarkus-cache")
     implementation("io.quarkus:quarkus-redis-client")
 
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonModuleKotlinVersion}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonModuleKotlinVersion")
 //    Error: Could not find target method: io.quarkus.netty.runtime.graal.Target_io_netty_handler_ssl_JdkSslClientContext(java.security.Provider,java.security.cert.X509Certificate[],javax.net.ssl.TrustManagerFactory,java.security.cert.X509Certificate[],java.security.PrivateKey,java.lang.String,javax.net.ssl.KeyManagerFactory,java.lang.Iterable,io.netty.handler.ssl.CipherSuiteFilter,io.netty.handler.ssl.ApplicationProtocolConfig,java.lang.String[],long,long,java.security.SecureRandom,java.lang.String) throws javax.net.ssl.SSLException
-//Internal exception: com.oracle.svm.core.util.UserError$UserException: Could not find target method: io.quarkus.netty.runtime.graal.Target_io_netty_handler_ssl_JdkSslClientContext(java.security.Provider,java.security.cert.X509Certificate[],javax.net.ssl.TrustManagerFactory,java.security.cert.X509Certificate[],java.security.PrivateKey,java.lang.String,javax.net.ssl.KeyManagerFactory,java.lang.Iterable,io.netty.handler.ssl.CipherSuiteFilter,io.netty.handler.ssl.ApplicationProtocolConfig,java.lang.String[],long,long,java.security.SecureRandom,java.lang.String) throws javax.net.ssl.SSLException
+// Internal exception: com.oracle.svm.core.util.UserError$UserException: Could not find target method: io.quarkus.netty.runtime.graal.Target_io_netty_handler_ssl_JdkSslClientContext(java.security.Provider,java.security.cert.X509Certificate[],javax.net.ssl.TrustManagerFactory,java.security.cert.X509Certificate[],java.security.PrivateKey,java.lang.String,javax.net.ssl.KeyManagerFactory,java.lang.Iterable,io.netty.handler.ssl.CipherSuiteFilter,io.netty.handler.ssl.ApplicationProtocolConfig,java.lang.String[],long,long,java.security.SecureRandom,java.lang.String) throws javax.net.ssl.SSLException
 // Tips 2024-11-06 新版本3.18.1依赖依然没有解决netty ssl问题,此库只会影响native image,不影响jvm,此库比quarkus-redis-client功能强大的多 非native image 可以正常使用
 //    implementation("org.redisson:redisson-quarkus-30:${redissonQuarkus30Version}")
 
     implementation(project(":shared"))
     implementation(project(":domain"))
 
-    //tips 2024-04-17 quarkus3.9.*如果需要native image 需要移除这两个依赖或者降级到2.5.8或者开启下方resolutionStrategy
-    //tips 另外除非需要一些响应式类库的互转比如reactor的flux和mono等或者kt协程等一般不需要smallrye转换类库
+    // tips 2024-04-17 quarkus3.9.*如果需要native image 需要移除这两个依赖或者降级到2.5.8或者开启下方resolutionStrategy
+    // tips 另外除非需要一些响应式类库的互转比如reactor的flux和mono等或者kt协程等一般不需要smallrye转换类库
 //    implementation("io.smallrye.reactive:mutiny-reactor:${mutinyReactorVersion}")
 //    implementation("io.smallrye.reactive:mutiny-kotlin:${mutinyReactorVersion}")
 
     implementation("io.mcarle:konvert-api:$konvertVersion")
     implementation("io.mcarle:konvert-cdi-annotations:$konvertVersion")
 
-    //tips 2024-04-17 此依赖解决mongo底层jnr native编译问题 此外有另一种方案未采用 自行搜索相关issue
-    implementation("com.github.jnr:jnr-unixsocket:${jnrUnixsocketVersion}")
+    // tips 2024-04-17 此依赖解决mongo底层jnr native编译问题 此外有另一种方案未采用 自行搜索相关issue
+    implementation("com.github.jnr:jnr-unixsocket:$jnrUnixsocketVersion")
 
     implementation("org.apache.camel.quarkus:camel-quarkus-reactive-executor")
     implementation("org.apache.camel.quarkus:camel-quarkus-reactive-streams")
@@ -111,7 +116,7 @@ configurations.all {
             }
         }
     }
-    //tips 2024-04-17 quarkus3.9.*如果需要native image 需要强制升级以下依赖或者使用上方依赖降级方案
+    // tips 2024-04-17 quarkus3.9.*如果需要native image 需要强制升级以下依赖或者使用上方依赖降级方案
 //    resolutionStrategy {
 //        // 强制使用特定版本的依赖
 //        force("io.smallrye.reactive:smallrye-reactive-messaging-provider:4.21.0")
@@ -153,10 +158,11 @@ project.afterEvaluate {
     // 遍历任务名称并调整依赖
     taskNames.forEach { taskName ->
         tasks.named(taskName).configure {
-            val newDependsOn = dependsOn
-                .filterIsInstance<Provider<Task>>()
-                .filterNot { it.get().name == "processResources" }
-                .toSet()
+            val newDependsOn =
+                dependsOn
+                    .filterIsInstance<Provider<Task>>()
+                    .filterNot { it.get().name == "processResources" }
+                    .toSet()
             setDependsOn(newDependsOn)
         }
     }

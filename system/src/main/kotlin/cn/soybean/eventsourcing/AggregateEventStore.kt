@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.eventsourcing
 
 import cn.soybean.application.exceptions.ErrorCode
@@ -23,29 +28,29 @@ import java.lang.reflect.InvocationTargetException
 
 @ApplicationScoped
 class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
-
     private val snapshotFrequency = 3
 
     @WithSpan
     override fun saveEvents(eventEntities: MutableList<AggregateEventEntity>): Uni<Unit> {
-        val eventEntityList = eventEntities.map { event ->
-            EventEntity().apply {
-                aggregateId = event.aggregateId
-                aggregateType = event.aggregateType
-                aggregateVersion = event.aggregateVersion
-                eventType = event.eventType
-                data = event.data
-                metaData = event.metaData ?: byteArrayOf()
-                timeStamp = event.timeStamp
+        val eventEntityList =
+            eventEntities.map { event ->
+                EventEntity().apply {
+                    aggregateId = event.aggregateId
+                    aggregateType = event.aggregateType
+                    aggregateVersion = event.aggregateVersion
+                    eventType = event.eventType
+                    data = event.data
+                    metaData = event.metaData ?: byteArrayOf()
+                    timeStamp = event.timeStamp
+                }
             }
-        }
 
         return EventEntity.persist(eventEntityList)
             .onItem()
             .invoke { _ ->
                 Log.debugf(
                     "[AggregateEventStore] (saveEvents) Successfully saved %d events",
-                    eventEntityList.size
+                    eventEntityList.size,
                 )
             }
             .replaceWithUnit()
@@ -54,39 +59,40 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
                 Log.errorf(
                     ex,
                     "[AggregateEventStore] (saveEvents) Error saving events. Details: %s",
-                    ex.message
+                    ex.message,
                 )
             }
     }
 
     @WithSpan
-    override fun loadEvents(aggregateId: String, aggregateVersion: Long): Uni<List<AggregateEventEntity>> =
-        EventEntity.find(
-            "aggregateId = ?1 and aggregateVersion > ?2",
-            Sort.by(AggregateConstants.AGGREGATE_VERSION),
-            aggregateId,
-            aggregateVersion
-        ).list()
-            .map { it.map { entity -> entity.toAggregateEventEntity() } }
-            .onFailure().invoke { ex ->
-                Log.errorf(
-                    ex,
-                    "[AggregateEventStore] (loadEvents) Error querying events for aggregateId: %s, aggregateVersion: %d.",
-                    aggregateId,
-                    aggregateVersion
-                )
-            }
+    override fun loadEvents(aggregateId: String, aggregateVersion: Long): Uni<List<AggregateEventEntity>> = EventEntity.find(
+        "aggregateId = ?1 and aggregateVersion > ?2",
+        Sort.by(AggregateConstants.AGGREGATE_VERSION),
+        aggregateId,
+        aggregateVersion,
+    ).list()
+        .map { it.map { entity -> entity.toAggregateEventEntity() } }
+        .onFailure().invoke { ex ->
+            Log.errorf(
+                ex,
+                "[AggregateEventStore] (loadEvents) Error querying events for aggregateId: %s, aggregateVersion: %d.",
+                aggregateId,
+                aggregateVersion,
+            )
+        }
 
     @WithSpan
     override fun <T : AggregateRoot> save(aggregate: T): Uni<Unit> {
         val changesCopy = aggregate.changes.toMutableList()
         return saveEvents(aggregate.changes).flatMap { _ ->
             when {
-                aggregate.aggregateVersion % snapshotFrequency == 0L -> saveSnapshot(aggregate).onItem()
-                    .invoke { _ -> Log.debug("[AggregateEventStore] AFTER SAVE SNAPSHOT: Snapshot saved successfully") }
+                aggregate.aggregateVersion % snapshotFrequency == 0L ->
+                    saveSnapshot(aggregate).onItem()
+                        .invoke { _ -> Log.debug("[AggregateEventStore] AFTER SAVE SNAPSHOT: Snapshot saved successfully") }
 
-                else -> Uni.createFrom().nullItem<Unit>().onItem()
-                    .invoke { _ -> Log.debug("[AggregateEventStore] SNAPSHOT NOT SAVED: Conditions not met for saving snapshot") }
+                else ->
+                    Uni.createFrom().nullItem<Unit>().onItem()
+                        .invoke { _ -> Log.debug("[AggregateEventStore] SNAPSHOT NOT SAVED: Conditions not met for saving snapshot") }
             }
         }.flatMap { _ -> eventBus.publish(changesCopy) }
             .onItem()
@@ -95,7 +101,7 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
                 Log.errorf(
                     ex,
                     "[AggregateEventStore] (save) Error during saving snapshot or publishing events to event bus. Error: %s",
-                    ex.message
+                    ex.message,
                 )
             }.replaceWithUnit()
     }
@@ -120,44 +126,42 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
     }
 
     @WithSpan
-    override fun <T : AggregateRoot> load(aggregateId: String, aggregateType: Class<T>): Uni<T> =
-        getSnapshot(aggregateId)
-            .map { snapshot -> getSnapshotFromClass(snapshot, aggregateId, aggregateType) }
-            .flatMap { aggregate ->
-                loadEvents(
-                    aggregate.aggregateId,
-                    aggregate.aggregateVersion
-                ).flatMap { events -> raiseAggregateEvents(aggregate, events) }
-            }
+    override fun <T : AggregateRoot> load(aggregateId: String, aggregateType: Class<T>): Uni<T> = getSnapshot(aggregateId)
+        .map { snapshot -> getSnapshotFromClass(snapshot, aggregateId, aggregateType) }
+        .flatMap { aggregate ->
+            loadEvents(
+                aggregate.aggregateId,
+                aggregate.aggregateVersion,
+            ).flatMap { events -> raiseAggregateEvents(aggregate, events) }
+        }
 
     @WithSpan
-    fun getSnapshot(aggregateId: String): Uni<SnapshotEntity?> =
-        SnapshotEntity.find(
-            "aggregateId",
-            Sort.descending(AggregateConstants.AGGREGATE_VERSION),
-            aggregateId
-        ).firstResult()
-            .onFailure()
-            .invoke { ex -> Log.errorf(ex, "[AggregateEventStore] (getSnapshot) Error executing preparedQuery.") }
-            .map { result ->
-                when (result) {
-                    null -> {
-                        Log.debugf(
-                            "[AggregateEventStore] (getSnapshot) No snapshot found for aggregateId: %s",
-                            aggregateId
-                        )
-                        null
-                    }
+    fun getSnapshot(aggregateId: String): Uni<SnapshotEntity?> = SnapshotEntity.find(
+        "aggregateId",
+        Sort.descending(AggregateConstants.AGGREGATE_VERSION),
+        aggregateId,
+    ).firstResult()
+        .onFailure()
+        .invoke { ex -> Log.errorf(ex, "[AggregateEventStore] (getSnapshot) Error executing preparedQuery.") }
+        .map { result ->
+            when (result) {
+                null -> {
+                    Log.debugf(
+                        "[AggregateEventStore] (getSnapshot) No snapshot found for aggregateId: %s",
+                        aggregateId,
+                    )
+                    null
+                }
 
-                    else -> {
-                        Log.debugf(
-                            "[AggregateEventStore] (getSnapshot) Snapshot aggregateVersion: %d",
-                            result.aggregateVersion
-                        )
-                        result
-                    }
+                else -> {
+                    Log.debugf(
+                        "[AggregateEventStore] (getSnapshot) Snapshot aggregateVersion: %d",
+                        result.aggregateVersion,
+                    )
+                    result
                 }
             }
+        }
 
     @WithSpan
     override fun exists(aggregateId: String): Uni<Boolean> = EventEntity.count("aggregateId", aggregateId)
@@ -166,7 +170,7 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
             Log.errorf(
                 ex,
                 "[AggregateEventStore] (exists) Error checking existence for aggregateId: %s.",
-                aggregateId
+                aggregateId,
             )
         }
 
@@ -184,36 +188,33 @@ class AggregateEventStore(private val eventBus: EventBus) : EventStoreDB {
     }
 
     @WithSpan
-    fun <T : AggregateRoot> getSnapshotFromClass(
-        snapshot: SnapshotEntity?,
-        aggregateId: String,
-        aggregateType: Class<T>
-    ): T = when (snapshot) {
-        null -> {
-            val defaultSnapshot = EventSourcingUtils.snapshotFromAggregate(getAggregate(aggregateId, aggregateType))
-            EventSourcingUtils.aggregateFromSnapshot(defaultSnapshot, aggregateType)
-        }
-
-        else -> EventSourcingUtils.aggregateFromSnapshot(snapshot.toAggregateSnapshotEntity(), aggregateType)
-    }
-
-    @WithSpan
-    fun <T : AggregateRoot> raiseAggregateEvents(aggregate: T, events: List<AggregateEventEntity>): Uni<T> =
-        when {
-            events.isNotEmpty() -> {
-                events.forEach { event ->
-                    aggregate.raiseEvent(event)
-                    Log.debugf(
-                        "[AggregateEventStore] (raiseAggregateEvents) Event aggregateVersion: %d",
-                        event.aggregateVersion
-                    )
-                }
-                Uni.createFrom().item(aggregate)
+    fun <T : AggregateRoot> getSnapshotFromClass(snapshot: SnapshotEntity?, aggregateId: String, aggregateType: Class<T>): T =
+        when (snapshot) {
+            null -> {
+                val defaultSnapshot = EventSourcingUtils.snapshotFromAggregate(getAggregate(aggregateId, aggregateType))
+                EventSourcingUtils.aggregateFromSnapshot(defaultSnapshot, aggregateType)
             }
 
-            else -> when (aggregate.aggregateVersion) {
+            else -> EventSourcingUtils.aggregateFromSnapshot(snapshot.toAggregateSnapshotEntity(), aggregateType)
+        }
+
+    @WithSpan
+    fun <T : AggregateRoot> raiseAggregateEvents(aggregate: T, events: List<AggregateEventEntity>): Uni<T> = when {
+        events.isNotEmpty() -> {
+            events.forEach { event ->
+                aggregate.raiseEvent(event)
+                Log.debugf(
+                    "[AggregateEventStore] (raiseAggregateEvents) Event aggregateVersion: %d",
+                    event.aggregateVersion,
+                )
+            }
+            Uni.createFrom().item(aggregate)
+        }
+
+        else ->
+            when (aggregate.aggregateVersion) {
                 0L -> Uni.createFrom().failure(ServiceException(ErrorCode.AGGREGATE_EVENT_NOT_FOUND))
                 else -> Uni.createFrom().item(aggregate)
             }
-        }
+    }
 }

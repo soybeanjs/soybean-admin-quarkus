@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.domain.system.event.role
 
 import cn.soybean.domain.system.enums.DbEnums
@@ -15,7 +20,7 @@ data class RoleCreatedOrUpdatedEventBase(
     val remark: String? = null,
     val userId: String? = null,
     val menuIds: Set<String>? = null,
-    val operationIds: Set<String>? = null
+    val operationIds: Set<String>? = null,
 ) : AggregateEventBase(aggregateId), DomainEvent {
     companion object {
         const val ROLE_CREATED_V1 = "ROLE_CREATED_V1"

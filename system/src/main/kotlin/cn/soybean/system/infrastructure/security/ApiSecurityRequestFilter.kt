@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.infrastructure.security
 
 import cn.soybean.domain.system.enums.DbEnums
@@ -18,15 +23,17 @@ import jakarta.ws.rs.container.ResourceInfo
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.ext.Provider
-import org.jboss.resteasy.reactive.server.ServerRequestFilter
 import java.time.Duration
 import java.time.Instant
 import kotlin.math.abs
+import org.jboss.resteasy.reactive.server.ServerRequestFilter
 
 data class ApiRequestAnnotation(val type: ApiRequestType, val keyName: String = "")
 
 enum class ApiRequestType {
-    API_KEY, API_SIGN, NONE
+    API_KEY,
+    API_SIGN,
+    NONE,
 }
 
 /**
@@ -47,9 +54,8 @@ class ApiSecurityRequestFilter(
     private val resourceInfo: ResourceInfo,
     private val apiKeyCache: ApiKeyCache,
     @RedisClientName("sign-redis") private val reactiveRedisDataSource: ReactiveRedisDataSource,
-    private val i18n: LocalizationService
+    private val i18n: LocalizationService,
 ) {
-
     @ServerRequestFilter
     fun apiKeyRequest(requestContext: ContainerRequestContext): Uni<Response> {
         val apiRequestAnnotation = getApiRequestAnnotation()
@@ -68,7 +74,7 @@ class ApiSecurityRequestFilter(
             resourceMethod.isAnnotationPresent(ApiKeyRequest::class.java) ->
                 ApiRequestAnnotation(
                     ApiRequestType.API_KEY,
-                    resourceMethod.getAnnotation(ApiKeyRequest::class.java).keyName
+                    resourceMethod.getAnnotation(ApiKeyRequest::class.java).keyName,
                 )
 
             resourceMethod.isAnnotationPresent(ApiSignRequest::class.java) -> ApiRequestAnnotation(ApiRequestType.API_SIGN)
@@ -87,24 +93,22 @@ class ApiSecurityRequestFilter(
         } ?: Uni.createFrom().item(badRequestResponse(i18n.getMessage("http.security.apiKeyMissing", keyName)))
     }
 
-    private fun validateApiKeyValue(
-        keyValue: String,
-        context: ContainerRequestContext
-    ): Triple<Boolean, String, String> {
+    private fun validateApiKeyValue(keyValue: String, context: ContainerRequestContext): Triple<Boolean, String, String> {
         val apikeyEntity = apiKeyCache.get(keyValue)
         return when {
             apikeyEntity == null -> Triple(false, i18n.getMessage("http.security.apiKeyNotExists"), "")
 
-            apikeyEntity.status != DbEnums.Status.ENABLED -> Triple(
-                false,
-                i18n.getMessage("http.security.apiKeyDisabled"),
-                ""
-            )
+            apikeyEntity.status != DbEnums.Status.ENABLED ->
+                Triple(
+                    false,
+                    i18n.getMessage("http.security.apiKeyDisabled"),
+                    "",
+                )
 
             else -> {
                 context.headers.putSingle(
                     AppConstants.API_TENANT_ID,
-                    apikeyEntity.tenantId?.toString() ?: "defaultTenantId"
+                    apikeyEntity.tenantId?.toString() ?: "defaultTenantId",
                 )
                 Triple(true, "", apikeyEntity.apiSecret)
             }
@@ -115,30 +119,33 @@ class ApiSecurityRequestFilter(
         val (isValid, errorMessage) = validateHeaderAndParams(context)
         return when {
             !isValid -> Uni.createFrom().item(badRequestResponse(errorMessage))
-            else -> validateTimestamp(context.headers.getFirst(AppConstants.API_TIMESTAMP))
-                .flatMap { (isValidTimestamp, timestampErrorMessage) ->
-                    when {
-                        isValidTimestamp -> validateNonce(context.headers.getFirst(AppConstants.API_NONCE))
-                            .flatMap { (isValidNonce, nonceErrorMessage) ->
-                                when {
-                                    isValidNonce -> validateSignature(context)
-                                    else -> Uni.createFrom().item(badRequestResponse(nonceErrorMessage))
-                                }
-                            }
+            else ->
+                validateTimestamp(context.headers.getFirst(AppConstants.API_TIMESTAMP))
+                    .flatMap { (isValidTimestamp, timestampErrorMessage) ->
+                        when {
+                            isValidTimestamp ->
+                                validateNonce(context.headers.getFirst(AppConstants.API_NONCE))
+                                    .flatMap { (isValidNonce, nonceErrorMessage) ->
+                                        when {
+                                            isValidNonce -> validateSignature(context)
+                                            else -> Uni.createFrom().item(badRequestResponse(nonceErrorMessage))
+                                        }
+                                    }
 
-                        else -> Uni.createFrom().item(badRequestResponse(timestampErrorMessage))
+                            else -> Uni.createFrom().item(badRequestResponse(timestampErrorMessage))
+                        }
                     }
-                }
         }
     }
 
     private fun validateHeaderAndParams(context: ContainerRequestContext): Pair<Boolean, String> {
-        val headerChecks = listOf(
-            AppConstants.API_KEY to i18n.getMessage("http.security.apiKeyNotIncluded"),
-            AppConstants.API_SIGNATURE to i18n.getMessage("http.security.signatureMissing"),
-            AppConstants.API_TIMESTAMP to i18n.getMessage("http.security.timestampMissing"),
-            AppConstants.API_NONCE to i18n.getMessage("http.security.nonceMissing")
-        )
+        val headerChecks =
+            listOf(
+                AppConstants.API_KEY to i18n.getMessage("http.security.apiKeyNotIncluded"),
+                AppConstants.API_SIGNATURE to i18n.getMessage("http.security.signatureMissing"),
+                AppConstants.API_TIMESTAMP to i18n.getMessage("http.security.timestampMissing"),
+                AppConstants.API_NONCE to i18n.getMessage("http.security.nonceMissing"),
+            )
 
         headerChecks.forEach { (headerName, errorMessage) ->
             context.getHeaderString(headerName) ?: return Pair(false, errorMessage)
@@ -149,9 +156,10 @@ class ApiSecurityRequestFilter(
 
     private fun validateTimestamp(timestamp: String): Uni<Pair<Boolean, String>> = when {
         abs(
-            Instant.now().toEpochMilli() - timestamp.toLong()
-        ) > AppConstants.API_TIMESTAMP_DISPARITY -> Uni.createFrom()
-            .item(Pair(false, i18n.getMessage("http.security.timestampOff")))
+            Instant.now().toEpochMilli() - timestamp.toLong(),
+        ) > AppConstants.API_TIMESTAMP_DISPARITY ->
+            Uni.createFrom()
+                .item(Pair(false, i18n.getMessage("http.security.timestampOff")))
 
         else -> Uni.createFrom().item(Pair(true, ""))
     }
@@ -184,17 +192,25 @@ class ApiSecurityRequestFilter(
             isValid -> {
                 val calculatedSign = SignUtil.createSign(allQueryParams, algorithm, apiSecret)
                 when (calculatedSign) {
-                    apiSignature -> reactiveRedisDataSource.value(String::class.java)
-                        .set(
-                            "${AppConstants.API_NONCE_CACHE_PREFIX}::$apiNonce",
-                            "1",
-                            SetArgs().nx()
-                                .ex(Duration.ofMillis(AppConstants.API_TIMESTAMP_DISPARITY + AppConstants.API_TIMESTAMP_EXTRA_TIME_MARGIN))
-                        )
-                        .flatMap { Uni.createFrom().nullItem() }
+                    apiSignature -> {
+                        val key = "${AppConstants.API_NONCE_CACHE_PREFIX}::$apiNonce"
+                        val expiration =
+                            Duration.ofMillis(
+                                AppConstants.API_TIMESTAMP_DISPARITY + AppConstants.API_TIMESTAMP_EXTRA_TIME_MARGIN,
+                            )
+                        reactiveRedisDataSource.value(String::class.java)
+                            .set(
+                                key,
+                                "1",
+                                SetArgs().nx()
+                                    .ex(expiration),
+                            )
+                            .flatMap { Uni.createFrom().nullItem() }
+                    }
 
-                    else -> Uni.createFrom()
-                        .item(badRequestResponse(i18n.getMessage("http.security.signatureOff")))
+                    else ->
+                        Uni.createFrom()
+                            .item(badRequestResponse(i18n.getMessage("http.security.signatureOff")))
                 }
             }
 

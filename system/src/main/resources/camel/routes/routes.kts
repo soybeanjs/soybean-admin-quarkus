@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package camel.routes
 
 import com.github.benmanes.caffeine.cache.Cache
@@ -28,9 +33,10 @@ from("direct:get")
 from("direct:post")
     .process { e -> e.getIn().body = "{ 'message': 'Hello POST' }" }
 
-val caffeineCache: Cache<String, String> = Caffeine.newBuilder()
-    .maximumSize(1000L)
-    .build()
+val caffeineCache: Cache<String, String> =
+    Caffeine.newBuilder()
+        .maximumSize(1000L)
+        .build()
 
 from("disruptor:processCache")
     .routeId("cacheRoute")
@@ -49,8 +55,9 @@ from("disruptor:processCache")
     }
     .log("Cache operation completed: \${body}")
     .process { _ ->
-        val allEntries = caffeineCache.asMap().entries.joinToString(", ") { entry ->
-            "${entry.key}=${entry.value}"
-        }
+        val allEntries =
+            caffeineCache.asMap().entries.joinToString(", ") { entry ->
+                "${entry.key}=${entry.value}"
+            }
         println("Current Cache Contents: $allEntries")
     }

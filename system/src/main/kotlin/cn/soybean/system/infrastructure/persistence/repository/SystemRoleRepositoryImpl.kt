@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.infrastructure.persistence.repository
 
 import cn.soybean.domain.system.entity.SystemRoleEntity
@@ -13,13 +18,13 @@ import jakarta.enterprise.context.ApplicationScoped
 class SystemRoleRepositoryImpl : SystemRoleRepository, PanacheRepositoryBase<SystemRoleEntity, String> {
     override fun getRoleCodesByUserId(userId: String): Uni<Set<String>> = list(
         "select r from SystemRoleEntity r, SystemRoleUserEntity ur where r.id = ur.roleId and ur.userId = ?1",
-        userId
+        userId,
     ).map { roles -> roles.mapNotNull { it.code }.toSet() }
 
-    override fun getRoleList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemRoleEntity> =
-        find(query, sort, params)
+    override fun getRoleList(query: String, sort: Sort, params: Parameters): PanacheQuery<SystemRoleEntity> = find(query, sort, params)
 
     override fun saveOrUpdate(entity: SystemRoleEntity): Uni<SystemRoleEntity> = persist(entity)
+
     override fun getById(id: String, tenantId: String): Uni<SystemRoleEntity?> =
         find("id = ?1 and tenantId = ?2", id, tenantId).firstResult()
 

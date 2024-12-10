@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.domain.system.event.route
 
 import cn.soybean.domain.system.enums.DbEnums
@@ -23,7 +28,7 @@ data class RouteCreatedOrUpdatedEventBase(
     val roles: List<String>? = null,
     val keepAlive: Boolean = false,
     val constant: Boolean = false,
-    val href: String? = null
+    val href: String? = null,
 ) : AggregateEventBase(aggregateId), DomainEvent {
     companion object {
         const val ROUTE_CREATED_V1 = "ROUTE_CREATED_V1"

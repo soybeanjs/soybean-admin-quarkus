@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.projection.tenant
 
 import cn.soybean.domain.system.config.DbConstants.SUPER_TENANT_ROLE_CODE
@@ -21,9 +26,8 @@ class TenantUpdatedProjection(
     private val tenantRepository: SystemTenantRepository,
     private val roleRepository: SystemRoleRepository,
     private val roleMenuRepository: SystemRoleMenuRepository,
-    private val roleApiRepository: SystemRoleApiRepository
+    private val roleApiRepository: SystemRoleApiRepository,
 ) : Projection {
-
     @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =
@@ -64,9 +68,10 @@ class TenantUpdatedProjection(
                 when {
                     adminRoleId.isNullOrBlank() -> {
                         roleRepository.getByCode(tenantId, SUPER_TENANT_ROLE_CODE).flatMap {
-                            val menusToAdd = menuIds.map { menuId ->
-                                SystemRoleMenuEntity(roleId = it.id, menuId = menuId, tenantId = tenantId)
-                            }
+                            val menusToAdd =
+                                menuIds.map { menuId ->
+                                    SystemRoleMenuEntity(roleId = it.id, menuId = menuId, tenantId = tenantId)
+                                }
                             roleMenuRepository.saveOrUpdateAll(menusToAdd)
                         }
                     }
@@ -86,9 +91,10 @@ class TenantUpdatedProjection(
                 when {
                     adminRoleId.isNullOrBlank() -> {
                         roleRepository.getByCode(tenantId, SUPER_TENANT_ROLE_CODE).flatMap {
-                            val operationsToAdd = operationIds.map { operationId ->
-                                SystemRoleApiEntity(roleId = it.id, operationId = operationId, tenantId = tenantId)
-                            }
+                            val operationsToAdd =
+                                operationIds.map { operationId ->
+                                    SystemRoleApiEntity(roleId = it.id, operationId = operationId, tenantId = tenantId)
+                                }
                             roleApiRepository.saveOrUpdateAll(operationsToAdd)
                         }
                     }
@@ -101,15 +107,11 @@ class TenantUpdatedProjection(
             }
     }
 
-    private fun syncAdminMenuIds(
-        tenantId: String,
-        roleId: String,
-        existingMenuIds: Set<String>,
-        newMenuIds: Set<String>
-    ): Uni<Unit> {
-        val menusToAdd = newMenuIds.subtract(existingMenuIds).map { menuId ->
-            SystemRoleMenuEntity(roleId = roleId, menuId = menuId, tenantId = tenantId)
-        }
+    private fun syncAdminMenuIds(tenantId: String, roleId: String, existingMenuIds: Set<String>, newMenuIds: Set<String>): Uni<Unit> {
+        val menusToAdd =
+            newMenuIds.subtract(existingMenuIds).map { menuId ->
+                SystemRoleMenuEntity(roleId = roleId, menuId = menuId, tenantId = tenantId)
+            }
 
         val menusToRemove = existingMenuIds.subtract(newMenuIds)
 
@@ -122,11 +124,12 @@ class TenantUpdatedProjection(
         tenantId: String,
         roleId: String,
         existingOperationIds: Set<String>,
-        newOperationIds: Set<String>
+        newOperationIds: Set<String>,
     ): Uni<Unit> {
-        val operationsToAdd = newOperationIds.subtract(existingOperationIds).map { operationId ->
-            SystemRoleApiEntity(roleId = roleId, operationId = operationId, tenantId = tenantId)
-        }
+        val operationsToAdd =
+            newOperationIds.subtract(existingOperationIds).map { operationId ->
+                SystemRoleApiEntity(roleId = roleId, operationId = operationId, tenantId = tenantId)
+            }
 
         val operationsToRemove = existingOperationIds.subtract(newOperationIds)
 
@@ -137,4 +140,3 @@ class TenantUpdatedProjection(
 
     override fun supports(eventType: String): Boolean = eventType == TenantUpdatedEventBase.TENANT_UPDATED_V1
 }
-

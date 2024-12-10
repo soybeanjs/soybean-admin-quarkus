@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.service
 
 import cn.soybean.application.exceptions.ErrorCode
@@ -30,8 +35,8 @@ import io.smallrye.mutiny.Uni
 import io.vertx.ext.web.RoutingContext
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Event
-import org.eclipse.microprofile.jwt.Claims
 import java.time.LocalDateTime
+import org.eclipse.microprofile.jwt.Claims
 
 @ApplicationScoped
 class AuthService(
@@ -40,9 +45,8 @@ class AuthService(
     private val roleQueryService: RoleQueryService,
     private val routingContext: RoutingContext,
     private val eventBus: Event<SystemLoginLogEntity>,
-    private val eventPublisher: DomainEventPublisher
+    private val eventPublisher: DomainEventPublisher,
 ) {
-
     fun pwdLogin(command: PwdLoginCommand): Uni<LoginResponse> = findAndVerifyTenant(command.tenantName)
         .flatMap { tenant ->
             findAndVerifyUserCredentials(command.userName, command.password, tenant.id)
@@ -57,14 +61,14 @@ class AuthService(
             }
         }
 
-    fun findAndVerifyTenant(tenantName: String): Uni<SystemTenantEntity> =
-        tenantQueryService.handle(TenantByNameQuery(tenantName))
-            .onItem().ifNull().failWith(ServiceException(ErrorCode.TENANT_NOT_FOUND))
-            .flatMap { tenant -> verifyTenantStatus(tenant) }
+    fun findAndVerifyTenant(tenantName: String): Uni<SystemTenantEntity> = tenantQueryService.handle(TenantByNameQuery(tenantName))
+        .onItem().ifNull().failWith(ServiceException(ErrorCode.TENANT_NOT_FOUND))
+        .flatMap { tenant -> verifyTenantStatus(tenant) }
 
     fun verifyTenantStatus(tenant: SystemTenantEntity): Uni<SystemTenantEntity> = when {
-        tenant.status == DbEnums.Status.DISABLED -> Uni.createFrom()
-            .failure(ServiceException(ErrorCode.TENANT_DISABLED))
+        tenant.status == DbEnums.Status.DISABLED ->
+            Uni.createFrom()
+                .failure(ServiceException(ErrorCode.TENANT_DISABLED))
 
         LocalDateTime.now().isAfter(tenant.expireTime) ->
             Uni.createFrom().failure(ServiceException(ErrorCode.TENANT_EXPIRED))
@@ -78,11 +82,13 @@ class AuthService(
             .flatMap { user -> verifyUserCredentials(user, password) }
 
     fun verifyUserCredentials(user: SystemUserEntity, password: String): Uni<SystemUserEntity> = when {
-        !BcryptUtil.matches(password, user.accountPassword) -> Uni.createFrom()
-            .failure(ServiceException(ErrorCode.ACCOUNT_CREDENTIALS_INVALID))
+        !BcryptUtil.matches(password, user.accountPassword) ->
+            Uni.createFrom()
+                .failure(ServiceException(ErrorCode.ACCOUNT_CREDENTIALS_INVALID))
 
-        user.status == DbEnums.Status.DISABLED -> Uni.createFrom()
-            .failure(ServiceException(ErrorCode.ACCOUNT_DISABLED))
+        user.status == DbEnums.Status.DISABLED ->
+            Uni.createFrom()
+                .failure(ServiceException(ErrorCode.ACCOUNT_DISABLED))
 
         else -> Uni.createFrom().item(user)
     }
@@ -90,33 +96,35 @@ class AuthService(
     private fun createLoginResponse(
         tenantEntity: SystemTenantEntity,
         systemUserEntity: SystemUserEntity,
-        roleCodes: Set<String>
+        roleCodes: Set<String>,
     ): LoginResponse {
-        val tokenValue = Jwt.upn(systemUserEntity.accountName)
-            .subject(systemUserEntity.id)
-            .groups(roleCodes + AppConstants.APP_COMMON_ROLE)
-            .claim(TENANT_KEY, tenantEntity.id)
-            .claim(USER_KEY, systemUserEntity.id)
-            .claim(DEPT_KEY, systemUserEntity.deptId ?: "")
-            .claim(USER_AVATAR, systemUserEntity.avatar ?: "")
-            .claim(Claims.nickname.name, systemUserEntity.nickName)
-            .claim(Claims.gender.name, systemUserEntity.gender ?: "")
-            .sign()
+        val tokenValue =
+            Jwt.upn(systemUserEntity.accountName)
+                .subject(systemUserEntity.id)
+                .groups(roleCodes + AppConstants.APP_COMMON_ROLE)
+                .claim(TENANT_KEY, tenantEntity.id)
+                .claim(USER_KEY, systemUserEntity.id)
+                .claim(DEPT_KEY, systemUserEntity.deptId ?: "")
+                .claim(USER_AVATAR, systemUserEntity.avatar ?: "")
+                .claim(Claims.nickname.name, systemUserEntity.nickName)
+                .claim(Claims.gender.name, systemUserEntity.gender ?: "")
+                .sign()
         UserPermActionEvent(systemUserEntity.id).also { eventPublisher.publish(it) }
         return LoginResponse(tokenValue, "")
     }
 
     private fun saveLoginLog(user: SystemUserEntity, tenantId: String) {
         val (ip, port) = getClientIPAndPort(routingContext.request())
-        val loginLogEntity = SystemLoginLogEntity(
-            loginType = DbEnums.LoginType.PC,
-            userId = user.id,
-            accountName = user.accountName,
-            loginIp = ip,
-            loginRegion = Ip2RegionUtil.search(ip),
-            loginPort = port,
-            userAgent = routingContext.request().getHeader("User-Agent") ?: "Unknown",
-        )
+        val loginLogEntity =
+            SystemLoginLogEntity(
+                loginType = DbEnums.LoginType.PC,
+                userId = user.id,
+                accountName = user.accountName,
+                loginIp = ip,
+                loginRegion = Ip2RegionUtil.search(ip),
+                loginPort = port,
+                userAgent = routingContext.request().getHeader("User-Agent") ?: "Unknown",
+            )
         loginLogEntity.id = YitIdHelper.nextId().toString()
         loginLogEntity.tenantId = tenantId
         loginLogEntity.createBy = user.id

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.domain.system.aggregate.tenant
 
 import cn.soybean.domain.system.enums.DbEnums
@@ -11,9 +16,12 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDateTime
 
-class TenantAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggregateId: String) :
+class TenantAggregate
+@JsonCreator
+constructor(
+    @JsonProperty("aggregateId") aggregateId: String,
+) :
     AggregateRoot(aggregateId, AGGREGATE_TYPE) {
-
     var name: String? = null
     var contactUserId: String? = null
     var contactAccountName: String? = null
@@ -25,24 +33,27 @@ class TenantAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggr
 
     override fun whenCondition(eventEntity: AggregateEventEntity) {
         when (eventEntity.eventType) {
-            TenantCreatedEventBase.TENANT_CREATED_V1 -> handle(
+            TenantCreatedEventBase.TENANT_CREATED_V1 ->
+                handle(
+                    SerializerUtils.deserializeFromJsonBytes(
+                        eventEntity.data,
+                        TenantCreatedEventBase::class.java,
+                    ),
+                )
+
+            TenantUpdatedEventBase.TENANT_UPDATED_V1 ->
+                handle(
+                    SerializerUtils.deserializeFromJsonBytes(
+                        eventEntity.data,
+                        TenantUpdatedEventBase::class.java,
+                    ),
+                )
+
+            TenantDeletedEventBase.TENANT_DELETED_V1 ->
                 SerializerUtils.deserializeFromJsonBytes(
                     eventEntity.data,
-                    TenantCreatedEventBase::class.java
+                    TenantDeletedEventBase::class.java,
                 )
-            )
-
-            TenantUpdatedEventBase.TENANT_UPDATED_V1 -> handle(
-                SerializerUtils.deserializeFromJsonBytes(
-                    eventEntity.data,
-                    TenantUpdatedEventBase::class.java
-                )
-            )
-
-            TenantDeletedEventBase.TENANT_DELETED_V1 -> SerializerUtils.deserializeFromJsonBytes(
-                eventEntity.data,
-                TenantDeletedEventBase::class.java
-            )
 
             else -> throw RuntimeException(eventEntity.eventType)
         }

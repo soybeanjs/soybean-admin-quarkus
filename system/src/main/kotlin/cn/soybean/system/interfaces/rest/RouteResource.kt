@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.interfaces.rest
 
 import cn.soybean.domain.system.entity.SystemMenuEntity
@@ -45,9 +50,8 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 class RouteResource(
     private val routeQueryService: RouteQueryService,
     private val routeService: RouteService,
-    private val loginHelper: LoginHelper
+    private val loginHelper: LoginHelper,
 ) {
-
     @Authenticated
     @Path("/getUserRoutes")
     @GET
@@ -111,12 +115,11 @@ class RouteResource(
     @Path("/tree")
     @WithSession
     @Operation(summary = "路由🌲结构", description = "获取路由🌲")
-    fun getMenuTree(): Uni<ResponseEntity<List<MenuResponse>>> =
-        routeQueryService.handle(
-            ListTreeRoutesByUserIdAndConstantQuery(
-                loginHelper.getUserId(),
-                loginHelper.getTenantId()
-            )
-        )
-            .map { ResponseEntity.ok(it) }
+    fun getMenuTree(): Uni<ResponseEntity<List<MenuResponse>>> = routeQueryService.handle(
+        ListTreeRoutesByUserIdAndConstantQuery(
+            loginHelper.getUserId(),
+            loginHelper.getTenantId(),
+        ),
+    )
+        .map { ResponseEntity.ok(it) }
 }

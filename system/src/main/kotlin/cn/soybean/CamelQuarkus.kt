@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean
 
 import io.opentelemetry.instrumentation.annotations.WithSpan
@@ -13,7 +18,6 @@ import org.apache.camel.model.rest.RestBindingMode
 
 @ApplicationScoped
 class CaffeineCacheRoute : RouteBuilder() {
-
     override fun configure() {
         restConfiguration()
             .component("platform-http")
@@ -54,20 +58,18 @@ class CaffeineCacheRoute : RouteBuilder() {
 @Path("/camel")
 @ApplicationScoped
 class CacheResource(private val producerTemplate: ProducerTemplate) {
-
     @WithSpan
     @POST
     @Path("/cache/put/{key}/{value}")
-    fun putCache(@PathParam("key") key: String, @PathParam("value") value: String): Uni<String> =
-        Uni.createFrom().future {
-            producerTemplate.asyncRequestBodyAndHeaders(
-                "direct:start",
-                value,
-                mapOf("CamelCaffeineKey" to key)
-            ).thenApply {
-                "Cache Updated for key: $key with value: $value"
-            }
+    fun putCache(@PathParam("key") key: String, @PathParam("value") value: String): Uni<String> = Uni.createFrom().future {
+        producerTemplate.asyncRequestBodyAndHeaders(
+            "direct:start",
+            value,
+            mapOf("CamelCaffeineKey" to key),
+        ).thenApply {
+            "Cache Updated for key: $key with value: $value"
         }
+    }
 
     @WithSpan
     @GET
@@ -79,8 +81,8 @@ class CacheResource(private val producerTemplate: ProducerTemplate) {
                 null,
                 "CamelCaffeineKey",
                 key,
-                String::class.java
-            )
+                String::class.java,
+            ),
         )
     }
 }

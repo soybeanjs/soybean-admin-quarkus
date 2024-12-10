@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean
 
 import cn.soybean.infrastructure.config.consts.AppConstants
@@ -23,12 +28,11 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 @Path("/hello")
 @Tag(name = "Demo", description = "Operations related to demos")
 class ExampleResource {
-
     @PermissionsAllowed("${AppConstants.APP_PERM_NAME_PREFIX}hello")
     @GET
     @Operation(
         summary = "@PermissionsAllowed注解权限验证",
-        description = "默认使用[io.quarkus.security.StringPermission],也即默认按照冒号分割资源和权限,例user:read(user代表资源,read代表动作"
+        description = "默认使用[io.quarkus.security.StringPermission],也即默认按照冒号分割资源和权限,例user:read(user代表资源,read代表动作",
     )
     fun hello(): Uni<ResponseEntity<String>> = uni { ResponseEntity.ok("Hello from RESTEasy Reactive") }
 
@@ -61,8 +65,7 @@ class ExampleResource {
     @Produces("application/x-msgpack")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "msgPack验证", description = "msgPack请求验证")
-    fun msgPack(@Valid dto: MsgTempData): Uni<ResponseEntity<MsgTempData>> =
-        uni { ResponseEntity.ok(dto) }
+    fun msgPack(@Valid dto: MsgTempData): Uni<ResponseEntity<MsgTempData>> = uni { ResponseEntity.ok(dto) }
 
     class MsgTempData {
         val name: String? = null

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.command.user.handler
 
 import cn.soybean.domain.system.aggregate.user.UserAggregate
@@ -14,21 +19,20 @@ import jakarta.enterprise.context.ApplicationScoped
 @ApplicationScoped
 class UpdateUserCommandHandler(private val eventStoreDB: EventStoreDB, private val loginHelper: LoginHelper) :
     CommandHandler<UpdateUserCommand, Boolean> {
-    override fun handle(command: UpdateUserCommand): Uni<Boolean> =
-        eventStoreDB.load(command.id, UserAggregate::class.java)
-            .map { aggregate ->
-                aggregate.updateUser(
-                    command.toUserCreatedOrUpdatedEventBase().also {
-                        it.tenantId = loginHelper.getTenantId()
-                        it.updateBy = loginHelper.getUserId()
-                        it.updateAccountName = loginHelper.getAccountName()
-                    }
-                )
-                aggregate
-            }
-            .flatMap { aggregate -> eventStoreDB.save(aggregate) }
-            .replaceWith(true)
-            .onFailure().invoke { ex -> Log.errorf(ex, "UpdateUserCommandHandler fail") }
+    override fun handle(command: UpdateUserCommand): Uni<Boolean> = eventStoreDB.load(command.id, UserAggregate::class.java)
+        .map { aggregate ->
+            aggregate.updateUser(
+                command.toUserCreatedOrUpdatedEventBase().also {
+                    it.tenantId = loginHelper.getTenantId()
+                    it.updateBy = loginHelper.getUserId()
+                    it.updateAccountName = loginHelper.getAccountName()
+                },
+            )
+            aggregate
+        }
+        .flatMap { aggregate -> eventStoreDB.save(aggregate) }
+        .replaceWith(true)
+        .onFailure().invoke { ex -> Log.errorf(ex, "UpdateUserCommandHandler fail") }
 
     override fun canHandle(command: Command): Boolean = command is UpdateUserCommand
 }

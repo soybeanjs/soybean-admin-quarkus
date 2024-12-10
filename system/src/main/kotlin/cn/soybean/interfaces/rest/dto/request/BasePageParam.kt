@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.interfaces.rest.dto.request
 
 import io.quarkus.panache.common.Page
@@ -5,8 +10,8 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.QueryParam
-import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 import java.io.Serializable
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 
 open class BasePageParam(
     /**
@@ -17,7 +22,6 @@ open class BasePageParam(
     @field:NotNull(message = "{validation.page.index.NotNull}")
     @field:Min(value = 1, message = "{validation.page.index.Min}")
     var index: Int = PAGE_NO,
-
     /**
      * See [io.quarkus.panache.common.Page.size]
      */
@@ -26,7 +30,7 @@ open class BasePageParam(
     @field:NotNull(message = "{validation.page.size.NotNull}")
     @field:Min(value = 1, message = "{validation.page.size.Min}")
     @field:Max(value = 100, message = "{validation.page.size.Max}")
-    var size: Int = PAGE_SIZE
+    var size: Int = PAGE_SIZE,
 ) : Serializable {
     // 用于获取调整后的页码（适用于 Panache）
     private fun getAdjustedPageNo(): Int = index - 1

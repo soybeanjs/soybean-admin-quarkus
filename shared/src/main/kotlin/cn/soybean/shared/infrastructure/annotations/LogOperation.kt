@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.shared.infrastructure.annotations
 
 import jakarta.interceptor.InterceptorBinding
@@ -10,5 +15,5 @@ annotation class LogOperation(
     val description: String = "",
     val logReqParams: Boolean = false,
     val logReqBody: Boolean = false,
-    val logResBody: Boolean = false
+    val logResBody: Boolean = false,
 )

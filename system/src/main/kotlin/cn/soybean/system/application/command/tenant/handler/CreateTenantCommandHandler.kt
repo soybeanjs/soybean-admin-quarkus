@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.command.tenant.handler
 
 import cn.soybean.domain.system.aggregate.tenant.TenantAggregate
@@ -23,8 +28,8 @@ class CreateTenantCommandHandler(private val eventStoreDB: EventStoreDB, private
                 loginHelper.getTenantId(),
                 loginHelper.getUserId(),
                 loginHelper.getAccountName(),
-                YitIdHelper.nextId().toString()
-            )
+                YitIdHelper.nextId().toString(),
+            ),
         )
         return eventStoreDB.save(aggregate).replaceWith(aggregate)
             .onFailure().invoke { ex -> Log.errorf(ex, "CreateTenantCommandHandler fail") }

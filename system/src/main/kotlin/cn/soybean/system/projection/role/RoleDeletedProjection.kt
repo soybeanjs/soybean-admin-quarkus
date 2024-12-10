@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.projection.role
 
 import cn.soybean.domain.system.event.role.RoleDeletedEventBase
@@ -16,9 +21,8 @@ import jakarta.enterprise.context.ApplicationScoped
 class RoleDeletedProjection(
     private val roleRepository: SystemRoleRepository,
     private val roleMenuRepository: SystemRoleMenuRepository,
-    private val roleUserRepository: SystemRoleUserRepository
+    private val roleUserRepository: SystemRoleUserRepository,
 ) : Projection {
-
     @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event = SerializerUtils.deserializeFromJsonBytes(eventEntity.data, RoleDeletedEventBase::class.java)

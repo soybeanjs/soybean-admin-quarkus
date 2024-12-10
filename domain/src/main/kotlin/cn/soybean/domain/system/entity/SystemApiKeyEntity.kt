@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.domain.system.entity
 
 import cn.soybean.domain.base.BaseTenantEntity
@@ -12,7 +17,6 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "sys_api_key")
 open class SystemApiKeyEntity : BaseTenantEntity(), PanacheEntityBase {
-
     /**
      * key
      */

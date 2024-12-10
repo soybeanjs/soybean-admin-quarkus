@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.application.exceptions
 
 enum class ErrorCode(val code: Int, val message: String) {
@@ -18,5 +23,5 @@ enum class ErrorCode(val code: Int, val message: String) {
     PARENT_MENU_NOT_FOUND(1202, "The parent menu does not exist."),
     PARENT_MENU_TYPE_INVALID(1203, "The parent menu's type must be either 'Directory' or 'Menu'."),
 
-    ROLE_NOT_FOUND(1301, "The role does not exist.")
+    ROLE_NOT_FOUND(1301, "The role does not exist."),
 }

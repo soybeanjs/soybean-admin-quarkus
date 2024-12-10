@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.eventhandler
 
 import cn.soybean.domain.system.entity.SystemApisEntity
@@ -21,18 +26,17 @@ import io.vertx.core.Vertx
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.ObservesAsync
 import jakarta.inject.Inject
-import org.eclipse.microprofile.config.inject.ConfigProperty
-import org.hibernate.reactive.mutiny.Mutiny
 import java.time.Duration
 import java.util.*
+import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.hibernate.reactive.mutiny.Mutiny
 
 @ApplicationScoped
 class SystemEventHandler(
     private val sessionFactory: Mutiny.SessionFactory,
     private val vertx: Vertx,
-    @RedisClientName("sign-redis") private val reactiveRedisDataSource: ReactiveRedisDataSource
+    @RedisClientName("sign-redis") private val reactiveRedisDataSource: ReactiveRedisDataSource,
 ) {
-
     @Inject
     @ConfigProperty(name = "mp.jwt.verify.token.age")
     private lateinit var mpJwtVerifyTokenAge: Optional<Long>
@@ -43,7 +47,7 @@ class SystemEventHandler(
         }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
             .subscribe().with(
                 { Log.trace("[SystemEventHandler] LoginLog event processed successfully") },
-                { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing LoginLog event") }
+                { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing LoginLog event") },
             )
     }
 
@@ -56,27 +60,33 @@ class SystemEventHandler(
                         .flatMap { SystemApisEntity.persist(item.map { it.toSystemApisEntity() }.toList()) }
                 }.subscribe().with(
                     { Log.trace("[SystemEventHandler] ApisEntity event processed successfully") },
-                    { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing ApisEntity event") }
+                    { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing ApisEntity event") },
                 )
-            }
+            },
         )
     }
 
     fun handleUserPermActionEvent(@ObservesAsync userPermActionEvent: UserPermActionEvent) {
         sessionFactory.withStatelessSession { statelessSession ->
             when {
-                isSuperUser(userPermActionEvent.userId) -> getApiPermAction(statelessSession).map { apis ->
-                    storeUserPermAction(apis, userPermActionEvent.userId)
-                }
+                isSuperUser(userPermActionEvent.userId) ->
+                    getApiPermAction(statelessSession).map { apis ->
+                        storeUserPermAction(apis, userPermActionEvent.userId)
+                    }
 
-                else -> getApiPermActionByUserId(statelessSession, userPermActionEvent.userId).map { apis ->
-                    storeUserPermAction(apis, userPermActionEvent.userId)
-                }
+                else ->
+                    getApiPermActionByUserId(statelessSession, userPermActionEvent.userId).map { apis ->
+                        storeUserPermAction(apis, userPermActionEvent.userId)
+                    }
             }
         }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
             .subscribe().with(
-                { Log.trace("[SystemEventHandler] UserPermActionEvent event processed successfully. userId: ${userPermActionEvent.userId}") },
-                { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing UserPermActionEvent event") }
+                {
+                    Log.trace(
+                        "[SystemEventHandler] UserPermActionEvent event processed successfully. userId: ${userPermActionEvent.userId}",
+                    )
+                },
+                { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing UserPermActionEvent event") },
             )
     }
 
@@ -86,7 +96,7 @@ class SystemEventHandler(
         }.runSubscriptionOn(MutinyHelper.executor(vertx.getOrCreateContext()))
             .subscribe().with(
                 { Log.trace("[SystemEventHandler] OperationLogDTO event processed successfully") },
-                { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing OperationLogDTO event") }
+                { ex -> Log.errorf(ex, "[SystemEventHandler] Error processing OperationLogDTO event") },
             )
     }
 
@@ -112,23 +122,18 @@ class SystemEventHandler(
         }
     }
 
-    private fun extractPermissions(apis: List<SystemApisEntity>): Set<String> =
-        apis.asSequence()
-            .mapNotNull { it.permissions }
-            .flatMap { it.split(",").asSequence().map(String::trim) }
-            .filterNot { it.isBlank() }
-            .toSet()
+    private fun extractPermissions(apis: List<SystemApisEntity>): Set<String> = apis.asSequence()
+        .mapNotNull { it.permissions }
+        .flatMap { it.split(",").asSequence().map(String::trim) }
+        .filterNot { it.isBlank() }
+        .toSet()
 
-    private fun getApiPermAction(statelessSession: Mutiny.StatelessSession): Uni<List<SystemApisEntity>> =
-        statelessSession.createQuery(
-            "FROM SystemApisEntity",
-            SystemApisEntity::class.java
-        ).resultList
+    private fun getApiPermAction(statelessSession: Mutiny.StatelessSession): Uni<List<SystemApisEntity>> = statelessSession.createQuery(
+        "FROM SystemApisEntity",
+        SystemApisEntity::class.java,
+    ).resultList
 
-    private fun getApiPermActionByUserId(
-        statelessSession: Mutiny.StatelessSession,
-        userId: String
-    ): Uni<List<SystemApisEntity>> =
+    private fun getApiPermActionByUserId(statelessSession: Mutiny.StatelessSession, userId: String): Uni<List<SystemApisEntity>> =
         statelessSession.createQuery(
             """
                 SELECT a
@@ -137,6 +142,6 @@ class SystemEventHandler(
                      LEFT JOIN SystemRoleUserEntity ru ON ru.roleId = ra.roleId
                 WHERE ru.userId = :userId
             """,
-            SystemApisEntity::class.java
+            SystemApisEntity::class.java,
         ).setParameter("userId", userId).resultList
 }

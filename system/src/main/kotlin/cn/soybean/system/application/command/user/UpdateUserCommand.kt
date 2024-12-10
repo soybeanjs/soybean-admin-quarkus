@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.command.user
 
 import cn.soybean.domain.system.enums.DbEnums
@@ -9,8 +14,8 @@ import io.mcarle.konvert.api.Mapping
 @KonvertTo(
     UserCreatedOrUpdatedEventBase::class,
     mappings = [
-        Mapping(source = "id", target = "aggregateId")
-    ]
+        Mapping(source = "id", target = "aggregateId"),
+    ],
 )
 data class UpdateUserCommand(
     var id: String,
@@ -25,5 +30,5 @@ data class UpdateUserCommand(
     var gender: DbEnums.Gender? = null,
     var avatar: String? = null,
     var deptId: String? = null,
-    var status: DbEnums.Status
+    var status: DbEnums.Status,
 ) : Command

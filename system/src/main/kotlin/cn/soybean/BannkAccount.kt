@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean
 
 import cn.soybean.shared.domain.aggregate.AggregateEventBase
@@ -31,28 +36,35 @@ import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import java.math.BigDecimal
 import org.eclipse.microprofile.faulttolerance.CircuitBreaker
 import org.eclipse.microprofile.faulttolerance.Retry
 import org.eclipse.microprofile.faulttolerance.Timeout
-import java.math.BigDecimal
 
 data class CreateBankAccountCommand(val email: String, val userName: String, val address: String)
+
 data class ChangeEmailCommand(val aggregateID: String, val newEmail: String)
+
 data class ChangeAddressCommand(val aggregateID: String, val newAddress: String)
+
 data class DepositAmountCommand(val aggregateID: String, val amount: BigDecimal)
+
 data class DeleteBankAccountCommand(val aggregateID: String)
 
 interface BankAccountCommandService {
     fun handle(command: CreateBankAccountCommand): Uni<String>
+
     fun handle(command: ChangeEmailCommand): Uni<Unit>
+
     fun handle(command: ChangeAddressCommand): Uni<Unit>
+
     fun handle(command: DepositAmountCommand): Uni<Unit>
+
     fun handle(command: DeleteBankAccountCommand): Uni<Boolean>
 }
 
 @ApplicationScoped
 class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAccountCommandService {
-
     override fun handle(command: CreateBankAccountCommand): Uni<String> {
         val aggregate = BankAccountAggregate(YitIdHelper.nextId().toString())
         aggregate.createBankAccount(command.email, command.address, command.userName)
@@ -61,50 +73,47 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
             .onItem().invoke { _ -> Log.debugf("created bank account: %s", aggregate) }
     }
 
-    override fun handle(command: ChangeEmailCommand): Uni<Unit> =
-        eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
-            .map { aggregate ->
-                aggregate.changeEmail(command.newEmail)
-                aggregate
-            }
-            .flatMap { aggregate -> eventStoreDB.save(aggregate) }
-            .onItem().invoke { _ ->
-                Log.debugf(
-                    "changed email: %s, aggregateId: %s",
-                    command.newEmail,
-                    command.aggregateID
-                )
-            }
+    override fun handle(command: ChangeEmailCommand): Uni<Unit> = eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
+        .map { aggregate ->
+            aggregate.changeEmail(command.newEmail)
+            aggregate
+        }
+        .flatMap { aggregate -> eventStoreDB.save(aggregate) }
+        .onItem().invoke { _ ->
+            Log.debugf(
+                "changed email: %s, aggregateId: %s",
+                command.newEmail,
+                command.aggregateID,
+            )
+        }
 
-    override fun handle(command: ChangeAddressCommand): Uni<Unit> =
-        eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
-            .map { aggregate ->
-                aggregate.changeAddress(command.newAddress)
-                aggregate
-            }
-            .flatMap { aggregate -> eventStoreDB.save(aggregate) }
-            .onItem().invoke { _ ->
-                Log.debugf(
-                    "changed address: %s, aggregateId: %s",
-                    command.newAddress,
-                    command.aggregateID
-                )
-            }
+    override fun handle(command: ChangeAddressCommand): Uni<Unit> = eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
+        .map { aggregate ->
+            aggregate.changeAddress(command.newAddress)
+            aggregate
+        }
+        .flatMap { aggregate -> eventStoreDB.save(aggregate) }
+        .onItem().invoke { _ ->
+            Log.debugf(
+                "changed address: %s, aggregateId: %s",
+                command.newAddress,
+                command.aggregateID,
+            )
+        }
 
-    override fun handle(command: DepositAmountCommand): Uni<Unit> =
-        eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
-            .map { aggregate ->
-                aggregate.depositBalance(command.amount)
-                aggregate
-            }
-            .flatMap { aggregate -> eventStoreDB.save(aggregate) }
-            .onItem().invoke { _ ->
-                Log.debugf(
-                    "deposited amount: %s, aggregateId: %s",
-                    command.amount,
-                    command.aggregateID
-                )
-            }
+    override fun handle(command: DepositAmountCommand): Uni<Unit> = eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
+        .map { aggregate ->
+            aggregate.depositBalance(command.amount)
+            aggregate
+        }
+        .flatMap { aggregate -> eventStoreDB.save(aggregate) }
+        .onItem().invoke { _ ->
+            Log.debugf(
+                "deposited amount: %s, aggregateId: %s",
+                command.amount,
+                command.aggregateID,
+            )
+        }
 
     override fun handle(command: DeleteBankAccountCommand): Uni<Boolean> =
         eventStoreDB.load(command.aggregateID, BankAccountAggregate::class.java)
@@ -117,7 +126,7 @@ class BankAccountCommandHandler(private val eventStoreDB: EventStoreDB) : BankAc
             .onItem().invoke { _ ->
                 Log.debugf(
                     "deleted bank account, aggregateId: %s",
-                    command.aggregateID
+                    command.aggregateID,
                 )
             }
 }
@@ -126,7 +135,7 @@ data class BankAccountCreatedAggregateEventBase(
     val aggregateId: String,
     val email: String,
     val userName: String,
-    val address: String
+    val address: String,
 ) : AggregateEventBase(aggregateId) {
     companion object {
         const val BANK_ACCOUNT_CREATED_V1 = "BANK_ACCOUNT_CREATED_V1"
@@ -135,7 +144,7 @@ data class BankAccountCreatedAggregateEventBase(
 
 data class EmailChangedAggregateEventBase(
     val aggregateId: String,
-    val newEmail: String
+    val newEmail: String,
 ) : AggregateEventBase(aggregateId) {
     companion object {
         const val EMAIL_CHANGED_V1 = "EMAIL_CHANGED_V1"
@@ -144,7 +153,7 @@ data class EmailChangedAggregateEventBase(
 
 data class AddressUpdatedAggregateEventBase(
     val aggregateId: String,
-    val newAddress: String
+    val newAddress: String,
 ) : AggregateEventBase(aggregateId) {
     companion object {
         const val ADDRESS_UPDATED_V1 = "ADDRESS_UPDATED_V1"
@@ -153,7 +162,7 @@ data class AddressUpdatedAggregateEventBase(
 
 data class BalanceDepositedAggregateEventBase(
     val aggregateId: String,
-    val amount: BigDecimal
+    val amount: BigDecimal,
 ) : AggregateEventBase(aggregateId) {
     companion object {
         const val BALANCE_DEPOSITED_V1 = "BALANCE_DEPOSITED_V1"
@@ -161,16 +170,19 @@ data class BalanceDepositedAggregateEventBase(
 }
 
 data class BankAccountDeletedAggregateEventBase(
-    val aggregateId: String
+    val aggregateId: String,
 ) : AggregateEventBase(aggregateId) {
     companion object {
         const val BANK_ACCOUNT_DELETED_V1 = "BANK_ACCOUNT_DELETED_V1"
     }
 }
 
-class BankAccountAggregate @JsonCreator constructor(@JsonProperty("aggregateId") aggregateId: String) :
+class BankAccountAggregate
+@JsonCreator
+constructor(
+    @JsonProperty("aggregateId") aggregateId: String,
+) :
     AggregateRoot(aggregateId, AGGREGATE_TYPE) {
-
     private var email: String = ""
     private var userName: String = ""
     private var address: String = ""
@@ -178,33 +190,37 @@ class BankAccountAggregate @JsonCreator constructor(@JsonProperty("aggregateId")
 
     override fun whenCondition(eventEntity: AggregateEventEntity) {
         when (eventEntity.eventType) {
-            BankAccountCreatedAggregateEventBase.BANK_ACCOUNT_CREATED_V1 -> handle(
-                SerializerUtils.deserializeFromJsonBytes(
-                    eventEntity.data,
-                    BankAccountCreatedAggregateEventBase::class.java
+            BankAccountCreatedAggregateEventBase.BANK_ACCOUNT_CREATED_V1 ->
+                handle(
+                    SerializerUtils.deserializeFromJsonBytes(
+                        eventEntity.data,
+                        BankAccountCreatedAggregateEventBase::class.java,
+                    ),
                 )
-            )
 
-            EmailChangedAggregateEventBase.EMAIL_CHANGED_V1 -> handle(
-                SerializerUtils.deserializeFromJsonBytes(
-                    eventEntity.data,
-                    EmailChangedAggregateEventBase::class.java
+            EmailChangedAggregateEventBase.EMAIL_CHANGED_V1 ->
+                handle(
+                    SerializerUtils.deserializeFromJsonBytes(
+                        eventEntity.data,
+                        EmailChangedAggregateEventBase::class.java,
+                    ),
                 )
-            )
 
-            AddressUpdatedAggregateEventBase.ADDRESS_UPDATED_V1 -> handle(
-                SerializerUtils.deserializeFromJsonBytes(
-                    eventEntity.data,
-                    AddressUpdatedAggregateEventBase::class.java
+            AddressUpdatedAggregateEventBase.ADDRESS_UPDATED_V1 ->
+                handle(
+                    SerializerUtils.deserializeFromJsonBytes(
+                        eventEntity.data,
+                        AddressUpdatedAggregateEventBase::class.java,
+                    ),
                 )
-            )
 
-            BalanceDepositedAggregateEventBase.BALANCE_DEPOSITED_V1 -> handle(
-                SerializerUtils.deserializeFromJsonBytes(
-                    eventEntity.data,
-                    BalanceDepositedAggregateEventBase::class.java
+            BalanceDepositedAggregateEventBase.BALANCE_DEPOSITED_V1 ->
+                handle(
+                    SerializerUtils.deserializeFromJsonBytes(
+                        eventEntity.data,
+                        BalanceDepositedAggregateEventBase::class.java,
+                    ),
                 )
-            )
 
             BankAccountDeletedAggregateEventBase.BANK_ACCOUNT_DELETED_V1 -> Unit
 
@@ -289,7 +305,6 @@ class BankAccountDocument : ReactivePanacheMongoEntity() {
 
 @ApplicationScoped
 class BankAccountCreatedEventProjection : Projection {
-
     @WithSpan
     @Retry(maxRetries = 3, delay = 500)
     @Timeout(value = 5000)
@@ -297,7 +312,7 @@ class BankAccountCreatedEventProjection : Projection {
         Log.debugf(
             "(when) BankAccountCreatedAggregateEventBase: %s, aggregateID: %s",
             eventEntity,
-            eventEntity.aggregateId
+            eventEntity.aggregateId,
         )
 
         val event =
@@ -316,19 +331,17 @@ class BankAccountCreatedEventProjection : Projection {
                 Log.errorf(
                     ex,
                     "handle BankAccountCreatedEvent persist aggregateID: %s",
-                    event.aggregateId
+                    event.aggregateId,
                 )
             }
             .replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean =
-        eventType == BankAccountCreatedAggregateEventBase.BANK_ACCOUNT_CREATED_V1
+    override fun supports(eventType: String): Boolean = eventType == BankAccountCreatedAggregateEventBase.BANK_ACCOUNT_CREATED_V1
 }
 
 @ApplicationScoped
 class EmailChangedEventProjection : Projection {
-
     @WithSpan
     @Retry(maxRetries = 3, delay = 500)
     @Timeout(value = 5000)
@@ -336,7 +349,7 @@ class EmailChangedEventProjection : Projection {
         Log.debugf(
             "(when) EmailChangedAggregateEventBase: %s, aggregateID: %s",
             eventEntity,
-            eventEntity.aggregateId
+            eventEntity.aggregateId,
         )
 
         val event =
@@ -347,7 +360,7 @@ class EmailChangedEventProjection : Projection {
                 Log.errorf(
                     ex,
                     "handle EmailChangedAggregateEventBase findByAggregateId aggregateID: %s",
-                    event.aggregateId
+                    event.aggregateId,
                 )
             }
             .flatMap { bankAccountDocument ->
@@ -362,13 +375,13 @@ class EmailChangedEventProjection : Projection {
                 Log.errorf(
                     ex,
                     "handle EmailChangedAggregateEventBase update aggregateID: %s",
-                    event.aggregateId
+                    event.aggregateId,
                 )
             }
             .onItem().invoke { updatedDocument ->
                 Log.debugf(
                     "(EmailChangedAggregateEventBase) updatedDocument: %s",
-                    updatedDocument
+                    updatedDocument,
                 )
             }
             .replaceWithUnit()
@@ -379,7 +392,6 @@ class EmailChangedEventProjection : Projection {
 
 @ApplicationScoped
 class AddressUpdatedEventProjection : Projection {
-
     @WithSpan
     @Retry(maxRetries = 3, delay = 500)
     @Timeout(value = 5000)
@@ -387,7 +399,7 @@ class AddressUpdatedEventProjection : Projection {
         Log.debugf(
             "(when) AddressUpdatedAggregateEventBase: %s, aggregateID: %s",
             eventEntity,
-            eventEntity.aggregateId
+            eventEntity.aggregateId,
         )
 
         val event =
@@ -398,7 +410,7 @@ class AddressUpdatedEventProjection : Projection {
                 Log.errorf(
                     ex,
                     "handle AddressUpdatedAggregateEventBase findByAggregateId aggregateID: %s",
-                    event.aggregateId
+                    event.aggregateId,
                 )
             }
             .flatMap { bankAccountDocument ->
@@ -413,13 +425,13 @@ class AddressUpdatedEventProjection : Projection {
                 Log.errorf(
                     ex,
                     "handle AddressUpdatedAggregateEventBase update aggregateID: %s",
-                    event.aggregateId
+                    event.aggregateId,
                 )
             }
             .onItem().invoke { updatedDocument ->
                 Log.debugf(
                     "(AddressUpdatedAggregateEventBase) updatedDocument: %s",
-                    updatedDocument
+                    updatedDocument,
                 )
             }
             .replaceWithUnit()
@@ -430,7 +442,6 @@ class AddressUpdatedEventProjection : Projection {
 
 @ApplicationScoped
 class BalanceDepositedEventProjection : Projection {
-
     @WithSpan
     @Retry(maxRetries = 3, delay = 500)
     @Timeout(value = 5000)
@@ -438,7 +449,7 @@ class BalanceDepositedEventProjection : Projection {
         Log.debugf(
             "(when) BalanceDepositedAggregateEventBase: %s, aggregateID: %s",
             eventEntity,
-            eventEntity.aggregateId
+            eventEntity.aggregateId,
         )
 
         val event =
@@ -449,7 +460,7 @@ class BalanceDepositedEventProjection : Projection {
                 Log.errorf(
                     ex,
                     "handle BalanceDepositedAggregateEventBase findByAggregateId aggregateID: %s",
-                    event.aggregateId
+                    event.aggregateId,
                 )
             }
             .flatMap { bankAccountDocument ->
@@ -464,20 +475,19 @@ class BalanceDepositedEventProjection : Projection {
                 Log.errorf(
                     ex,
                     "handle BalanceDepositedAggregateEventBase update aggregateID: %s",
-                    event.aggregateId
+                    event.aggregateId,
                 )
             }
             .onItem().invoke { updatedDocument ->
                 Log.debugf(
                     "(BalanceDepositedAggregateEventBase) updatedDocument: %s",
-                    updatedDocument
+                    updatedDocument,
                 )
             }
             .replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean =
-        eventType == BalanceDepositedAggregateEventBase.BALANCE_DEPOSITED_V1
+    override fun supports(eventType: String): Boolean = eventType == BalanceDepositedAggregateEventBase.BALANCE_DEPOSITED_V1
 }
 
 @ApplicationScoped
@@ -486,7 +496,7 @@ class BankAccountDeletedEventProjection : Projection {
         Log.debugf(
             "(when) BankAccountDeletedAggregateEventBase: %s, aggregateID: %s",
             eventEntity,
-            eventEntity.aggregateId
+            eventEntity.aggregateId,
         )
 
         return BankAccountDocument.delete("aggregateId", eventEntity.aggregateId)
@@ -495,14 +505,13 @@ class BankAccountDeletedEventProjection : Projection {
                 Log.errorf(
                     ex,
                     "handle BankAccountDeletedEvent persist aggregateID: %s",
-                    eventEntity.aggregateId
+                    eventEntity.aggregateId,
                 )
             }
             .replaceWithUnit()
     }
 
-    override fun supports(eventType: String): Boolean =
-        eventType == BankAccountDeletedAggregateEventBase.BANK_ACCOUNT_DELETED_V1
+    override fun supports(eventType: String): Boolean = eventType == BankAccountDeletedAggregateEventBase.BANK_ACCOUNT_DELETED_V1
 }
 
 @ApplicationScoped
@@ -511,57 +520,55 @@ class BankCardDeletedEventProjection : Projection {
         Log.debugf(
             "(when) BankCardDeletedEventProjection: %s, aggregateID: %s",
             eventEntity,
-            eventEntity.aggregateId
+            eventEntity.aggregateId,
         )
 
         return Uni.createFrom().item(Unit)
     }
 
-    override fun supports(eventType: String): Boolean =
-        eventType == BankAccountDeletedAggregateEventBase.BANK_ACCOUNT_DELETED_V1
+    override fun supports(eventType: String): Boolean = eventType == BankAccountDeletedAggregateEventBase.BANK_ACCOUNT_DELETED_V1
 }
 
 data class CreateBankAccountRequestDTO(
     @field:Size(min = 10, max = 250) @field:NotBlank @field:Email @param:Email @param:NotBlank @param:Size(
         min = 10,
-        max = 250
+        max = 250,
     ) val email: String,
     @field:Size(min = 10, max = 250) @field:NotBlank @param:NotBlank @param:Size(
         min = 10,
-        max = 250
+        max = 250,
     ) val address: String,
     @field:Size(min = 10, max = 250) @field:NotBlank @param:NotBlank @param:Size(
         min = 10,
-        max = 250
-    ) val userName: String
+        max = 250,
+    ) val userName: String,
 )
 
 data class ChangeEmailRequestDTO(
     @field:Size(
         min = 10,
-        max = 250
-    ) @field:NotBlank @field:Email @param:Email @param:NotBlank @param:Size(min = 10, max = 250) val newEmail: String
+        max = 250,
+    ) @field:NotBlank @field:Email @param:Email @param:NotBlank @param:Size(min = 10, max = 250) val newEmail: String,
 )
 
 data class ChangeAddressRequestDTO(
     @field:Size(
         min = 10,
-        max = 250
-    ) @field:NotBlank @param:NotBlank @param:Size(min = 10, max = 250) val newAddress: String
+        max = 250,
+    ) @field:NotBlank @param:NotBlank @param:Size(min = 10, max = 250) val newAddress: String,
 )
 
 data class DepositAmountRequestDTO(
     @field:NotNull @field:Min(
         value = 300,
-        message = "minimal amount is 300"
-    ) @param:Min(value = 300, message = "minimal amount is 300") @param:NotNull val amount: BigDecimal
+        message = "minimal amount is 300",
+    ) @param:Min(value = 300, message = "minimal amount is 300") @param:NotNull val amount: BigDecimal,
 )
 
 @Path(value = "/api/v1/bank")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 class BankAccountResource(private val commandService: BankAccountCommandService) {
-
     @POST
     @WithSpan
     @Retry(maxRetries = 3, delay = 300)
@@ -593,10 +600,7 @@ class BankAccountResource(private val commandService: BankAccountCommandService)
     @Retry(maxRetries = 3, delay = 300)
     @Timeout(value = 5000)
     @CircuitBreaker(requestVolumeThreshold = 30, delay = 3000, failureRatio = 0.6)
-    fun changeAddress(
-        @PathParam("aggregateID") aggregateID: String,
-        @Valid dto: ChangeAddressRequestDTO
-    ): Uni<Response> {
+    fun changeAddress(@PathParam("aggregateID") aggregateID: String, @Valid dto: ChangeAddressRequestDTO): Uni<Response> {
         val command = ChangeAddressCommand(aggregateID, dto.newAddress)
         Log.debugf("ChangeAddressCommand: %s", command)
         return commandService.handle(command).map { Response.status(Response.Status.NO_CONTENT).build() }
@@ -608,10 +612,7 @@ class BankAccountResource(private val commandService: BankAccountCommandService)
     @Retry(maxRetries = 3, delay = 300)
     @Timeout(value = 5000)
     @CircuitBreaker(requestVolumeThreshold = 30, delay = 3000, failureRatio = 0.6)
-    fun depositAmount(
-        @PathParam("aggregateID") aggregateID: String,
-        @Valid dto: DepositAmountRequestDTO
-    ): Uni<Response> {
+    fun depositAmount(@PathParam("aggregateID") aggregateID: String, @Valid dto: DepositAmountRequestDTO): Uni<Response> {
         val command = DepositAmountCommand(aggregateID, dto.amount)
         Log.debugf("DepositAmountCommand: %s", command)
         return commandService.handle(command).map { Response.status(Response.Status.NO_CONTENT).build() }

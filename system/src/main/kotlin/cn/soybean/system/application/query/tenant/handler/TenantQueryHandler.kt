@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.query.tenant.handler
 
 import cn.soybean.domain.system.entity.SystemTenantEntity
@@ -20,13 +25,12 @@ fun SystemTenantEntity.toTenantResponse(): TenantResponse = TenantResponse(
     website = website,
     expireTime = expireTime,
     menuIds = menuIds,
-    operationIds = operationIds
+    operationIds = operationIds,
 )
 
 @ApplicationScoped
 class TenantQueryHandler(private val systemTenantRepository: SystemTenantRepository) : TenantQueryService {
-    override fun handle(query: TenantByNameQuery): Uni<SystemTenantEntity> =
-        systemTenantRepository.findByName(query.name)
+    override fun handle(query: TenantByNameQuery): Uni<SystemTenantEntity> = systemTenantRepository.findByName(query.name)
 
     override fun handle(query: PageTenantQuery): Uni<PageResult<TenantResponse>> {
         val (q, params, page) = query
@@ -38,11 +42,9 @@ class TenantQueryHandler(private val systemTenantRepository: SystemTenantReposit
         }
     }
 
-    override fun handle(query: TenantByNameExistsQuery): Uni<Boolean> =
-        systemTenantRepository.existsByName(query.name)
+    override fun handle(query: TenantByNameExistsQuery): Uni<Boolean> = systemTenantRepository.existsByName(query.name)
 
-    override fun handle(query: TenantByIdBuiltInQuery): Uni<Boolean> =
-        systemTenantRepository.getById(query.id).map { it.builtIn }
+    override fun handle(query: TenantByIdBuiltInQuery): Uni<Boolean> = systemTenantRepository.getById(query.id).map { it.builtIn }
 
     override fun handle(query: TenantByIdQuery): Uni<SystemTenantEntity> = systemTenantRepository.getById(query.id)
 }

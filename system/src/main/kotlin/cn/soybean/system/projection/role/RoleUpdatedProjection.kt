@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.projection.role
 
 import cn.soybean.domain.system.event.role.RoleCreatedOrUpdatedEventBase
@@ -12,7 +17,6 @@ import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
 class RoleUpdatedProjection(private val roleRepository: SystemRoleRepository) : Projection {
-
     @WithTransaction
     override fun process(eventEntity: AggregateEventEntity): Uni<Unit> {
         val event =
@@ -40,4 +44,3 @@ class RoleUpdatedProjection(private val roleRepository: SystemRoleRepository) : 
 
     override fun supports(eventType: String): Boolean = eventType == RoleCreatedOrUpdatedEventBase.ROLE_UPDATED_V1
 }
-

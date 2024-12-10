@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.infrastructure.persistence.repository
 
 import cn.soybean.domain.system.entity.SystemRoleMenuEntity
@@ -12,15 +17,13 @@ class SystemRoleMenuRepositoryImpl : SystemRoleMenuRepository, PanacheRepository
     override fun delById(roleId: String, menuId: String, tenantId: String): Uni<Long> =
         delete("roleId = ?1 and menuId = ?2 and tenantId = ?3", roleId, menuId, tenantId)
 
-    override fun delByMenuId(menuId: String, tenantId: String): Uni<Long> =
-        delete("menuId = ?1 and tenantId = ?2", menuId, tenantId)
+    override fun delByMenuId(menuId: String, tenantId: String): Uni<Long> = delete("menuId = ?1 and tenantId = ?2", menuId, tenantId)
 
-    override fun delByRoleId(roleId: String, tenantId: String): Uni<Long> =
-        delete("roleId = ?1 and tenantId = ?2", roleId, tenantId)
+    override fun delByRoleId(roleId: String, tenantId: String): Uni<Long> = delete("roleId = ?1 and tenantId = ?2", roleId, tenantId)
 
     override fun saveOrUpdate(roleMenu: SystemRoleMenuEntity): Uni<SystemRoleMenuEntity> = persist(roleMenu)
-    override fun saveOrUpdateAll(roleMenus: List<SystemRoleMenuEntity>): Uni<Unit> =
-        persist(roleMenus).replaceWithUnit()
+
+    override fun saveOrUpdateAll(roleMenus: List<SystemRoleMenuEntity>): Uni<Unit> = persist(roleMenus).replaceWithUnit()
 
     override fun findMenuIds(tenantId: String, roleCode: String): Uni<List<SystemRoleMenuEntity>> = list(
         """
@@ -31,7 +34,7 @@ class SystemRoleMenuRepositoryImpl : SystemRoleMenuRepository, PanacheRepository
                   AND r.code = ?2
                 """,
         tenantId,
-        roleCode
+        roleCode,
     )
 
     override fun removeMenusByTenantId(tenantId: String, menuIds: Set<String>): Uni<Long> =

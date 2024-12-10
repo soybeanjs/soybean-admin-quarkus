@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.infrastructure.persistence
 
 import io.quarkus.panache.common.Parameters
@@ -25,8 +30,7 @@ class QueryBuilder(tenantId: String) {
         return this
     }
 
-    fun addLikeCondition(field: String, value: String?): QueryBuilder =
-        addCondition(field, value?.let { "%$it%" }, "LIKE")
+    fun addLikeCondition(field: String, value: String?): QueryBuilder = addCondition(field, value?.let { "%$it%" }, "LIKE")
 
     fun addCompositeCondition(composite: () -> QueryBuilder, prefix: String = "AND"): QueryBuilder {
         val builder = composite()

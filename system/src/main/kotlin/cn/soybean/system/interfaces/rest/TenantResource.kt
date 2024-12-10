@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.interfaces.rest
 
 import cn.soybean.infrastructure.config.consts.AppConstants
@@ -43,9 +48,8 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag
 class TenantResource(
     private val tenantQueryService: TenantQueryService,
     private val tenantService: TenantService,
-    private val loginHelper: LoginHelper
+    private val loginHelper: LoginHelper,
 ) {
-
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}tenant.list")
     @GET
     @WithSession
@@ -71,25 +75,27 @@ class TenantResource(
     @POST
     @WithTransaction
     @Operation(summary = "创建租户", description = "创建租户信息")
-    fun createTenant(@Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: TenantRequest): Uni<ResponseEntity<Boolean>> =
-        tenantService.createTenant(req.toCreateTenantCommand()).map { (isSuccess, message) ->
-            when {
-                isSuccess -> ResponseEntity.ok(true)
-                else -> ResponseEntity.fail(message, false)
-            }
+    fun createTenant(
+        @Valid @ConvertGroup(to = ValidationGroups.OnCreate::class) @NotNull req: TenantRequest,
+    ): Uni<ResponseEntity<Boolean>> = tenantService.createTenant(req.toCreateTenantCommand()).map { (isSuccess, message) ->
+        when {
+            isSuccess -> ResponseEntity.ok(true)
+            else -> ResponseEntity.fail(message, false)
         }
+    }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}tenant.update")
     @PUT
     @WithTransaction
     @Operation(summary = "更新租户", description = "更新租户信息")
-    fun updateTenant(@Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: TenantRequest): Uni<ResponseEntity<Boolean>> =
-        tenantService.updateTenant(req.toUpdateTenantCommand()).map { (isSuccess, message) ->
-            when {
-                isSuccess -> ResponseEntity.ok(true)
-                else -> ResponseEntity.fail(message, false)
-            }
+    fun updateTenant(
+        @Valid @ConvertGroup(to = ValidationGroups.OnUpdate::class) @NotNull req: TenantRequest,
+    ): Uni<ResponseEntity<Boolean>> = tenantService.updateTenant(req.toUpdateTenantCommand()).map { (isSuccess, message) ->
+        when {
+            isSuccess -> ResponseEntity.ok(true)
+            else -> ResponseEntity.fail(message, false)
         }
+    }
 
     @PermissionsAllowed("${AppConstants.APP_PERM_ACTION_PREFIX}tenant.delete")
     @DELETE

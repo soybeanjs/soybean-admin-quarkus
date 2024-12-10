@@ -1,11 +1,16 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.eventsourcing.entity
 
 import cn.soybean.domain.aggregate.AggregateConstants
 import io.quarkus.mongodb.panache.common.MongoEntity
 import io.quarkus.mongodb.panache.kotlin.reactive.ReactivePanacheMongoCompanion
 import io.quarkus.mongodb.panache.kotlin.reactive.ReactivePanacheMongoEntity
-import org.bson.codecs.pojo.annotations.BsonProperty
 import java.time.LocalDateTime
+import org.bson.codecs.pojo.annotations.BsonProperty
 
 @MongoEntity(collection = AggregateConstants.SNAPSHOT)
 class SnapshotEntity : ReactivePanacheMongoEntity() {

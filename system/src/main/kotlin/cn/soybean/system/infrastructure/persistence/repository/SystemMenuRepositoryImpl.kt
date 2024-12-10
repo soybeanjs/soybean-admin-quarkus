@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.infrastructure.persistence.repository
 
 import cn.soybean.domain.system.entity.SystemMenuEntity
@@ -20,7 +25,7 @@ class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<Sys
                     where ur.userId = ?1 and m.status = ?2
                 """,
         userId,
-        DbEnums.Status.ENABLED
+        DbEnums.Status.ENABLED,
     )
 
     override fun allByTenantId(tenantId: String): Uni<List<SystemMenuEntity>> =
@@ -33,9 +38,13 @@ class SystemMenuRepositoryImpl : SystemMenuRepository, PanacheRepositoryBase<Sys
         }
 
     override fun saveOrUpdate(entity: SystemMenuEntity): Uni<SystemMenuEntity> = persist(entity)
+
     override fun getById(id: String): Uni<SystemMenuEntity> = findById(id)
+
     override fun delById(id: String): Uni<Boolean> = deleteById(id)
+
     override fun findAllByConstant(constant: Boolean): Uni<List<SystemMenuEntity>> = list("constant", constant)
+
     override fun allByTenantIdAndConstant(tenantId: String, constant: Boolean): Uni<List<SystemMenuEntity>> =
         SystemTenantEntity.getTenantMenuIds(tenantId).flatMap { menuIds ->
             if (menuIds.isEmpty()) {

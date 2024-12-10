@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.infrastructure.web
 
 import cn.soybean.system.infrastructure.web.helper.generateOperationId
@@ -8,10 +13,10 @@ import jakarta.ws.rs.container.DynamicFeature
 import jakarta.ws.rs.container.ResourceInfo
 import jakarta.ws.rs.core.FeatureContext
 import jakarta.ws.rs.ext.Provider
-import org.eclipse.microprofile.openapi.annotations.Operation
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.kotlinFunction
+import org.eclipse.microprofile.openapi.annotations.Operation
 
 @Provider
 class ApiEndpointDynamicFeature : DynamicFeature {
@@ -28,9 +33,10 @@ class ApiEndpointDynamicFeature : DynamicFeature {
         val fullPath =
             if (classPath.isNotEmpty() && methodPath.isNotEmpty()) "$classPath$methodPath" else classPath + methodPath
 
-        val httpMethod = resourceMethod?.javaMethod?.declaredAnnotations?.find { annotation ->
-            annotation.annotationClass.annotations.any { it is HttpMethod }
-        }?.annotationClass?.simpleName
+        val httpMethod =
+            resourceMethod?.javaMethod?.declaredAnnotations?.find { annotation ->
+                annotation.annotationClass.annotations.any { it is HttpMethod }
+            }?.annotationClass?.simpleName
 
         val operationAnnotation = resourceMethod?.findAnnotation<Operation>()
         val summary = operationAnnotation?.summary
@@ -41,15 +47,16 @@ class ApiEndpointDynamicFeature : DynamicFeature {
         val permissionsAllowedInclusive = permissionsAllowedAnnotation?.inclusive
 
         if (fullPath.isNotEmpty() && httpMethod != null) {
-            val apiEndpoint = ApiEndpoint(
-                path = fullPath,
-                httpMethod = httpMethod,
-                summary = summary,
-                description = description,
-                permissions = permissionsAllowedValue,
-                inclusive = permissionsAllowedInclusive,
-                operationId = generateOperationId(httpMethod, fullPath)
-            )
+            val apiEndpoint =
+                ApiEndpoint(
+                    path = fullPath,
+                    httpMethod = httpMethod,
+                    summary = summary,
+                    description = description,
+                    permissions = permissionsAllowedValue,
+                    inclusive = permissionsAllowedInclusive,
+                    operationId = generateOperationId(httpMethod, fullPath),
+                )
             apiEndpoints.add(apiEndpoint)
         }
     }

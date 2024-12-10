@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.infrastructure.security
 
 import jakarta.enterprise.context.RequestScoped
@@ -7,7 +12,6 @@ import org.eclipse.microprofile.jwt.Claims
 
 @RequestScoped
 class LoginHelper {
-
     @Inject
     @Claim(standard = Claims.sub)
     private lateinit var subject: String

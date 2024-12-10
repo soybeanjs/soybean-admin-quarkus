@@ -1,3 +1,8 @@
+/*
+ * Copyright 2024 Soybean Admin Backend
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ */
 package cn.soybean.system.application.command.user.handler
 
 import cn.soybean.domain.system.aggregate.user.UserAggregate
@@ -22,8 +27,8 @@ class CreateUserCommandHandler(private val eventStoreDB: EventStoreDB, private v
                 aggregate.aggregateId,
                 loginHelper.getTenantId(),
                 loginHelper.getUserId(),
-                loginHelper.getAccountName()
-            )
+                loginHelper.getAccountName(),
+            ),
         )
         return eventStoreDB.save(aggregate).replaceWith(true)
             .onFailure().invoke { ex -> Log.errorf(ex, "CreateUserCommandHandler fail") }
