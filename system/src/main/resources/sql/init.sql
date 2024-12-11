@@ -95,6 +95,15 @@ VALUES ('65', 'built-in', '-1', '2024-01-01 00:00:00.000000', null, null, null, 
         'view.manage_user-detail', false, true, null, 'route.manage_user-detail', null, '1', false,
         'manage_user-detail', 1, false, 3, '54', null, 'manage_user-detail', '/manage/user-detail/:id', 0)
 ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_menu (id, create_account_name, create_by, create_time, update_account_name, update_by,
+                      update_time, active_menu, built_in, component, constant, hide_in_menu, href, i18n_key,
+                      icon,
+                      icon_type, keep_alive, menu_name, menu_type, multi_tab, sequence, parent_id, roles,
+                      route_name, route_path, status)
+VALUES ('66', 'built-in', '-1', '2024-01-01 00:00:00.000000', null, null, null, null, true, 'view.manage_tenant', false,
+        false, null, 'route.manage_tenant', 'arcticons:tenantcloud-pro', '1', false, 'manage_tenant', 1, false, 1, '54', null,
+        'manage_tenant', '/manage/tenant', 0)
+ON CONFLICT (id) DO NOTHING;
 
 -- sys_role
 INSERT INTO sys_role (id, create_account_name, create_by, create_time, update_account_name, update_by,

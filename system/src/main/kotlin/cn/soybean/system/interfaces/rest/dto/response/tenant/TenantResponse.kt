@@ -9,6 +9,7 @@ import cn.soybean.domain.system.enums.DbEnums
 import java.time.LocalDateTime
 
 data class TenantResponse(
+    val id: String,
     val name: String?,
     var contactAccountName: String?,
     var status: DbEnums.Status,

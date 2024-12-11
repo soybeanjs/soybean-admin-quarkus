@@ -20,6 +20,7 @@ import jakarta.enterprise.context.ApplicationScoped
 
 fun SystemTenantEntity.toTenantResponse(): TenantResponse =
     TenantResponse(
+        id = id,
         name = name,
         contactAccountName = contactAccountName,
         status = status,
