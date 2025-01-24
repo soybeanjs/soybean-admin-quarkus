@@ -17,13 +17,13 @@ plugins {
 val javaVersion = JavaVersion.VERSION_21
 
 val jacksonModuleKotlinVersion = "2.18.2"
-val redissonQuarkus30Version = "3.39.0"
+val redissonQuarkus30Version = "3.43.0"
 val konvertVersion = "4.0.1"
-val mutinyReactorVersion = "2.7.0-RC3"
+val mutinyReactorVersion = "2.8.0"
 val idgeneratorVersion = "1.0.6"
 val jnrUnixsocketVersion = "0.38.23"
 val ip2regionVersion = "2.7.0"
-val msgpackVersion = "0.9.8"
+val msgpackVersion = "0.9.9"
 
 dependencies {
     implementation("jakarta.persistence:jakarta.persistence-api")
@@ -85,7 +85,7 @@ dependencies {
     implementation("org.apache.camel.quarkus:camel-quarkus-reactive-streams")
     implementation("org.apache.camel.quarkus:camel-quarkus-direct")
     implementation("org.apache.camel.quarkus:camel-quarkus-yaml-dsl")
-    implementation("org.apache.camel.quarkus:camel-quarkus-kotlin-dsl")
+    implementation("org.apache.camel.quarkus:camel-quarkus-kotlin-dsl:3.16.0")
     implementation("org.apache.camel.quarkus:camel-quarkus-bean")
     implementation("org.apache.camel.quarkus:camel-quarkus-rest")
     implementation("org.apache.camel.quarkus:camel-quarkus-platform-http")
@@ -192,7 +192,7 @@ tasks.withType<KotlinCompile>().configureEach {
          * 暂时降级处理
          */
         apiVersion = KotlinVersion.KOTLIN_1_9
-        languageVersion = KotlinVersion.KOTLIN_2_0
+        languageVersion = KotlinVersion.KOTLIN_2_1
 
         jvmTarget = JvmTarget.JVM_21
         // w: Scripts are not yet supported with K2 in LightTree mode, consider using K1 or disable LightTree mode with -Xuse-fir-lt=false

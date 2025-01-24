@@ -32,8 +32,8 @@ java {
 
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
-        apiVersion = KotlinVersion.KOTLIN_1_9
-        languageVersion = KotlinVersion.KOTLIN_2_0
+        apiVersion = KotlinVersion.KOTLIN_2_1
+        languageVersion = KotlinVersion.KOTLIN_2_1
 
         jvmTarget = JvmTarget.JVM_21
         // w: Scripts are not yet supported with K2 in LightTree mode, consider using K1 or disable LightTree mode with -Xuse-fir-lt=false
